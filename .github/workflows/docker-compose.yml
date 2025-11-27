@@ -1,0 +1,48 @@
+name: Docker Compose CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docker-compose.yml"
+      - "docker/**"
+      - ".github/workflows/docker-compose.yml"
+
+jobs:
+  test-compose:
+    name: Test Docker Compose
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create .env file
+        run: |
+          cp .env.template .env
+          echo "POSTGRES_PASSWORD=test_password" >> .env
+          echo "JWT_SECRET=YourSuperSecretKeyThatIsAtLeast32CharactersLong123456789" >> .env
+
+      - name: Build services
+        run: docker-compose build
+
+      - name: Start services
+        run: docker-compose up -d
+
+      - name: Wait for services
+        run: |
+          sleep 30
+          docker-compose ps
+
+      - name: Check service health
+        run: |
+          docker-compose ps
+          curl -f http://localhost:5001/health || exit 1
+
+      - name: View logs
+        if: failure()
+        run: docker-compose logs
+
+      - name: Stop services
+        if: always()
+        run: docker-compose down -v

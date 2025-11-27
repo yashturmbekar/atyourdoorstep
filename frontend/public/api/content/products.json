@@ -1,0 +1,273 @@
+{
+  "products": [
+    {
+      "id": "alphonso_mangoes",
+      "name": "Ratnagiri Alphonso Mangoes",
+      "category": "Fresh Fruits",
+      "brand": "AtYourDoorStep",
+      "description": "Authentic king of mangoes from Ratnagiri with unmatched sweetness and aroma. Hand-picked from GI-tagged orchards, naturally ripened without any chemicals.",
+      "detailed_description": "Our Alphonso mangoes come from the red laterite soil of Ratnagiri, where the clean air and optimal climate create the perfect conditions for growing the world's finest mangoes. Each mango is hand-picked at the right time and allowed to ripen naturally under the sun, ensuring the authentic taste and aroma that makes Alphonso the king of mangoes.",
+      "origin": {
+        "location": "Ratnagiri, Maharashtra, India",
+        "soil_type": "Red laterite soil",
+        "climate": "Coastal tropical climate",
+        "certification": "GI-tagged (Geographical Indication)"
+      },
+      "characteristics": [
+        "Unmatched sweetness and aroma",
+        "Bright saffron color when ripe",
+        "Smooth, creamy texture",
+        "Rich flavor profile",
+        "High nutritional value"
+      ],
+      "quality_features": [
+        "No carbide ripening",
+        "Naturally sun-dried",
+        "Hand-picked selection",
+        "Chemical-free cultivation",
+        "Direct from orchards"
+      ],
+      "season": {
+        "availability": "March to June",
+        "peak_season": "April to May",
+        "harvest_method": "Hand-picked when optimally mature"
+      },
+      "nutritional_benefits": [
+        "Rich in Vitamin C",
+        "High in Vitamin A",
+        "Good source of fiber",
+        "Contains antioxidants",
+        "Natural energy source"
+      ],
+      "varieties": [
+        {
+          "name": "Premium Grade A",
+          "description": "Large sized, perfectly ripe mangoes",
+          "weight_range": "200-300g per piece"
+        },
+        {
+          "name": "Grade A",
+          "description": "Medium to large sized mangoes",
+          "weight_range": "150-250g per piece"
+        }
+      ],
+      "packaging": [
+        "Eco-friendly packaging",
+        "Protective cushioning",
+        "Ventilated boxes",
+        "Temperature controlled shipping"
+      ],
+      "storage_instructions": [
+        "Store at room temperature for ripening",
+        "Refrigerate once ripe",
+        "Consume within 3-5 days of ripening",
+        "Handle with care to prevent bruising"
+      ],
+      "experience": "4 years of mango sourcing expertise",
+      "sustainability": [
+        "Direct farmer partnerships",
+        "Sustainable farming practices",
+        "Minimal packaging waste",
+        "Carbon-conscious delivery"
+      ]
+    },
+    {
+      "id": "cold_pressed_oils",
+      "name": "Pure Cold-Pressed Oils",
+      "category": "Cooking Oils",
+      "brand": "AtYourDoorStep",
+      "description": "100% pure, unrefined cold-pressed oils extracted using traditional wooden ghani method. No heat, no chemicals, nutrients completely intact.",
+      "detailed_description": "Our cold-pressed oils are extracted in a controlled hygienic environment using the traditional wooden ghani method that has been used for centuries. This process ensures that no heat is generated during extraction, preserving all the natural nutrients, flavors, and therapeutic properties of the oils.",
+      "extraction_method": {
+        "technique": "Traditional wooden ghani cold-pressing",
+        "temperature": "Below 40°C (cold extraction)",
+        "process": "Single extraction without heat or chemicals",
+        "facility": "Dedicated controlled hygienic unit"
+      },
+      "varieties": [
+        {
+          "name": "Coconut Oil",
+          "description": "Pure cold-pressed coconut oil with natural aroma",
+          "benefits": [
+            "Rich in medium-chain fatty acids",
+            "Natural antimicrobial properties",
+            "Good for cooking and skincare",
+            "High smoke point for cooking"
+          ],
+          "extraction_source": "Fresh coconut meat"
+        },
+        {
+          "name": "Sesame Oil",
+          "description": "Traditional cold-pressed sesame oil",
+          "benefits": [
+            "Rich in antioxidants",
+            "Good for heart health",
+            "Natural preservative properties",
+            "Traditional Ayurvedic uses"
+          ],
+          "extraction_source": "Premium sesame seeds"
+        },
+        {
+          "name": "Groundnut Oil",
+          "description": "Pure cold-pressed groundnut (peanut) oil",
+          "benefits": [
+            "High in monounsaturated fats",
+            "Good for high-temperature cooking",
+            "Rich in Vitamin E",
+            "Natural nutty flavor"
+          ],
+          "extraction_source": "Quality groundnuts/peanuts"
+        },
+        {
+          "name": "Mustard Oil",
+          "description": "Traditional cold-pressed mustard oil",
+          "benefits": [
+            "Rich in omega-3 fatty acids",
+            "Natural preservative properties",
+            "Good for traditional cooking",
+            "Therapeutic properties"
+          ],
+          "extraction_source": "Pure mustard seeds"
+        }
+      ],
+      "quality_features": [
+        "Single cold extraction",
+        "No heat treatment",
+        "No chemical processing",
+        "No artificial additives",
+        "Retains natural nutrients"
+      ],
+      "nutritional_preservation": [
+        "Essential fatty acids intact",
+        "Natural antioxidants preserved",
+        "Vitamins and minerals retained",
+        "Natural flavor compounds maintained"
+      ],
+      "production_since": "2021",
+      "storage_instructions": [
+        "Store in cool, dry place",
+        "Keep away from direct sunlight",
+        "Use airtight containers",
+        "Best consumed within 6-12 months"
+      ],
+      "certifications": [
+        "Chemical-free processing",
+        "Hygienic production standards",
+        "Quality tested"
+      ]
+    },
+    {
+      "id": "organic_jaggery",
+      "name": "Organic Jaggery",
+      "category": "Natural Sweeteners",
+      "brand": "AtYourDoorStep",
+      "description": "Pure organic jaggery made using traditional iron pan boiling method over firewood. Rich in minerals, completely chemical-free natural sweetener.",
+      "detailed_description": "Our jaggery is produced using traditional methods that have been perfected over 30+ years. Made by boiling fresh sugarcane juice in iron pans over firewood, this age-old process creates a pure, mineral-rich sweetener that retains all the natural goodness of sugarcane.",
+      "production_process": {
+        "method": "Traditional iron pan boiling over firewood",
+        "location": "Near sugarcane farms for freshness",
+        "experience": "30+ years in jaggery production",
+        "process_steps": [
+          "Fresh sugarcane juice extraction",
+          "Natural filtration",
+          "Slow boiling in iron pans",
+          "Firewood heating (no gas/electric)",
+          "Natural cooling and setting"
+        ]
+      },
+      "varieties": [
+        {
+          "name": "Pure Jaggery Blocks",
+          "description": "Traditional solid jaggery blocks",
+          "texture": "Firm, easy to store",
+          "usage": "Cooking, direct consumption, sweets preparation",
+          "shelf_life": "12-18 months"
+        },
+        {
+          "name": "Jaggery Powder",
+          "description": "Finely powdered jaggery for easy use",
+          "texture": "Fine powder form",
+          "usage": "Instant mixing, baking, beverages",
+          "shelf_life": "10-12 months"
+        }
+      ],
+      "nutritional_benefits": [
+        "Rich in iron",
+        "Contains potassium",
+        "Good source of magnesium",
+        "Natural source of antioxidants",
+        "Provides quick energy",
+        "Aids digestion"
+      ],
+      "quality_features": [
+        "100% chemical-free",
+        "No artificial additives",
+        "No synthetic processing",
+        "Rich mineral content",
+        "Traditional processing methods"
+      ],
+      "health_benefits": [
+        "Natural blood purifier",
+        "Boosts immunity",
+        "Good for anemia",
+        "Aids in digestion",
+        "Natural detoxifier",
+        "Provides sustained energy"
+      ],
+      "usage_applications": [
+        "Direct consumption",
+        "Cooking and baking",
+        "Traditional sweets preparation",
+        "Tea and coffee sweetening",
+        "Ayurvedic preparations",
+        "Festival cooking"
+      ],
+      "sustainability": [
+        "Direct farmer sourcing",
+        "Traditional eco-friendly methods",
+        "Minimal processing",
+        "Local community support"
+      ],
+      "storage_instructions": [
+        "Store in airtight containers",
+        "Keep in cool, dry place",
+        "Protect from moisture",
+        "Avoid direct sunlight"
+      ]
+    }
+  ],
+  "product_categories": [
+    {
+      "name": "Fresh Fruits",
+      "description": "Premium seasonal fruits directly from farms",
+      "products": ["Alphonso Mangoes"]
+    },
+    {
+      "name": "Cooking Oils",
+      "description": "Pure cold-pressed oils using traditional methods",
+      "products": ["Coconut Oil", "Sesame Oil", "Groundnut Oil", "Mustard Oil"]
+    },
+    {
+      "name": "Natural Sweeteners",
+      "description": "Organic and traditional sweeteners",
+      "products": ["Organic Jaggery", "Jaggery Powder"]
+    }
+  ],
+  "quality_standards": {
+    "chemical_free": "100% chemical-free processing across all products",
+    "traditional_methods": "Using time-tested traditional processing techniques",
+    "direct_sourcing": "Direct sourcing from farms and production units",
+    "quality_testing": "Rigorous quality checks at every stage",
+    "hygienic_processing": "Controlled hygienic production environments"
+  },
+  "availability": {
+    "mango_season": "March to June (seasonal)",
+    "oils_and_jaggery": "Year-round availability",
+    "delivery_areas": "Pan India delivery",
+    "order_processing": "Fresh preparation for each order"
+  },
+  "last_updated": "2025-08-26",
+  "content_type": "product_catalog",
+  "total_products": 3,
+  "total_varieties": 7
+}

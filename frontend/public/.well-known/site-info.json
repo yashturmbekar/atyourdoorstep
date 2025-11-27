@@ -1,0 +1,34 @@
+{
+  "website": "https://atyourdoorstep.shop",
+  "name": "AtYourDoorStep",
+  "description": "Premium doorstep delivery of authentic Indian natural products",
+  "contact": {
+    "email": "info@atyourdoorstep.shop",
+    "website": "https://atyourdoorstep.shop",
+    "social": {
+      "facebook": "https://www.facebook.com/profile.php?id=100074808451374",
+      "instagram": "https://www.instagram.com/gopro.baba/",
+      "twitter": "https://x.com/goprobaba",
+      "linkedin": "https://www.linkedin.com/in/yashturmbekar"
+    }
+  },
+  "content_apis": {
+    "all_content": "https://atyourdoorstep.shop/api/content/all.json",
+    "products": "https://atyourdoorstep.shop/api/content/products.json",
+    "about": "https://atyourdoorstep.shop/api/content/about.json",
+    "services": "https://atyourdoorstep.shop/api/content/services.json",
+    "testimonials": "https://atyourdoorstep.shop/api/content/testimonials.json",
+    "metadata": "https://atyourdoorstep.shop/api/metadata.json"
+  },
+  "sitemaps": {
+    "main": "https://atyourdoorstep.shop/sitemap.xml",
+    "content": "https://atyourdoorstep.shop/content-sitemap.xml"
+  },
+  "crawling": {
+    "robots_txt": "https://atyourdoorstep.shop/robots.txt",
+    "rag_optimized": true,
+    "structured_data": true,
+    "json_apis": true
+  },
+  "last_updated": "2025-08-26"
+}

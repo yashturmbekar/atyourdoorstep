@@ -1,0 +1,225 @@
+{
+  "website_metadata": {
+    "name": "AtYourDoorStep",
+    "url": "https://atyourdoorstep.shop",
+    "type": "E-commerce Food Delivery Platform",
+    "description": "Premium doorstep delivery service for authentic Ratnagiri Alphonso mangoes, pure cold-pressed oils, and organic jaggery from trusted Indian farmers",
+    "industry": "Food & Beverages, E-commerce, Traditional Indian Foods",
+    "established": "2024",
+    "location": "Maharashtra, India",
+    "service_area": "Pan India",
+    "languages": ["English", "Hindi"],
+    "currency": "INR",
+    "content_last_updated": "2025-08-26",
+    "crawling_optimized": true,
+    "rag_friendly": true
+  },
+  "content_structure": {
+    "main_sections": [
+      {
+        "section": "Homepage",
+        "url": "https://atyourdoorstep.shop/",
+        "content_type": "landing_page",
+        "priority": "highest",
+        "includes": [
+          "hero",
+          "about_summary",
+          "products",
+          "services",
+          "testimonials",
+          "contact"
+        ]
+      },
+      {
+        "section": "About Company",
+        "url": "https://atyourdoorstep.shop/#about",
+        "content_type": "company_information",
+        "priority": "high",
+        "includes": [
+          "company_story",
+          "facilities",
+          "experience",
+          "values",
+          "statistics"
+        ]
+      },
+      {
+        "section": "Products",
+        "url": "https://atyourdoorstep.shop/#products",
+        "content_type": "product_catalog",
+        "priority": "highest",
+        "includes": ["alphonso_mangoes", "cold_pressed_oils", "organic_jaggery"]
+      },
+      {
+        "section": "Services",
+        "url": "https://atyourdoorstep.shop/#services",
+        "content_type": "service_information",
+        "priority": "high",
+        "includes": [
+          "delivery_services",
+          "quality_assurance",
+          "customer_support"
+        ]
+      },
+      {
+        "section": "Customer Testimonials",
+        "url": "https://atyourdoorstep.shop/#testimonials",
+        "content_type": "social_proof",
+        "priority": "medium",
+        "includes": [
+          "customer_reviews",
+          "satisfaction_metrics",
+          "geographic_reach"
+        ]
+      },
+      {
+        "section": "Contact Information",
+        "url": "https://atyourdoorstep.shop/#contact",
+        "content_type": "contact_details",
+        "priority": "medium",
+        "includes": ["contact_form", "social_media", "business_hours"]
+      }
+    ],
+    "api_endpoints": [
+      {
+        "endpoint": "/api/content/all.json",
+        "description": "Complete business information in structured format",
+        "content_type": "application/json",
+        "purpose": "comprehensive_business_data",
+        "update_frequency": "weekly"
+      },
+      {
+        "endpoint": "/api/content/products.json",
+        "description": "Detailed product catalog with specifications",
+        "content_type": "application/json",
+        "purpose": "product_information",
+        "update_frequency": "weekly"
+      },
+      {
+        "endpoint": "/api/content/about.json",
+        "description": "Company history, facilities, and values",
+        "content_type": "application/json",
+        "purpose": "company_information",
+        "update_frequency": "monthly"
+      },
+      {
+        "endpoint": "/api/content/services.json",
+        "description": "Service offerings and delivery information",
+        "content_type": "application/json",
+        "purpose": "service_information",
+        "update_frequency": "monthly"
+      },
+      {
+        "endpoint": "/api/content/testimonials.json",
+        "description": "Customer reviews and satisfaction metrics",
+        "content_type": "application/json",
+        "purpose": "customer_feedback",
+        "update_frequency": "weekly"
+      }
+    ]
+  },
+  "business_entity": {
+    "legal_name": "AtYourDoorStep",
+    "business_type": "Family-run Indian Business",
+    "industry_classification": [
+      "Food Processing",
+      "E-commerce",
+      "Doorstep Delivery",
+      "Traditional Indian Foods",
+      "Organic Products"
+    ],
+    "specializations": [
+      "Ratnagiri Alphonso Mangoes",
+      "Cold-Pressed Oils",
+      "Organic Jaggery",
+      "Chemical-free Processing",
+      "Traditional Methods"
+    ],
+    "value_propositions": [
+      "100% Chemical-free products",
+      "30+ years experience",
+      "Direct farm sourcing",
+      "Traditional processing methods",
+      "Pan India delivery",
+      "No middlemen policy"
+    ]
+  },
+  "technical_specifications": {
+    "website_technology": "React with TypeScript",
+    "hosting": "Vite-based single page application",
+    "seo_optimizations": [
+      "Structured data markup",
+      "Meta tags optimization",
+      "Semantic HTML",
+      "Content APIs",
+      "Sitemap generation",
+      "Schema.org markup"
+    ],
+    "crawl_accessibility": [
+      "Robots.txt optimization",
+      "JSON content APIs",
+      "Semantic markup",
+      "Structured data",
+      "Multiple sitemaps",
+      "RAG-friendly formatting"
+    ]
+  },
+  "content_themes": {
+    "primary_keywords": [
+      "Alphonso mangoes",
+      "Ratnagiri mangoes",
+      "cold-pressed oils",
+      "organic jaggery",
+      "doorstep delivery",
+      "chemical-free products",
+      "traditional processing",
+      "Indian natural products"
+    ],
+    "content_categories": [
+      "Product information",
+      "Company history",
+      "Traditional processing methods",
+      "Quality assurance",
+      "Customer testimonials",
+      "Delivery services",
+      "Health benefits",
+      "Sustainability practices"
+    ],
+    "target_audience": [
+      "Health-conscious consumers",
+      "Quality food enthusiasts",
+      "Traditional food lovers",
+      "Busy professionals",
+      "Families seeking authentic products",
+      "Gift purchasers"
+    ]
+  },
+  "crawling_instructions": {
+    "recommended_crawl_paths": [
+      "/",
+      "/api/content/all.json",
+      "/api/content/products.json",
+      "/api/content/about.json",
+      "/api/content/services.json",
+      "/api/content/testimonials.json"
+    ],
+    "content_priority": {
+      "highest": ["homepage", "product_catalog", "structured_apis"],
+      "high": ["about_company", "services"],
+      "medium": ["testimonials", "contact"]
+    },
+    "update_schedule": {
+      "daily": ["homepage_content"],
+      "weekly": ["product_information", "testimonials", "structured_apis"],
+      "monthly": ["company_information", "service_details"]
+    },
+    "crawl_friendly_features": [
+      "JSON APIs for structured data",
+      "Semantic HTML markup",
+      "Schema.org structured data",
+      "Multiple sitemap files",
+      "Meta tag optimization",
+      "Content categorization"
+    ]
+  }
+}

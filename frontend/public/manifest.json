@@ -1,0 +1,55 @@
+{
+  "name": "AtYourDoorStep - Premium Natural Products Delivery",
+  "short_name": "AtYourDoorStep",
+  "description": "Premium doorstep delivery of authentic Ratnagiri Alphonso mangoes, pure cold-pressed oils, and organic jaggery from trusted Indian farmers.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#FF6B35",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en-IN",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/images/AtYourDoorStep.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/images/AtYourDoorStep.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "categories": ["food", "shopping", "lifestyle"],
+  "screenshots": [
+    {
+      "src": "/images/mangoes-carousel.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "Premium Alphonso Mangoes"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Shop Mangoes",
+      "short_name": "Mangoes",
+      "description": "Order premium Ratnagiri Alphonso mangoes",
+      "url": "/#products",
+      "icons": [{ "src": "/images/mangoes-carousel-1.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Cold-Pressed Oils",
+      "short_name": "Oils",
+      "description": "Browse our pure cold-pressed oils",
+      "url": "/#products",
+      "icons": [
+        { "src": "/images/cold-pressed-oil-carousel-1.png", "sizes": "96x96" }
+      ]
+    }
+  ]
+}

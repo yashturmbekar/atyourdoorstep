@@ -1,0 +1,167 @@
+{
+  "about": {
+    "company_overview": {
+      "name": "AtYourDoorStep",
+      "tagline": "Purity, Tradition, and Quality",
+      "description": "AtYourDoorStep is a proudly Indian, family-run business bringing the essence of purity, tradition, and quality directly to your home. From the sweetness of our Ratnagiri Alphonso mangoes to the rich minerals of our organic jaggery, and the wholesome goodness of our cold-pressed oils — we deliver farm-fresh, factory-direct products with no middlemen and no compromises.",
+      "business_type": "Family-run Indian business",
+      "establishment": "Built on 30+ years of traditional processing experience",
+      "core_principle": "Purity with convenience, rooted in Indian traditions and powered by modern delivery"
+    },
+    "company_story": {
+      "beginning": "We began over 30 years ago with a small, traditional jaggery unit near sugarcane fields — built on values of purity, tradition, and hard work.",
+      "mission": "At the heart of this growth lies a simple yet powerful mission: To bring honest, chemical-free, and high-quality products into Indian households, while making the process as easy and accessible as possible.",
+      "evolution": "Today, AtYourDoorstep is more than just a brand — it's a promise of purity with convenience, rooted in Indian traditions and powered by modern delivery.",
+      "founding_values": [
+        "Purity in every product",
+        "Traditional processing methods",
+        "Hard work and dedication",
+        "Chemical-free commitment",
+        "Customer accessibility"
+      ]
+    },
+    "facilities": {
+      "mango_orchards": {
+        "location": "Ratnagiri, Maharashtra",
+        "description": "Located in Ratnagiri, thriving on red laterite soil and clean air, producing premium Alphonso mangoes.",
+        "characteristics": [
+          "Red laterite soil composition",
+          "Clean air environment",
+          "Optimal climate for Alphonso cultivation",
+          "Traditional orchard management",
+          "GI-tagged authenticity"
+        ],
+        "specialization": "Premium Alphonso mango cultivation"
+      },
+      "jaggery_warehouse": {
+        "location": "Near sugarcane farms",
+        "description": "Built near sugarcane farms, where juice is boiled in iron pans over firewood, the traditional way.",
+        "process_details": [
+          "Fresh sugarcane juice extraction",
+          "Traditional iron pan boiling",
+          "Firewood heating method",
+          "Age-old processing techniques",
+          "30+ years of expertise"
+        ],
+        "specialization": "Traditional jaggery production"
+      },
+      "cold_pressing_unit": {
+        "location": "Controlled hygienic environment",
+        "description": "Operates in a controlled hygienic environment, where quality seeds are cold-pressed without heat or chemicals.",
+        "process_details": [
+          "Traditional wooden ghani method",
+          "No heat treatment",
+          "No chemical processing",
+          "Nutrient preservation",
+          "Quality seed selection"
+        ],
+        "specialization": "Pure cold-pressed oil extraction",
+        "operational_since": "2021"
+      }
+    },
+    "product_expertise": {
+      "jaggery": {
+        "experience": "30+ years in the industry",
+        "description": "Our jaggery is made using age-old methods in our own processing facility — rich in minerals, free from chemicals.",
+        "key_features": [
+          "Age-old traditional methods",
+          "Own processing facility",
+          "Rich in minerals",
+          "Chemical-free production",
+          "Iron pan boiling over firewood"
+        ]
+      },
+      "cold_pressed_oils": {
+        "experience": "Since 2021",
+        "description": "We've been extracting unrefined oils (coconut, sesame, groundnut, mustard) using the traditional wooden ghani method in our cold-pressing facility — keeping nutrients intact.",
+        "varieties": ["Coconut", "Sesame", "Groundnut", "Mustard"],
+        "key_features": [
+          "Traditional wooden ghani method",
+          "Unrefined extraction",
+          "Nutrients intact",
+          "Cold-pressing facility",
+          "No heat or chemicals"
+        ]
+      },
+      "mangoes": {
+        "experience": "Past 4 years",
+        "description": "We've been hand-picking the finest GI-tagged Alphonso mangoes from Ratnagiri. No carbide, no shortcuts — just naturally ripened, sun-kissed fruits.",
+        "key_features": [
+          "Hand-picked selection",
+          "GI-tagged authenticity",
+          "No carbide ripening",
+          "No shortcuts",
+          "Naturally ripened",
+          "Sun-kissed quality"
+        ]
+      }
+    },
+    "company_statistics": {
+      "experience": "30+ Years of Experience",
+      "quality": "100% Chemical Free",
+      "product_range": "3 Premium Products",
+      "customer_base": "1000+ Happy Customers"
+    },
+    "value_propositions": {
+      "purity": {
+        "title": "100% Purity Guarantee",
+        "description": "All products are completely chemical-free and processed using traditional methods"
+      },
+      "tradition": {
+        "title": "Time-tested Traditions",
+        "description": "30+ years of traditional processing expertise passed down through generations"
+      },
+      "quality": {
+        "title": "Premium Quality Assurance",
+        "description": "Rigorous quality checks and direct sourcing ensure the finest products"
+      },
+      "convenience": {
+        "title": "Modern Convenience",
+        "description": "Traditional products delivered with modern convenience to your doorstep"
+      }
+    },
+    "business_philosophy": {
+      "core_belief": "Bringing authentic, farm-fresh, factory-direct products with no middlemen and no compromises",
+      "approach": [
+        "Direct farmer partnerships",
+        "Traditional processing methods",
+        "Chemical-free commitment",
+        "Quality over quantity",
+        "Customer-centric service"
+      ],
+      "differentiation": [
+        "No middlemen involvement",
+        "Factory-direct supply",
+        "Farm-fresh guarantee",
+        "Traditional authenticity",
+        "Modern delivery convenience"
+      ]
+    },
+    "sustainability_commitment": {
+      "environmental": [
+        "Traditional eco-friendly processing",
+        "Minimal chemical usage",
+        "Sustainable farming partnerships",
+        "Reduced packaging waste"
+      ],
+      "social": [
+        "Direct farmer support",
+        "Local community engagement",
+        "Traditional skill preservation",
+        "Fair trade practices"
+      ]
+    }
+  },
+  "last_updated": "2025-08-26",
+  "content_type": "company_information",
+  "sections": [
+    "Company Overview",
+    "Company Story",
+    "Facilities",
+    "Product Expertise",
+    "Statistics",
+    "Value Propositions",
+    "Business Philosophy",
+    "Sustainability"
+  ]
+}

@@ -1,0 +1,158 @@
+{
+  "website": {
+    "name": "AtYourDoorStep",
+    "description": "Premium doorstep delivery service for authentic Ratnagiri Alphonso mangoes, pure cold-pressed oils, and organic jaggery from trusted Indian farmers.",
+    "url": "https://atyourdoorstep.shop",
+    "type": "E-commerce Food Delivery Service",
+    "established": "2024",
+    "location": "Maharashtra, India",
+    "services": [
+      "Doorstep delivery",
+      "Premium natural products",
+      "Chemical-free foods",
+      "Direct farm sourcing"
+    ]
+  },
+  "company": {
+    "story": {
+      "summary": "We began over 30 years ago with a small, traditional jaggery unit near sugarcane fields — built on values of purity, tradition, and hard work.",
+      "mission": "To bring honest, chemical-free, and high-quality products into Indian households, while making the process as easy and accessible as possible.",
+      "vision": "AtYourDoorstep is more than just a brand — it's a promise of purity with convenience, rooted in Indian traditions and powered by modern delivery.",
+      "years_of_experience": "30+",
+      "founding_principle": "Chemical-free, traditional methods, direct from farm to home"
+    },
+    "facilities": {
+      "mango_orchards": {
+        "location": "Ratnagiri, Maharashtra",
+        "soil_type": "Red laterite soil",
+        "environment": "Clean air, optimal climate",
+        "product": "Premium Alphonso mangoes",
+        "certification": "GI-tagged"
+      },
+      "jaggery_warehouse": {
+        "location": "Near sugarcane farms",
+        "process": "Traditional iron pan boiling over firewood",
+        "experience": "30+ years in industry",
+        "method": "Age-old traditional methods"
+      },
+      "cold_pressing_unit": {
+        "environment": "Controlled hygienic facility",
+        "method": "Traditional wooden ghani method",
+        "since": "2021",
+        "principle": "No heat, no chemicals, nutrients intact"
+      }
+    },
+    "statistics": {
+      "experience_years": "30+",
+      "chemical_free_percentage": "100%",
+      "premium_products_count": "3",
+      "happy_customers": "1000+"
+    }
+  },
+  "products": {
+    "alphonso_mangoes": {
+      "name": "Ratnagiri Alphonso Mangoes",
+      "description": "Authentic king of mangoes from Ratnagiri with unmatched sweetness and aroma",
+      "origin": "Ratnagiri, Maharashtra",
+      "characteristics": [
+        "GI-tagged authenticity",
+        "No carbide ripening",
+        "Naturally sun-kissed",
+        "Hand-picked quality",
+        "Rich sweetness and aroma"
+      ],
+      "season": "March to June",
+      "experience": "4 years of expertise",
+      "quality_assurance": "No chemicals, no shortcuts, naturally ripened"
+    },
+    "cold_pressed_oils": {
+      "name": "Pure Cold-Pressed Oils",
+      "description": "100% pure cold-pressed oils extracted using traditional methods",
+      "types": ["Coconut oil", "Sesame oil", "Groundnut oil", "Mustard oil"],
+      "method": "Traditional wooden ghani cold-pressing",
+      "benefits": [
+        "Unrefined and pure",
+        "Nutrients intact",
+        "No heat treatment",
+        "No chemical processing"
+      ],
+      "since": "2021",
+      "facility": "Dedicated cold-pressing unit"
+    },
+    "organic_jaggery": {
+      "name": "Organic Jaggery",
+      "description": "Pure organic jaggery - natural sweetener from traditional sources",
+      "process": "Traditional iron pan boiling over firewood",
+      "benefits": [
+        "Rich in minerals",
+        "Chemical-free",
+        "Natural sweetener",
+        "Traditional processing"
+      ],
+      "experience": "30+ years in jaggery production",
+      "types": ["Pure jaggery blocks", "Jaggery powder"]
+    }
+  },
+  "services": {
+    "doorstep_delivery": {
+      "description": "Convenient doorstep delivery across India",
+      "features": [
+        "Fresh product delivery",
+        "Secure packaging",
+        "Timely delivery",
+        "Quality assurance"
+      ]
+    },
+    "quality_assurance": {
+      "description": "100% quality guarantee on all products",
+      "standards": [
+        "Chemical-free processing",
+        "Traditional methods",
+        "Direct farm sourcing",
+        "Hygienic packaging"
+      ]
+    },
+    "customer_support": {
+      "description": "Dedicated customer support for all queries",
+      "channels": ["Phone support", "Email support", "WhatsApp assistance"]
+    }
+  },
+  "value_propositions": {
+    "purity": "100% chemical-free products using traditional methods",
+    "authenticity": "Direct sourcing from authentic locations like Ratnagiri",
+    "tradition": "30+ years of traditional processing experience",
+    "convenience": "Easy doorstep delivery across India",
+    "quality": "Premium quality assurance and customer satisfaction",
+    "transparency": "No middlemen, direct farm to home delivery"
+  },
+  "contact_information": {
+    "website": "https://atyourdoorstep.shop",
+    "social_media": {
+      "facebook": "https://www.facebook.com/profile.php?id=100074808451374",
+      "instagram": "https://www.instagram.com/gopro.baba/",
+      "twitter": "https://x.com/goprobaba",
+      "linkedin": "https://www.linkedin.com/in/yashturmbekar"
+    },
+    "service_areas": "Pan India delivery",
+    "business_type": "Family-run Indian business"
+  },
+  "keywords": [
+    "Alphonso mangoes",
+    "Ratnagiri mangoes",
+    "cold-pressed oils",
+    "organic jaggery",
+    "doorstep delivery",
+    "premium natural products",
+    "Indian mangoes",
+    "pure oils",
+    "traditional jaggery",
+    "chemical-free foods",
+    "farm-fresh products",
+    "GI-tagged mangoes",
+    "traditional processing",
+    "wooden ghani oils"
+  ],
+  "last_updated": "2025-08-26",
+  "content_type": "structured_business_data",
+  "crawling_friendly": true
+}

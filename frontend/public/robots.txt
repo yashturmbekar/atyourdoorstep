@@ -1,0 +1,81 @@
+# Robots.txt for AtYourDoorStep - Premium Doorstep Delivery Service
+# Optimized for RAG (Retrieval-Augmented Generation) crawlers and search engines
+
+User-agent: *
+Allow: /
+
+# Allow all major search engine bots
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+# Allow AI/RAG crawlers
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: YouBot
+Allow: /
+
+# Allow content APIs for structured data access
+Allow: /api/
+Allow: /content/
+Allow: *.json$
+
+# Disallow only development-specific files
+Disallow: /src/
+Disallow: /node_modules/
+Disallow: *.ts$
+Disallow: *.tsx$
+Disallow: /vite.config.*
+Disallow: /tsconfig.*
+Disallow: /package-lock.json
+Disallow: /yarn.lock
+Disallow: /admin/
+
+# Allow access to all content and media files
+Allow: /images/
+Allow: *.png$
+Allow: *.jpg$
+Allow: *.jpeg$
+Allow: *.gif$
+Allow: *.svg$
+Allow: *.webp$
+Allow: *.pdf$
+Allow: *.css$
+Allow: *.js$
+
+# Reduced crawl delay for better content discovery
+Crawl-delay: 0.5
+
+# Sitemap locations
+Sitemap: https://atyourdoorstep.shop/sitemap.xml
+Sitemap: https://atyourdoorstep.shop/content-sitemap.xml

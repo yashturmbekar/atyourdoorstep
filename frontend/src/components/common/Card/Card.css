@@ -1,0 +1,59 @@
+/* Card Component Styles using Theme System */
+/* Base styles are defined in theme-utilities.css */
+
+/* Card Variants */
+.card-default {
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-md);
+}
+
+.card-elevated {
+  border: none;
+  box-shadow: var(--shadow-lg);
+}
+
+.card-outlined {
+  border: 2px solid var(--border-light);
+  box-shadow: none;
+  background-color: transparent;
+}
+
+/* Padding Variants */
+.card-padding-sm {
+  padding: var(--spacing-sm);
+}
+
+.card-padding-md {
+  padding: var(--spacing-lg);
+}
+
+.card-padding-lg {
+  padding: var(--spacing-xl);
+}
+
+/* Interactive States */
+.card-hoverable:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+  transition: var(--transition-normal);
+}
+
+.card-clickable {
+  cursor: pointer;
+  transition: var(--transition-normal);
+}
+
+.card-clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow-lg);
+}
+
+.card-clickable:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-lg);
+}
+
+.card-clickable:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}

@@ -1,0 +1,319 @@
+/* Button Component Styles - Enhanced with Theme System */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: var(--radius-lg);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: var(--transition-normal);
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  gap: var(--spacing-sm);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  white-space: nowrap;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.button:hover::before {
+  left: 100%;
+}
+
+.button-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.button-disabled::before {
+  display: none;
+}
+
+/* Primary variant - Uses theme primary color */
+.button-primary {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-md);
+}
+
+.button-primary:hover:not(.button-disabled) {
+  transform: translateY(-3px);
+  background: var(--primary-dark);
+  box-shadow: var(--shadow-glow-lg);
+  border-color: var(--primary-dark);
+}
+
+.button-primary:active:not(.button-disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.button-primary:focus {
+  box-shadow:
+    0 4px 15px rgba(99, 102, 241, 0.4),
+    0 0 0 3px rgba(99, 102, 241, 0.3);
+}
+
+/* Secondary variant - Uses theme secondary color */
+.button-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--secondary-color);
+  border-color: var(--secondary-color);
+  backdrop-filter: blur(10px);
+}
+
+.button-secondary:hover:not(.button-disabled) {
+  background: var(--secondary-color);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
+
+.button-secondary:focus {
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.3);
+}
+
+/* Outline variant */
+.button-outline {
+  background: transparent;
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
+  backdrop-filter: blur(5px);
+}
+
+.button-outline:hover:not(.button-disabled) {
+  background: var(--primary-color);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.button-outline:focus {
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.4);
+}
+
+/* Ghost variant */
+.button-ghost {
+  background: transparent;
+  color: var(--text-primary);
+  border: 2px solid transparent;
+  backdrop-filter: none;
+}
+
+.button-ghost:hover:not(.button-disabled) {
+  background: var(--bg-hover);
+  border-color: var(--border-color);
+  transform: translateY(-1px);
+}
+
+.button-ghost:focus {
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.4);
+}
+
+/* Danger variant - Uses theme error color */
+.button-danger {
+  background: var(--error-color);
+  color: var(--text-primary);
+  border-color: var(--error-color);
+  box-shadow: var(--shadow-md);
+}
+
+.button-danger:hover:not(.button-disabled) {
+  transform: translateY(-2px);
+  background: #dc2626;
+  box-shadow:
+    0 6px 20px rgba(239, 68, 68, 0.5),
+    var(--shadow-md);
+}
+
+.button-danger:focus {
+  box-shadow:
+    var(--shadow-md),
+    0 0 0 3px rgba(239, 68, 68, 0.3);
+}
+
+/* Gradient variant */
+.button-gradient {
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
+  color: white;
+  border: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.button-gradient:hover:not(.button-disabled) {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-glow-lg);
+}
+
+.button-gradient::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    var(--primary-dark),
+    var(--secondary-color)
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.button-gradient:hover::before {
+  opacity: 1;
+}
+
+/* Soft button variant */
+.button-soft {
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--primary-color);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.button-soft:hover:not(.button-disabled) {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: rgba(99, 102, 241, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Floating action button variant */
+.button-floating {
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-lg);
+  padding: var(--spacing-md);
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.button-floating:hover:not(.button-disabled) {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+}
+
+/* Enhanced Size variants using theme spacing */
+.button-small {
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 0.75rem;
+  border-radius: var(--radius-md);
+  letter-spacing: 0.25px;
+}
+
+.button-medium {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: 0.875rem;
+  border-radius: var(--radius-lg);
+  letter-spacing: 0.5px;
+}
+
+.button-large {
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: 1rem;
+  border-radius: var(--radius-xl);
+  letter-spacing: 0.75px;
+}
+
+/* Button enhancement animations */
+@keyframes buttonPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+.button:active:not(.button-disabled) {
+  animation: buttonPulse 0.2s ease-in-out;
+}
+
+/* Better focus states for accessibility */
+.button:focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .button {
+    min-height: 44px; /* Better touch targets */
+  }
+
+  .button-small {
+    padding: 0.6rem 1.2rem;
+  }
+
+  .button-medium {
+    padding: 0.8rem 1.6rem;
+  }
+
+  .button-large {
+    padding: 1.1rem 2.2rem;
+  }
+}
+
+/* Enhanced loading state */
+.button-loading {
+  position: relative;
+  pointer-events: none;
+}
+
+.button-loading::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: buttonSpin 1s linear infinite;
+}
+
+@keyframes buttonSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.button-loading .button-text {
+  opacity: 0;
+}

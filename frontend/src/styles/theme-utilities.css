@@ -1,0 +1,479 @@
+/* Theme Utility Classes */
+/* Use these classes to apply theme values consistently across components */
+
+/* Color Utilities */
+.theme-primary {
+  color: var(--primary-color) !important;
+}
+.theme-secondary {
+  color: var(--secondary-color) !important;
+}
+.theme-accent {
+  color: var(--accent-color) !important;
+}
+.theme-success {
+  color: var(--success-color) !important;
+}
+.theme-warning {
+  color: var(--warning-color) !important;
+}
+.theme-error {
+  color: var(--error-color) !important;
+}
+
+/* Text Color Utilities */
+.text-primary {
+  color: var(--text-primary) !important;
+}
+.text-secondary {
+  color: var(--text-secondary) !important;
+}
+.text-muted {
+  color: var(--text-muted) !important;
+}
+.text-light {
+  color: var(--text-light) !important;
+}
+.text-inverse {
+  color: var(--text-inverse) !important;
+}
+.text-accent {
+  color: var(--text-accent) !important;
+}
+
+/* Background Color Utilities */
+.bg-primary {
+  background-color: var(--bg-primary) !important;
+}
+.bg-secondary {
+  background-color: var(--bg-secondary) !important;
+}
+
+/* Modern Semi-Light Theme Specific Utilities */
+.surface-glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+.surface-elevated {
+  background: var(--bg-card);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-color);
+}
+
+.surface-subtle {
+  background: rgba(248, 250, 252, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(226, 232, 240, 0.5);
+}
+.bg-tertiary {
+  background-color: var(--bg-tertiary) !important;
+}
+.bg-card {
+  background-color: var(--bg-card) !important;
+}
+.bg-hover {
+  background-color: var(--bg-hover) !important;
+}
+.bg-dark {
+  background-color: var(--bg-dark) !important;
+}
+.bg-accent {
+  background-color: var(--bg-accent) !important;
+}
+
+/* Theme Background Colors */
+.bg-theme-primary {
+  background-color: var(--primary-color) !important;
+}
+.bg-theme-secondary {
+  background-color: var(--secondary-color) !important;
+}
+.bg-theme-accent {
+  background-color: var(--accent-color) !important;
+}
+.bg-theme-success {
+  background-color: var(--success-color) !important;
+}
+.bg-theme-warning {
+  background-color: var(--warning-color) !important;
+}
+.bg-theme-error {
+  background-color: var(--error-color) !important;
+}
+
+/* Border Utilities */
+.border-theme {
+  border-color: var(--border-color) !important;
+}
+.border-light {
+  border-color: var(--border-light) !important;
+}
+.border-primary {
+  border-color: var(--primary-color) !important;
+}
+.border-secondary {
+  border-color: var(--secondary-color) !important;
+}
+.border-accent {
+  border-color: var(--accent-color) !important;
+}
+
+/* Shadow Utilities */
+.shadow-sm {
+  box-shadow: var(--shadow-sm) !important;
+}
+.shadow-md {
+  box-shadow: var(--shadow-md) !important;
+}
+.shadow-lg {
+  box-shadow: var(--shadow-lg) !important;
+}
+.shadow-xl {
+  box-shadow: var(--shadow-xl) !important;
+}
+.shadow-inner {
+  box-shadow: var(--shadow-inner) !important;
+}
+.shadow-glow {
+  box-shadow: var(--shadow-glow) !important;
+}
+.shadow-glow-lg {
+  box-shadow: var(--shadow-glow-lg) !important;
+}
+
+/* Transition Utilities */
+.transition-fast {
+  transition: var(--transition-fast) !important;
+}
+.transition-normal {
+  transition: var(--transition-normal) !important;
+}
+.transition-slow {
+  transition: var(--transition-slow) !important;
+}
+.transition-elastic {
+  transition: var(--transition-elastic) !important;
+}
+.transition-bounce {
+  transition: var(--transition-bounce) !important;
+}
+
+/* Spacing Utilities */
+.p-xs {
+  padding: var(--spacing-xs) !important;
+}
+.p-sm {
+  padding: var(--spacing-sm) !important;
+}
+.p-md {
+  padding: var(--spacing-md) !important;
+}
+.p-lg {
+  padding: var(--spacing-lg) !important;
+}
+.p-xl {
+  padding: var(--spacing-xl) !important;
+}
+.p-2xl {
+  padding: var(--spacing-2xl) !important;
+}
+.p-3xl {
+  padding: var(--spacing-3xl) !important;
+}
+
+.px-xs {
+  padding-left: var(--spacing-xs) !important;
+  padding-right: var(--spacing-xs) !important;
+}
+.px-sm {
+  padding-left: var(--spacing-sm) !important;
+  padding-right: var(--spacing-sm) !important;
+}
+.px-md {
+  padding-left: var(--spacing-md) !important;
+  padding-right: var(--spacing-md) !important;
+}
+.px-lg {
+  padding-left: var(--spacing-lg) !important;
+  padding-right: var(--spacing-lg) !important;
+}
+.px-xl {
+  padding-left: var(--spacing-xl) !important;
+  padding-right: var(--spacing-xl) !important;
+}
+.px-2xl {
+  padding-left: var(--spacing-2xl) !important;
+  padding-right: var(--spacing-2xl) !important;
+}
+.px-3xl {
+  padding-left: var(--spacing-3xl) !important;
+  padding-right: var(--spacing-3xl) !important;
+}
+
+.py-xs {
+  padding-top: var(--spacing-xs) !important;
+  padding-bottom: var(--spacing-xs) !important;
+}
+.py-sm {
+  padding-top: var(--spacing-sm) !important;
+  padding-bottom: var(--spacing-sm) !important;
+}
+.py-md {
+  padding-top: var(--spacing-md) !important;
+  padding-bottom: var(--spacing-md) !important;
+}
+.py-lg {
+  padding-top: var(--spacing-lg) !important;
+  padding-bottom: var(--spacing-lg) !important;
+}
+.py-xl {
+  padding-top: var(--spacing-xl) !important;
+  padding-bottom: var(--spacing-xl) !important;
+}
+.py-2xl {
+  padding-top: var(--spacing-2xl) !important;
+  padding-bottom: var(--spacing-2xl) !important;
+}
+.py-3xl {
+  padding-top: var(--spacing-3xl) !important;
+  padding-bottom: var(--spacing-3xl) !important;
+}
+
+.m-xs {
+  margin: var(--spacing-xs) !important;
+}
+.m-sm {
+  margin: var(--spacing-sm) !important;
+}
+.m-md {
+  margin: var(--spacing-md) !important;
+}
+.m-lg {
+  margin: var(--spacing-lg) !important;
+}
+.m-xl {
+  margin: var(--spacing-xl) !important;
+}
+.m-2xl {
+  margin: var(--spacing-2xl) !important;
+}
+.m-3xl {
+  margin: var(--spacing-3xl) !important;
+}
+
+.mx-xs {
+  margin-left: var(--spacing-xs) !important;
+  margin-right: var(--spacing-xs) !important;
+}
+.mx-sm {
+  margin-left: var(--spacing-sm) !important;
+  margin-right: var(--spacing-sm) !important;
+}
+.mx-md {
+  margin-left: var(--spacing-md) !important;
+  margin-right: var(--spacing-md) !important;
+}
+.mx-lg {
+  margin-left: var(--spacing-lg) !important;
+  margin-right: var(--spacing-lg) !important;
+}
+.mx-xl {
+  margin-left: var(--spacing-xl) !important;
+  margin-right: var(--spacing-xl) !important;
+}
+.mx-2xl {
+  margin-left: var(--spacing-2xl) !important;
+  margin-right: var(--spacing-2xl) !important;
+}
+.mx-3xl {
+  margin-left: var(--spacing-3xl) !important;
+  margin-right: var(--spacing-3xl) !important;
+}
+
+.my-xs {
+  margin-top: var(--spacing-xs) !important;
+  margin-bottom: var(--spacing-xs) !important;
+}
+.my-sm {
+  margin-top: var(--spacing-sm) !important;
+  margin-bottom: var(--spacing-sm) !important;
+}
+.my-md {
+  margin-top: var(--spacing-md) !important;
+  margin-bottom: var(--spacing-md) !important;
+}
+.my-lg {
+  margin-top: var(--spacing-lg) !important;
+  margin-bottom: var(--spacing-lg) !important;
+}
+.my-xl {
+  margin-top: var(--spacing-xl) !important;
+  margin-bottom: var(--spacing-xl) !important;
+}
+.my-2xl {
+  margin-top: var(--spacing-2xl) !important;
+  margin-bottom: var(--spacing-2xl) !important;
+}
+.my-3xl {
+  margin-top: var(--spacing-3xl) !important;
+  margin-bottom: var(--spacing-3xl) !important;
+}
+
+/* Border Radius Utilities */
+.rounded-none {
+  border-radius: var(--radius-none) !important;
+}
+.rounded-sm {
+  border-radius: var(--radius-sm) !important;
+}
+.rounded-md {
+  border-radius: var(--radius-md) !important;
+}
+.rounded-lg {
+  border-radius: var(--radius-lg) !important;
+}
+.rounded-xl {
+  border-radius: var(--radius-xl) !important;
+}
+.rounded-full {
+  border-radius: var(--radius-full) !important;
+}
+
+/* Theme Component Classes */
+.theme-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-md);
+  transition: var(--transition-normal);
+}
+
+.theme-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.theme-button {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-normal);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.theme-button-primary {
+  background-color: var(--primary-color);
+  color: var(--text-primary);
+}
+
+.theme-button-primary:hover {
+  background-color: var(--primary-dark);
+  box-shadow: var(--shadow-glow);
+}
+
+.theme-button-secondary {
+  background-color: var(--secondary-color);
+  color: var(--text-primary);
+}
+
+.theme-button-secondary:hover {
+  background-color: var(--accent-color);
+  box-shadow: var(--shadow-glow);
+}
+
+.theme-section {
+  padding: var(--spacing-2xl) var(--spacing-lg);
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  margin: var(--spacing-lg) 0;
+}
+
+.theme-page-layout {
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Interactive States */
+.hover-lift {
+  transition: var(--transition-normal);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.hover-glow {
+  transition: var(--transition-normal);
+}
+
+.hover-glow:hover {
+  box-shadow: var(--shadow-glow);
+}
+
+.hover-scale {
+  transition: var(--transition-elastic);
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+.focus-ring:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Animation Classes */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.slide-in-up {
+  animation: slideInUp 0.5s var(--transition-bounce);
+}
+
+.slide-in-left {
+  animation: slideInLeft 0.5s var(--transition-bounce);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

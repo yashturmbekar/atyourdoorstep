@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  
+  <!-- Homepage -->
+  <url>
+    <loc>https://atyourdoorstep.shop/</loc>
+    <lastmod>2025-08-26</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://atyourdoorstep.shop/images/AtYourDoorStep.png</image:loc>
+      <image:title>AtYourDoorStep - Premium Doorstep Delivery</image:title>
+      <image:caption>Premium quality Alphonso mangoes, cold-pressed oils, and organic jaggery delivered to your doorstep</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://atyourdoorstep.shop/images/mangoes-carousel.png</image:loc>
+      <image:title>Premium Ratnagiri Alphonso Mangoes</image:title>
+      <image:caption>Authentic Ratnagiri Alphonso mangoes - King of Mangoes delivered fresh</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://atyourdoorstep.shop/images/cold-pressed-oil-carousel.png</image:loc>
+      <image:title>Pure Cold-Pressed Oils</image:title>
+      <image:caption>100% pure cold-pressed oils extracted using traditional methods</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://atyourdoorstep.shop/images/jaggery-carousel.png</image:loc>
+      <image:title>Organic Jaggery</image:title>
+      <image:caption>Pure organic jaggery - natural sweetener from traditional sources</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Content API Endpoints for RAG Crawlers -->
+  <url>
+    <loc>https://atyourdoorstep.shop/api/content/all.json</loc>
+    <lastmod>2025-08-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <url>
+    <loc>https://atyourdoorstep.shop/api/content/products.json</loc>
+    <lastmod>2025-08-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <url>
+    <loc>https://atyourdoorstep.shop/api/content/about.json</loc>
+    <lastmod>2025-08-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>https://atyourdoorstep.shop/api/content/services.json</loc>
+    <lastmod>2025-08-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>https://atyourdoorstep.shop/api/content/testimonials.json</loc>
+    <lastmod>2025-08-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Section-based URLs for content discovery -->
+  <url>
+    <loc>https://atyourdoorstep.shop/#about</loc>
+    <lastmod>2025-08-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>https://atyourdoorstep.shop/#products</loc>
+    <lastmod>2025-08-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <url>
+    <loc>https://atyourdoorstep.shop/#services</loc>
+    <lastmod>2025-08-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://atyourdoorstep.shop/#testimonials</loc>
+    <lastmod>2025-08-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://atyourdoorstep.shop/#contact</loc>
+    <lastmod>2025-08-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+</urlset>

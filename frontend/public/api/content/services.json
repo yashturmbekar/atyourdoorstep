@@ -1,0 +1,199 @@
+{
+  "services": {
+    "overview": {
+      "title": "Premium Delivery Services",
+      "description": "Comprehensive doorstep delivery services for fresh natural products across India",
+      "service_areas": "Pan India delivery coverage",
+      "business_model": "Direct farm-to-home delivery"
+    },
+    "core_services": [
+      {
+        "name": "Doorstep Delivery",
+        "description": "Convenient and reliable delivery of fresh products directly to your doorstep",
+        "features": [
+          "Pan India coverage",
+          "Temperature-controlled shipping",
+          "Secure packaging",
+          "Timely delivery",
+          "Real-time tracking"
+        ],
+        "delivery_areas": [
+          "Metro cities",
+          "Tier 2 cities",
+          "Rural areas",
+          "Remote locations"
+        ],
+        "shipping_methods": [
+          "Express delivery",
+          "Standard delivery",
+          "Bulk orders",
+          "Seasonal products"
+        ]
+      },
+      {
+        "name": "Quality Assurance",
+        "description": "Comprehensive quality guarantee on all products with 100% chemical-free processing",
+        "quality_standards": [
+          "Chemical-free processing",
+          "Traditional methods",
+          "Direct farm sourcing",
+          "Hygienic packaging",
+          "Quality testing at every stage"
+        ],
+        "certifications": [
+          "GI-tagged products (Alphonso mangoes)",
+          "Traditional processing methods",
+          "Hygienic production standards",
+          "Chemical-free certification"
+        ],
+        "quality_checks": [
+          "Source verification",
+          "Processing monitoring",
+          "Final product inspection",
+          "Packaging quality",
+          "Delivery condition"
+        ]
+      },
+      {
+        "name": "Customer Support",
+        "description": "Dedicated customer support for all queries, orders, and after-sales service",
+        "support_channels": [
+          "Phone support",
+          "Email assistance",
+          "WhatsApp support",
+          "Online chat"
+        ],
+        "support_services": [
+          "Order assistance",
+          "Product information",
+          "Delivery tracking",
+          "Issue resolution",
+          "Feedback collection"
+        ],
+        "availability": "7 days a week support"
+      },
+      {
+        "name": "Fresh Product Sourcing",
+        "description": "Direct sourcing from farms and production units to ensure maximum freshness",
+        "sourcing_principles": [
+          "Direct farmer partnerships",
+          "Seasonal availability respect",
+          "Quality over quantity",
+          "Traditional sourcing methods",
+          "Sustainable practices"
+        ],
+        "sourcing_locations": [
+          "Ratnagiri orchards (Alphonso mangoes)",
+          "Sugarcane farms (Jaggery)",
+          "Quality seed suppliers (Cold-pressed oils)"
+        ]
+      }
+    ],
+    "service_specializations": {
+      "seasonal_products": {
+        "description": "Specialized handling of seasonal products like Alphonso mangoes",
+        "season_management": [
+          "Pre-season quality assessment",
+          "Peak season availability",
+          "Post-season preservation",
+          "Seasonal packaging adjustments"
+        ],
+        "mango_season": "March to June specialized services"
+      },
+      "traditional_processing": {
+        "description": "Maintaining traditional processing methods while ensuring modern delivery standards",
+        "traditional_methods": [
+          "Wooden ghani cold-pressing",
+          "Iron pan jaggery boiling",
+          "Natural mango ripening",
+          "Firewood heating processes"
+        ]
+      },
+      "bulk_orders": {
+        "description": "Special services for bulk and institutional orders",
+        "bulk_services": [
+          "Custom packaging",
+          "Flexible delivery schedules",
+          "Volume discounts",
+          "Quality consistency",
+          "Dedicated support"
+        ]
+      }
+    },
+    "delivery_features": {
+      "packaging": {
+        "description": "Eco-friendly and protective packaging for all products",
+        "features": [
+          "Temperature-controlled packaging",
+          "Protective cushioning",
+          "Ventilated boxes for fresh products",
+          "Airtight containers for oils",
+          "Moisture-proof packaging for jaggery"
+        ]
+      },
+      "tracking": {
+        "description": "Real-time order and delivery tracking",
+        "features": [
+          "Order confirmation",
+          "Processing updates",
+          "Dispatch notifications",
+          "Delivery tracking",
+          "Delivery confirmation"
+        ]
+      },
+      "handling": {
+        "description": "Specialized handling for different product categories",
+        "handling_methods": [
+          "Fresh fruit handling protocols",
+          "Oil container security",
+          "Jaggery moisture protection",
+          "Temperature maintenance",
+          "Damage prevention"
+        ]
+      }
+    },
+    "why_choose_us": {
+      "unique_selling_points": [
+        {
+          "title": "30+ Years Experience",
+          "description": "Three decades of expertise in traditional food processing and quality assurance"
+        },
+        {
+          "title": "100% Chemical-Free",
+          "description": "Complete commitment to chemical-free processing across all product categories"
+        },
+        {
+          "title": "Direct Farm Sourcing",
+          "description": "No middlemen - direct partnerships with farmers and producers for authenticity"
+        },
+        {
+          "title": "Traditional Methods",
+          "description": "Preserving age-old processing techniques while ensuring modern quality standards"
+        },
+        {
+          "title": "Pan India Delivery",
+          "description": "Comprehensive delivery coverage across India with reliable logistics"
+        },
+        {
+          "title": "Quality Guarantee",
+          "description": "100% satisfaction guarantee with rigorous quality checks at every stage"
+        }
+      ]
+    },
+    "service_commitment": {
+      "quality_promise": "Every product meets our strict quality standards before delivery",
+      "freshness_guarantee": "Products delivered at peak freshness and quality",
+      "authenticity_assurance": "Genuine products directly from authentic sources",
+      "customer_satisfaction": "Complete customer satisfaction as our primary goal"
+    }
+  },
+  "last_updated": "2025-08-26",
+  "content_type": "service_information",
+  "service_categories": [
+    "Delivery Services",
+    "Quality Assurance",
+    "Customer Support",
+    "Product Sourcing",
+    "Specialized Services"
+  ]
+}

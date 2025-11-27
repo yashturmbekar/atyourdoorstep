@@ -1,0 +1,32 @@
+/* Section Component Styles using Theme System */
+/* Base styles are defined in theme-utilities.css */
+
+/* Section Variants */
+.section-default {
+  background-color: var(--bg-secondary);
+}
+
+.section-primary {
+  background-color: var(--bg-primary);
+}
+
+.section-secondary {
+  background-color: var(--bg-tertiary);
+}
+
+/* Padding Variants */
+.section-padding-sm {
+  padding: var(--spacing-lg) var(--spacing-md);
+}
+
+.section-padding-md {
+  padding: var(--spacing-2xl) var(--spacing-lg);
+}
+
+.section-padding-lg {
+  padding: var(--spacing-3xl) var(--spacing-xl);
+}
+
+.section-padding-xl {
+  padding: var(--spacing-3xl) var(--spacing-2xl);
+}

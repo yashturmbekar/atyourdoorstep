@@ -1,0 +1,251 @@
+{
+  "testimonials": {
+    "overview": {
+      "title": "Customer Testimonials",
+      "description": "Authentic feedback from valued customers about their experience with AtYourDoorStep products and services",
+      "total_testimonials": 6,
+      "average_rating": 5.0,
+      "satisfaction_rate": "95%+"
+    },
+    "customer_reviews": [
+      {
+        "id": 1,
+        "customer_name": "Priya Sharma",
+        "location": "Mumbai, Maharashtra",
+        "customer_type": "Mumbai Resident",
+        "rating": 5,
+        "product_category": "Alphonso Mangoes",
+        "review_text": "The mangoes were unbelievably fresh and sweet! You can taste the authentic Ratnagiri flavor in every bite. Best Alphonso mangoes I've had outside of Maharashtra.",
+        "key_highlights": [
+          "Unbelievably fresh",
+          "Authentic Ratnagiri flavor",
+          "Sweet and delicious",
+          "Best quality outside Maharashtra"
+        ],
+        "review_date": "2025-04-15",
+        "verified_purchase": true
+      },
+      {
+        "id": 2,
+        "customer_name": "Ramesh Kumar",
+        "location": "Bangalore, Karnataka",
+        "customer_type": "Bangalore Food Lover",
+        "rating": 5,
+        "product_category": "Organic Jaggery",
+        "review_text": "Your jaggery reminds me of the kind we had growing up in my village. So pure and rich in taste - no artificial sweetness. Finally found authentic jaggery in the city!",
+        "key_highlights": [
+          "Reminds of village jaggery",
+          "Pure and rich taste",
+          "No artificial sweetness",
+          "Authentic quality in city"
+        ],
+        "review_date": "2025-03-20",
+        "verified_purchase": true
+      },
+      {
+        "id": 3,
+        "customer_name": "Neha Joshi",
+        "location": "Pune, Maharashtra",
+        "customer_type": "Pune Homemaker",
+        "rating": 5,
+        "product_category": "Cold-Pressed Oils",
+        "review_text": "Finally found oil that smells and tastes just like my grandmother's kitchen! The cold-pressed groundnut oil is amazing - you can actually taste the difference.",
+        "key_highlights": [
+          "Grandmother's kitchen quality",
+          "Amazing aroma and taste",
+          "Noticeable quality difference",
+          "Traditional flavor"
+        ],
+        "review_date": "2025-02-10",
+        "verified_purchase": true
+      },
+      {
+        "id": 4,
+        "customer_name": "Arjun Patel",
+        "location": "Delhi, NCR",
+        "customer_type": "Delhi Chef",
+        "rating": 5,
+        "product_category": "Cold-Pressed Oils",
+        "review_text": "As a chef, I'm very particular about ingredients. AtYourDoorStep's products are restaurant-quality. The coconut oil and sesame oil have incredible aroma and purity.",
+        "key_highlights": [
+          "Restaurant-quality products",
+          "Professional chef approval",
+          "Incredible aroma",
+          "High purity standards"
+        ],
+        "review_date": "2025-01-25",
+        "verified_purchase": true,
+        "professional_endorsement": true
+      },
+      {
+        "id": 5,
+        "customer_name": "Kavitha Reddy",
+        "location": "Hyderabad, Telangana",
+        "customer_type": "Hyderabad Health Enthusiast",
+        "rating": 5,
+        "product_category": "Multiple Products",
+        "review_text": "Switched to their organic jaggery and cold-pressed oils completely. The health benefits are noticeable, and knowing they're chemical-free gives me peace of mind.",
+        "key_highlights": [
+          "Complete product switch",
+          "Noticeable health benefits",
+          "Chemical-free assurance",
+          "Peace of mind"
+        ],
+        "review_date": "2025-03-05",
+        "verified_purchase": true,
+        "health_focused": true
+      },
+      {
+        "id": 6,
+        "customer_name": "Vikram Singh",
+        "location": "Gurgaon, Haryana",
+        "customer_type": "Gurgaon Executive",
+        "rating": 5,
+        "product_category": "Alphonso Mangoes",
+        "review_text": "Ordered mangoes for my parents in Punjab - they were thrilled! The packaging was excellent, and every mango was perfectly ripe. Will definitely order again next season.",
+        "key_highlights": [
+          "Excellent packaging",
+          "Perfect ripeness",
+          "Family satisfaction",
+          "Repeat customer commitment"
+        ],
+        "review_date": "2025-04-20",
+        "verified_purchase": true,
+        "gift_order": true
+      }
+    ],
+    "customer_satisfaction_metrics": {
+      "taste_and_freshness": {
+        "percentage": "96%",
+        "description": "Love the authentic taste and freshness of products"
+      },
+      "chemical_free_quality": {
+        "percentage": "94%",
+        "description": "Appreciate the chemical-free, organic quality"
+      },
+      "packaging_and_delivery": {
+        "percentage": "92%",
+        "description": "Impressed by the careful packaging and delivery"
+      },
+      "recommendation_rate": {
+        "percentage": "98%",
+        "description": "Would order again and recommend to friends"
+      }
+    },
+    "review_themes": {
+      "authenticity": {
+        "description": "Customers consistently praise the authentic taste and traditional quality",
+        "mentions": [
+          "Authentic Ratnagiri flavor",
+          "Village-style jaggery",
+          "Grandmother's kitchen quality",
+          "Traditional flavor profiles"
+        ]
+      },
+      "quality": {
+        "description": "High quality standards appreciated by all customer segments",
+        "mentions": [
+          "Restaurant-quality products",
+          "Professional chef approval",
+          "Unbelievably fresh",
+          "Perfect ripeness"
+        ]
+      },
+      "health_benefits": {
+        "description": "Health-conscious customers notice tangible benefits",
+        "mentions": [
+          "Chemical-free assurance",
+          "Noticeable health benefits",
+          "Peace of mind",
+          "Pure and rich taste"
+        ]
+      },
+      "packaging_delivery": {
+        "description": "Excellent packaging and delivery experience",
+        "mentions": [
+          "Excellent packaging",
+          "Careful delivery",
+          "Perfect condition arrival",
+          "Impressive logistics"
+        ]
+      }
+    },
+    "geographic_reach": {
+      "cities_covered": [
+        "Mumbai, Maharashtra",
+        "Bangalore, Karnataka",
+        "Pune, Maharashtra",
+        "Delhi, NCR",
+        "Hyderabad, Telangana",
+        "Gurgaon, Haryana"
+      ],
+      "regional_satisfaction": "Consistent 5-star ratings across all regions"
+    },
+    "customer_segments": {
+      "homemakers": {
+        "characteristics": "Value traditional quality and family health",
+        "key_preferences": [
+          "Authentic taste",
+          "Chemical-free products",
+          "Family safety"
+        ]
+      },
+      "food_professionals": {
+        "characteristics": "Professional chefs and food enthusiasts",
+        "key_preferences": [
+          "Restaurant-quality",
+          "Aroma and purity",
+          "Professional standards"
+        ]
+      },
+      "health_enthusiasts": {
+        "characteristics": "Health-conscious individuals",
+        "key_preferences": [
+          "Health benefits",
+          "Chemical-free assurance",
+          "Organic quality"
+        ]
+      },
+      "gift_purchasers": {
+        "characteristics": "Customers buying for family and friends",
+        "key_preferences": [
+          "Excellent packaging",
+          "Perfect condition",
+          "Reliable delivery"
+        ]
+      }
+    },
+    "product_specific_feedback": {
+      "alphonso_mangoes": {
+        "key_positives": [
+          "Authentic Ratnagiri flavor",
+          "Perfect ripeness",
+          "Excellent sweetness",
+          "Fresh quality"
+        ],
+        "satisfaction_rate": "100%"
+      },
+      "organic_jaggery": {
+        "key_positives": [
+          "Village-style authenticity",
+          "Pure taste",
+          "No artificial sweetness",
+          "Rich flavor"
+        ],
+        "satisfaction_rate": "100%"
+      },
+      "cold_pressed_oils": {
+        "key_positives": [
+          "Traditional aroma",
+          "Restaurant quality",
+          "Noticeable difference",
+          "High purity"
+        ],
+        "satisfaction_rate": "100%"
+      }
+    }
+  },
+  "last_updated": "2025-08-26",
+  "content_type": "customer_testimonials",
+  "data_source": "Verified customer reviews and feedback"
+}
