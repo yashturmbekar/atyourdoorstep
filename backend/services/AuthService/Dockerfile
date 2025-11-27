@@ -8,25 +8,25 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
 # Copy shared projects
-COPY ["backend/shared/Domain/Shared.Domain.csproj", "Shared/Domain/"]
-COPY ["backend/shared/Application/Shared.Application.csproj", "Shared/Application/"]
-COPY ["backend/shared/Infrastructure/Shared.Infrastructure.csproj", "Shared/Infrastructure/"]
+COPY ["backend/shared/Domain/Shared.Domain.csproj", "backend/shared/Domain/"]
+COPY ["backend/shared/Application/Shared.Application.csproj", "backend/shared/Application/"]
+COPY ["backend/shared/Infrastructure/Shared.Infrastructure.csproj", "backend/shared/Infrastructure/"]
 
 # Copy AuthService projects
-COPY ["backend/services/AuthService/src/AuthService.Domain/AuthService.Domain.csproj", "AuthService/Domain/"]
-COPY ["backend/services/AuthService/src/AuthService.Application/AuthService.Application.csproj", "AuthService/Application/"]
-COPY ["backend/services/AuthService/src/AuthService.Infrastructure/AuthService.Infrastructure.csproj", "AuthService/Infrastructure/"]
-COPY ["backend/services/AuthService/src/AuthService.Api/AuthService.Api.csproj", "AuthService/Api/"]
+COPY ["backend/services/AuthService/src/AuthService.Domain/AuthService.Domain.csproj", "backend/services/AuthService/src/AuthService.Domain/"]
+COPY ["backend/services/AuthService/src/AuthService.Application/AuthService.Application.csproj", "backend/services/AuthService/src/AuthService.Application/"]
+COPY ["backend/services/AuthService/src/AuthService.Infrastructure/AuthService.Infrastructure.csproj", "backend/services/AuthService/src/AuthService.Infrastructure/"]
+COPY ["backend/services/AuthService/src/AuthService.Api/AuthService.Api.csproj", "backend/services/AuthService/src/AuthService.Api/"]
 
 # Restore dependencies
-RUN dotnet restore "AuthService/Api/AuthService.Api.csproj"
+RUN dotnet restore "backend/services/AuthService/src/AuthService.Api/AuthService.Api.csproj"
 
 # Copy source code
-COPY backend/shared/ ./Shared/
-COPY backend/services/AuthService/src/ ./AuthService/src/
+COPY backend/shared/ ./backend/shared/
+COPY backend/services/AuthService/src/ ./backend/services/AuthService/src/
 
 # Build
-WORKDIR "/src/AuthService/src/AuthService.Api"
+WORKDIR "/src/backend/services/AuthService/src/AuthService.Api"
 RUN dotnet build "AuthService.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish

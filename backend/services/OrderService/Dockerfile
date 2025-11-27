@@ -9,29 +9,30 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copy Shared projects
-COPY ["backend/shared/Domain/Shared.Domain.csproj", "Shared/Domain/"]
-COPY ["backend/shared/Application/Shared.Application.csproj", "Shared/Application/"]
-COPY ["backend/shared/Infrastructure/Shared.Infrastructure.csproj", "Shared/Infrastructure/"]
+COPY ["backend/shared/Domain/Shared.Domain.csproj", "backend/shared/Domain/"]
+COPY ["backend/shared/Application/Shared.Application.csproj", "backend/shared/Application/"]
+COPY ["backend/shared/Infrastructure/Shared.Infrastructure.csproj", "backend/shared/Infrastructure/"]
 
 # Copy OrderService project files
-COPY ["backend/services/OrderService/src/OrderService.Domain/OrderService.Domain.csproj", "OrderService/Domain/"]
-COPY ["backend/services/OrderService/src/OrderService.Application/OrderService.Application.csproj", "OrderService/Application/"]
-COPY ["backend/services/OrderService/src/OrderService.Infrastructure/OrderService.Infrastructure.csproj", "OrderService/Infrastructure/"]
-COPY ["backend/services/OrderService/src/OrderService.Api/OrderService.Api.csproj", "OrderService/Api/"]
+COPY ["backend/services/OrderService/src/OrderService.Domain/OrderService.Domain.csproj", "backend/services/OrderService/src/OrderService.Domain/"]
+COPY ["backend/services/OrderService/src/OrderService.Application/OrderService.Application.csproj", "backend/services/OrderService/src/OrderService.Application/"]
+COPY ["backend/services/OrderService/src/OrderService.Infrastructure/OrderService.Infrastructure.csproj", "backend/services/OrderService/src/OrderService.Infrastructure/"]
+COPY ["backend/services/OrderService/src/OrderService.Api/OrderService.Api.csproj", "backend/services/OrderService/src/OrderService.Api/"]
 
 # Restore dependencies
-RUN dotnet restore "OrderService/Api/OrderService.Api.csproj"
+RUN dotnet restore "backend/services/OrderService/src/OrderService.Api/OrderService.Api.csproj"
 
 # Copy all source code
-COPY backend/shared/ ./Shared/
-COPY backend/services/OrderService/src/ ./OrderService/src/
+COPY backend/shared/ ./backend/shared/
+COPY backend/services/OrderService/src/ ./backend/services/OrderService/src/
 
 # Build the project
-WORKDIR "/src/OrderService/src/OrderService.Api"
+WORKDIR "/src/backend/services/OrderService/src/OrderService.Api"
 RUN dotnet build "OrderService.Api.csproj" -c Release -o /app/build
 
 # Stage 3: Publish stage
 FROM build AS publish
+WORKDIR "/src/backend/services/OrderService/src/OrderService.Api"
 RUN dotnet publish "OrderService.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 # Stage 4: Final stage

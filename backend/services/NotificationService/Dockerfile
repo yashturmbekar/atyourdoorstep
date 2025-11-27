@@ -3,25 +3,25 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copy shared projects
-COPY ["backend/shared/Domain/Shared.Domain.csproj", "Shared/Domain/"]
-COPY ["backend/shared/Application/Shared.Application.csproj", "Shared/Application/"]
-COPY ["backend/shared/Infrastructure/Shared.Infrastructure.csproj", "Shared/Infrastructure/"]
+COPY ["backend/shared/Domain/Shared.Domain.csproj", "backend/shared/Domain/"]
+COPY ["backend/shared/Application/Shared.Application.csproj", "backend/shared/Application/"]
+COPY ["backend/shared/Infrastructure/Shared.Infrastructure.csproj", "backend/shared/Infrastructure/"]
 
 # Copy NotificationService projects
-COPY ["backend/services/NotificationService/src/NotificationService.Domain/NotificationService.Domain.csproj", "NotificationService/Domain/"]
-COPY ["backend/services/NotificationService/src/NotificationService.Application/NotificationService.Application.csproj", "NotificationService/Application/"]
-COPY ["backend/services/NotificationService/src/NotificationService.Infrastructure/NotificationService.Infrastructure.csproj", "NotificationService/Infrastructure/"]
-COPY ["backend/services/NotificationService/src/NotificationService.Api/NotificationService.Api.csproj", "NotificationService/Api/"]
+COPY ["backend/services/NotificationService/src/NotificationService.Domain/NotificationService.Domain.csproj", "backend/services/NotificationService/src/NotificationService.Domain/"]
+COPY ["backend/services/NotificationService/src/NotificationService.Application/NotificationService.Application.csproj", "backend/services/NotificationService/src/NotificationService.Application/"]
+COPY ["backend/services/NotificationService/src/NotificationService.Infrastructure/NotificationService.Infrastructure.csproj", "backend/services/NotificationService/src/NotificationService.Infrastructure/"]
+COPY ["backend/services/NotificationService/src/NotificationService.Api/NotificationService.Api.csproj", "backend/services/NotificationService/src/NotificationService.Api/"]
 
 # Restore dependencies
-RUN dotnet restore "NotificationService/Api/NotificationService.Api.csproj"
+RUN dotnet restore "backend/services/NotificationService/src/NotificationService.Api/NotificationService.Api.csproj"
 
 # Copy source code
-COPY backend/shared/ ./Shared/
-COPY backend/services/NotificationService/src/ ./NotificationService/src/
+COPY backend/shared/ ./backend/shared/
+COPY backend/services/NotificationService/src/ ./backend/services/NotificationService/src/
 
 # Build
-WORKDIR "/src/NotificationService/src/NotificationService.Api"
+WORKDIR "/src/backend/services/NotificationService/src/NotificationService.Api"
 RUN dotnet build "NotificationService.Api.csproj" -c Release -o /app/build
 
 # Publish
