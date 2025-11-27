@@ -23,8 +23,8 @@ services:
 
   authservice:
     build:
-      context: .
-      dockerfile: docker/AuthService.Dockerfile
+      context: ./AuthService
+      dockerfile: Dockerfile
     container_name: authservice
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
@@ -45,8 +45,8 @@ services:
 
   orderservice:
     build:
-      context: .
-      dockerfile: docker/OrderService.Dockerfile
+      context: ./OrderService
+      dockerfile: Dockerfile
     container_name: orderservice
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
@@ -67,8 +67,8 @@ services:
 
   notificationservice:
     build:
-      context: .
-      dockerfile: docker/NotificationService.Dockerfile
+      context: ./NotificationService
+      dockerfile: Dockerfile
     container_name: notificationservice
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
@@ -91,8 +91,8 @@ services:
 
   gateway:
     build:
-      context: .
-      dockerfile: docker/Gateway.Dockerfile
+      context: ./Gateway
+      dockerfile: Dockerfile
     container_name: gateway
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
