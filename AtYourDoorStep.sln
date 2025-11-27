@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
@@ -7,75 +7,75 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{4F52FD
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{B78A39BB-EFA7-05CB-3820-193A492A810C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Domain", "Shared\Domain\Shared.Domain.csproj", "{9964C69C-1284-436D-A93C-263B4FA26A7B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Domain", "backend\shared\Domain\Shared.Domain.csproj", "{9964C69C-1284-436D-A93C-263B4FA26A7B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application", "{2D035A4D-AF61-D649-F5F7-A54561A3CFF4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Application", "Shared\Application\Shared.Application.csproj", "{180FE240-86A5-4F71-9F8C-BAE7F7BD00C7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Application", "backend\shared\Application\Shared.Application.csproj", "{180FE240-86A5-4F71-9F8C-BAE7F7BD00C7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{80116189-D5F9-D6EC-C98D-5F7DB2F1B3A1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Infrastructure", "Shared\Infrastructure\Shared.Infrastructure.csproj", "{093C4427-AAE9-48A4-B085-0D4327497D4B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Infrastructure", "backend\shared\Infrastructure\Shared.Infrastructure.csproj", "{093C4427-AAE9-48A4-B085-0D4327497D4B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OrderService", "OrderService", "{1CDB8257-D98E-AF38-204D-5645D4EEB404}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B7002682-C511-B755-F4DA-019F023A936F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.Domain", "OrderService\src\OrderService.Domain\OrderService.Domain.csproj", "{60B0044E-5E22-4ABF-A1F6-DD655C05DDBB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.Domain", "backend\services\OrderService\src\OrderService.Domain\OrderService.Domain.csproj", "{60B0044E-5E22-4ABF-A1F6-DD655C05DDBB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.Application", "OrderService\src\OrderService.Application\OrderService.Application.csproj", "{A4B45029-1AE8-4B29-9323-9E4C9F1458A7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.Application", "backend\services\OrderService\src\OrderService.Application\OrderService.Application.csproj", "{A4B45029-1AE8-4B29-9323-9E4C9F1458A7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.Infrastructure", "OrderService\src\OrderService.Infrastructure\OrderService.Infrastructure.csproj", "{DAFA445C-C796-4B8A-9EFE-98514DEA01F7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.Infrastructure", "backend\services\OrderService\src\OrderService.Infrastructure\OrderService.Infrastructure.csproj", "{DAFA445C-C796-4B8A-9EFE-98514DEA01F7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.Api", "OrderService\src\OrderService.Api\OrderService.Api.csproj", "{F39BED0B-F69F-4B0A-8D04-8569CD6D09CC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.Api", "backend\services\OrderService\src\OrderService.Api\OrderService.Api.csproj", "{F39BED0B-F69F-4B0A-8D04-8569CD6D09CC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{D2505B2E-017E-9361-BC88-2ABC8DB4C32B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.UnitTests", "OrderService\tests\OrderService.UnitTests\OrderService.UnitTests.csproj", "{A7CFF56E-DA70-4BB2-B9B0-7FB7B77FF50D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.UnitTests", "backend\services\OrderService\tests\OrderService.UnitTests\OrderService.UnitTests.csproj", "{A7CFF56E-DA70-4BB2-B9B0-7FB7B77FF50D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.IntegrationTests", "OrderService\tests\OrderService.IntegrationTests\OrderService.IntegrationTests.csproj", "{4D2DA476-6782-4CCC-924E-1175898A0DDF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService.IntegrationTests", "backend\services\OrderService\tests\OrderService.IntegrationTests\OrderService.IntegrationTests.csproj", "{4D2DA476-6782-4CCC-924E-1175898A0DDF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AuthService", "AuthService", "{54C27F26-71CB-9721-02CF-9E5332C2F895}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{FDD3B01D-2D1E-62BC-06E4-AC249E101CD7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.Domain", "AuthService\src\AuthService.Domain\AuthService.Domain.csproj", "{452CE2DF-DD01-4898-AC96-2131D4D921FF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.Domain", "backend\services\AuthService\src\AuthService.Domain\AuthService.Domain.csproj", "{452CE2DF-DD01-4898-AC96-2131D4D921FF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.Application", "AuthService\src\AuthService.Application\AuthService.Application.csproj", "{D21F4A80-8557-4345-BCAF-09BD506AFEA7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.Application", "backend\services\AuthService\src\AuthService.Application\AuthService.Application.csproj", "{D21F4A80-8557-4345-BCAF-09BD506AFEA7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.Infrastructure", "AuthService\src\AuthService.Infrastructure\AuthService.Infrastructure.csproj", "{7550CAED-E051-4309-8F5A-A0999DB5BD9F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.Infrastructure", "backend\services\AuthService\src\AuthService.Infrastructure\AuthService.Infrastructure.csproj", "{7550CAED-E051-4309-8F5A-A0999DB5BD9F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.Api", "AuthService\src\AuthService.Api\AuthService.Api.csproj", "{0BE3CD0D-0B54-438D-A0A9-9EF9F0A4943E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.Api", "backend\services\AuthService\src\AuthService.Api\AuthService.Api.csproj", "{0BE3CD0D-0B54-438D-A0A9-9EF9F0A4943E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{AF531F21-14D5-E161-8F78-37D6050257F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.UnitTests", "AuthService\tests\AuthService.UnitTests\AuthService.UnitTests.csproj", "{1CF30A14-EA19-4A82-BF27-0E051818C120}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.UnitTests", "backend\services\AuthService\tests\AuthService.UnitTests\AuthService.UnitTests.csproj", "{1CF30A14-EA19-4A82-BF27-0E051818C120}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.IntegrationTests", "AuthService\tests\AuthService.IntegrationTests\AuthService.IntegrationTests.csproj", "{F5E4B35F-73B2-49CA-AA4C-3350B32EBEC9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService.IntegrationTests", "backend\services\AuthService\tests\AuthService.IntegrationTests\AuthService.IntegrationTests.csproj", "{F5E4B35F-73B2-49CA-AA4C-3350B32EBEC9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NotificationService", "NotificationService", "{0BAE62A9-2200-0262-2CB5-8EE825167370}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{30993AEE-98A1-529F-B564-95C3EB406259}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.Domain", "NotificationService\src\NotificationService.Domain\NotificationService.Domain.csproj", "{E8539CCB-564F-4AFA-A660-BF022F765D9B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.Domain", "backend\services\NotificationService\src\NotificationService.Domain\NotificationService.Domain.csproj", "{E8539CCB-564F-4AFA-A660-BF022F765D9B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.Application", "NotificationService\src\NotificationService.Application\NotificationService.Application.csproj", "{6BAEF031-B860-4C90-9FF7-76461105A144}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.Application", "backend\services\NotificationService\src\NotificationService.Application\NotificationService.Application.csproj", "{6BAEF031-B860-4C90-9FF7-76461105A144}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.Infrastructure", "NotificationService\src\NotificationService.Infrastructure\NotificationService.Infrastructure.csproj", "{48CB17E1-3133-4F80-904C-A8FA6E7E011F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.Infrastructure", "backend\services\NotificationService\src\NotificationService.Infrastructure\NotificationService.Infrastructure.csproj", "{48CB17E1-3133-4F80-904C-A8FA6E7E011F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.Api", "NotificationService\src\NotificationService.Api\NotificationService.Api.csproj", "{5E4D8E01-20E9-4C0C-B1DE-86367B74AA73}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.Api", "backend\services\NotificationService\src\NotificationService.Api\NotificationService.Api.csproj", "{5E4D8E01-20E9-4C0C-B1DE-86367B74AA73}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{994F0094-4453-B073-8ADD-88396438895B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.UnitTests", "NotificationService\tests\NotificationService.UnitTests\NotificationService.UnitTests.csproj", "{7A6486BB-2A2E-4518-A15E-6267AC546F6B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.UnitTests", "backend\services\NotificationService\tests\NotificationService.UnitTests\NotificationService.UnitTests.csproj", "{7A6486BB-2A2E-4518-A15E-6267AC546F6B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.IntegrationTests", "NotificationService\tests\NotificationService.IntegrationTests\NotificationService.IntegrationTests.csproj", "{4CE3A4DD-D577-41A3-9A80-3FE989BE1574}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService.IntegrationTests", "backend\services\NotificationService\tests\NotificationService.IntegrationTests\NotificationService.IntegrationTests.csproj", "{4CE3A4DD-D577-41A3-9A80-3FE989BE1574}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gateway", "Gateway", "{E7BDDBC6-9FD1-D1D7-ACD8-2C4F8E3D2461}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F8691A4F-CEDB-1E15-E612-3146EE04F3E3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gateway", "Gateway\src\Gateway.csproj", "{5C789F5F-378F-4E26-9A65-A9DC6879695F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gateway", "backend\services\Gateway\src\Gateway.csproj", "{5C789F5F-378F-4E26-9A65-A9DC6879695F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -390,3 +390,4 @@ Global
 		{5C789F5F-378F-4E26-9A65-A9DC6879695F} = {F8691A4F-CEDB-1E15-E612-3146EE04F3E3}
 	EndGlobalSection
 EndGlobal
+
