@@ -6,17 +6,177 @@
 
 ---
 
+## [2025-11-27] — Phase 4: Push Notification Service - COMPLETED ✅
+
+### Status: Completed
+
+**NotificationService - Complete Implementation:**
+
+**Files Created (17 files):**
+
+1. **Domain Layer:**
+   - `src/NotificationService/Domain/NotificationService.Domain.csproj`
+   - `src/NotificationService/Domain/Entities/PushSubscription.cs` - User subscription entity
+   - `src/NotificationService/Domain/Entities/Notification.cs` - Notification record entity
+   - `src/NotificationService/Domain/Enums/NotificationType.cs` - OrderPlaced, OrderShipped, etc.
+   - `src/NotificationService/Domain/Enums/NotificationStatus.cs` - Pending, Sent, Failed, Read
+
+2. **Application Layer:**
+   - `src/NotificationService/Application/NotificationService.Application.csproj`
+   - `src/NotificationService/Application/DTOs/NotificationDtos.cs` - Request/Response DTOs
+   - `src/NotificationService/Application/Validators/NotificationValidators.cs` - FluentValidation
+   - `src/NotificationService/Application/Interfaces/INotificationRepositories.cs` - Repository contracts
+   - `src/NotificationService/Application/Interfaces/INotificationService.cs` - Service contracts
+
+3. **Infrastructure Layer:**
+   - `src/NotificationService/Infrastructure/NotificationService.Infrastructure.csproj` - WebPush 1.0.12
+   - `src/NotificationService/Infrastructure/Persistence/NotificationDbContext.cs` - EF Core DbContext
+   - `src/NotificationService/Infrastructure/Repositories/NotificationRepositories.cs` - Repository implementations
+   - `src/NotificationService/Infrastructure/Services/WebPushService.cs` - VAPID Web Push implementation
+   - `src/NotificationService/Infrastructure/Services/NotificationManagementService.cs` - Business logic
+
+4. **API Layer:**
+   - `src/NotificationService/API/NotificationService.API.csproj`
+   - `src/NotificationService/API/Controllers/NotificationsController.cs` - REST API endpoints
+   - `src/NotificationService/API/Program.cs` - Minimal API with Serilog, JWT, CORS
+   - `src/NotificationService/API/appsettings.json` - Development configuration
+   - `src/NotificationService/API/appsettings.Production.json` - Production configuration with env vars
+
+5. **Docker & Infrastructure:**
+   - `docker/NotificationService.Dockerfile` - Multi-stage Docker build
+
+**Features Implemented:**
+- ✅ Web Push notifications using VAPID protocol
+- ✅ Subscription management (subscribe/unsubscribe)
+- ✅ Send notification to specific user
+- ✅ Broadcast notification to all subscribers (Admin only)
+- ✅ Notification history with pagination
+- ✅ Mark notifications as read
+- ✅ Unread count endpoint
+- ✅ JWT authentication integration
+- ✅ Role-based authorization (Admin for broadcast)
+- ✅ FluentValidation for all requests
+- ✅ Serilog structured logging
+- ✅ PostgreSQL persistence (atyourdoorstep_notifications DB)
+- ✅ Health checks
+- ✅ Swagger/OpenAPI documentation
+- ✅ Snake_case database naming convention
+- ✅ Global exception handling
+- ✅ Request/response logging
+
+**API Endpoints:**
+- `POST /api/notifications/subscribe` - Subscribe to notifications
+- `DELETE /api/notifications/unsubscribe/{userId}` - Unsubscribe
+- `POST /api/notifications/send` - Send notification to user
+- `POST /api/notifications/broadcast` - Broadcast to all (Admin)
+- `GET /api/notifications/user/{userId}` - Get user notifications (paginated)
+- `PUT /api/notifications/mark-read` - Mark notification as read
+- `GET /api/notifications/unread-count/{userId}` - Get unread count
+- `GET /health` - Health check endpoint
+
+**Gateway Integration:**
+- Added `/api/notifications/*` route to API Gateway
+- Route configured for both development (localhost:5003) and production (notificationservice:80)
+
+**Docker Configuration:**
+- Added NotificationService to docker-compose.yml
+- Port 5003 exposed for direct access
+- VAPID keys configured via environment variables
+- Database: atyourdoorstep_notifications (auto-migrated)
+
+**Commands Run:**
+```bash
+# Add projects to solution
+dotnet sln add src/NotificationService/Domain/NotificationService.Domain.csproj
+dotnet sln add src/NotificationService/Application/NotificationService.Application.csproj
+dotnet sln add src/NotificationService/Infrastructure/NotificationService.Infrastructure.csproj
+dotnet sln add src/NotificationService/API/NotificationService.API.csproj
+
+# Build verification
+dotnet build src/NotificationService/API/NotificationService.API.csproj
+```
+
+**Updated Files:**
+- `src/Gateway/appsettings.json` - Added notifications-route
+- `src/Gateway/appsettings.Production.json` - Added notification-cluster
+- `docker-compose.yml` - Added notificationservice definition
+- `.env.template` - Added VAPID configuration keys
+- `AtYourDoorStep.sln` - Added 4 NotificationService projects
+
+**Database Schema (auto-created via EF migrations):**
+- `push_subscriptions` table - VAPID subscriptions
+- `notifications` table - Notification history
+
+**Configuration Required:**
+1. Generate VAPID keys (https://www.stephane-quantin.com/en/tools/generators/vapid-keys)
+2. Set VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY in .env
+3. Configure VAPID_SUBJECT (mailto:your-email)
+
+**How to Run:**
+```bash
+# Development (direct)
+dotnet run --project src/NotificationService/API
+
+# Development (via Gateway)
+# Service: http://localhost:5003
+# Gateway: http://localhost:5000/api/notifications
+
+# Docker
+docker-compose up -d notificationservice
+
+# Test subscription
+curl -X POST http://localhost:5000/api/notifications/subscribe \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": "user-guid",
+    "endpoint": "https://fcm.googleapis.com/...",
+    "p256dh": "key...",
+    "auth": "auth..."
+  }'
+
+# Send notification
+curl -X POST http://localhost:5000/api/notifications/send \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": "user-guid",
+    "title": "Order Shipped",
+    "body": "Your order has been shipped!",
+    "type": 3
+  }'
+```
+
+**Architecture Benefits:**
+- Push notifications for real-time updates
+- Order status notifications (Placed, Confirmed, Shipped, Delivered)
+- User engagement through timely notifications
+- Admin broadcast capability for announcements
+- Persistent notification history
+- Web Push standard (works across browsers)
+- No third-party dependencies (self-hosted)
+
+**Next Steps:**
+- Frontend integration (Service Worker, Notification API)
+- Order status triggers from OrderService
+- Notification preferences per user
+- Notification templates
+
+---
+
 ## [2025-11-27] — Project Reorganization: Frontend Folder Renamed ✅
 
 ### Status: Completed
 
 **Changes Made:**
+
 - Renamed `atyourdoorstep_web/` → `frontend/` following standard coding conventions
-- Updated all documentation references (README.md, PROJECT_STRUCTURE.md, docs/*.md)
+- Updated all documentation references (README.md, PROJECT_STRUCTURE.md, docs/\*.md)
 - Updated CI/CD workflow paths (.github/workflows/frontend.yml)
 - Updated docker-compose.yml references
 
 **Why:**
+
 - `frontend` is a standard, clear, and professional naming convention
 - Improves consistency across the project
 - Easier for new developers to understand project structure

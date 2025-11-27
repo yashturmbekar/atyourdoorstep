@@ -261,14 +261,14 @@ The project structure is now clean and well-organized. Developers can:
 
 ## 📊 Structure Summary
 
-| Category         | Location              | Files                                     |
-| ---------------- | --------------------- | ----------------------------------------- |
-| Backend Services | `src/`                | 4 services (Shared, Auth, Order, Gateway) |
-| Frontend App     | `frontend/` | Complete React + TypeScript app           |
-| Docker Configs   | `docker/`             | 4 Dockerfiles + init script               |
-| Documentation    | `docs/`               | 5 markdown files                          |
-| CI/CD            | `.github/workflows/`  | GitHub Actions workflows                  |
-| Root Configs     | `/`                   | 7 configuration files                     |
+| Category         | Location             | Files                                     |
+| ---------------- | -------------------- | ----------------------------------------- |
+| Backend Services | `src/`               | 4 services (Shared, Auth, Order, Gateway) |
+| Frontend App     | `frontend/`          | Complete React + TypeScript app           |
+| Docker Configs   | `docker/`            | 4 Dockerfiles + init script               |
+| Documentation    | `docs/`              | 5 markdown files                          |
+| CI/CD            | `.github/workflows/` | GitHub Actions workflows                  |
+| Root Configs     | `/`                  | 7 configuration files                     |
 
 ---
 
