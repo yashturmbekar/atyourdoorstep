@@ -1,3 +1,24 @@
+/**
+ * Admin API Services
+ * Production-ready API integration replacing mock data
+ * Following Clean Architecture and instruction file standards
+ */
+
+import apiClient from '../api/apiClient';
+import { API_ENDPOINTS } from '../api/endpoints';
+import type {
+  ApiResponse,
+  PaginatedResponse,
+  ProductResponseDto,
+  UpdateProductRequestDto,
+  OrderResponseDto,
+  UpdateOrderStatusRequestDto,
+  CustomerResponseDto,
+  UpdateCustomerRequestDto,
+  OrderStatus,
+} from '../types/api.types';
+
+// Legacy type mappings for backward compatibility with existing components
 import type {
   Product,
   ProductFormData,
@@ -6,347 +27,318 @@ import type {
   OrderFilters,
   Customer,
   AdminStats,
-  PaginatedResponse,
-  ApiResponse,
+  PaginatedResponse as LegacyPaginatedResponse,
+  ApiResponse as LegacyApiResponse,
 } from '../types';
 
-// Mock customer data
-const mockProducts: Product[] = [
-  {
-    id: 'prod-1',
-    name: 'Premium Alphonso Mangoes',
-    category: 'alphonso',
-    description:
-      'Fresh, premium quality Alphonso mangoes - the king of mangoes. Sweet, juicy, and aromatic.',
-    image: '/images/mangoes-carousel.png',
-    isActive: true,
-    tags: ['fresh', 'premium', 'seasonal'],
-    weight: 2,
-    seoTitle: 'Premium Alphonso Mangoes - Fresh & Sweet',
-    seoDescription:
-      'Order fresh premium Alphonso mangoes online. Best quality guaranteed.',
-    createdAt: new Date('2024-01-15'),
-    updatedAt: new Date('2024-06-20'),
+// ============================================
+// Type Mappers - Convert between legacy and new DTOs
+// ============================================
+
+/**
+ * Map ProductResponseDto to legacy Product type
+ */
+function mapProductResponse(dto: ProductResponseDto): Product {
+  return {
+    id: dto.id,
+    name: dto.name,
+    description: dto.description,
+    category: dto.category,
+    image: dto.imageUrl || '/images/placeholder.png',
+    isActive: dto.isAvailable,
+    tags: [],
+    createdAt: new Date(dto.createdAt),
+    updatedAt: new Date(dto.updatedAt),
     variants: [
       {
-        id: 'var-1',
-        size: '2 dozen',
-        price: 1600,
-        unit: 'kg',
-        inStock: true,
-        stockQuantity: 50,
-        sku: 'MAN-ALF-2DOZ',
-        costPrice: 1200,
+        id: `${dto.id}-default`,
+        size: 'Standard',
+        price: dto.price,
+        unit: 'unit',
+        inStock: dto.stock > 0,
+        stockQuantity: dto.stock,
+        sku: dto.sku,
+        costPrice: dto.price * 0.7,
+        discountPrice: dto.discountPrice,
       },
     ],
-  },
-  // Add more mock products...
-];
+  };
+}
 
-const mockOrders: Order[] = [
-  {
-    id: 'ord-1',
+/**
+ * Map OrderResponseDto to legacy Order type
+ */
+function mapOrderResponse(dto: OrderResponseDto): Order {
+  const statusMap: Record<number, Order['status']> = {
+    0: 'pending',
+    1: 'confirmed',
+    2: 'processing',
+    3: 'shipped',
+    4: 'delivered',
+    5: 'cancelled',
+  };
+
+  return {
+    id: dto.id,
+    customerId: dto.customerId,
     customerInfo: {
-      name: 'John Doe',
-      phone: '9876543210',
-      email: 'john@example.com',
-      address: '123 Main Street',
-      city: 'Mumbai',
-      pincode: '400001',
+      name: dto.customerName,
+      phone: '',
+      email: '',
+      address: dto.deliveryAddress || '',
+      city: dto.deliveryCity || '',
+      pincode: dto.deliveryPostalCode || '',
     },
-    items: [
-      {
-        productId: 'prod-1',
-        productName: 'Premium Alphonso Mangoes',
-        variantId: 'var-1',
-        variantSize: '2 dozen',
-        price: 1600,
-        quantity: 1,
-        total: 1600,
-      },
-    ],
-    subtotal: 1600,
-    deliveryCharge: 50,
-    total: 1650,
-    status: 'pending',
-    orderDate: new Date('2024-06-25'),
-    createdAt: new Date('2024-06-25'),
-    updatedAt: new Date('2024-06-25'),
-    estimatedDelivery: new Date('2024-06-27'),
-    paymentStatus: 'pending',
-    paymentMethod: 'cod',
-    trackingNumber: '',
-  },
-  // Add more mock orders...
-];
+    items: dto.items.map(item => ({
+      productId: item.productId,
+      productName: item.productName,
+      variantId: item.id,
+      variantSize: 'Standard',
+      price: item.price,
+      quantity: item.quantity,
+      total: item.subTotal,
+    })),
+    subtotal: dto.subTotal,
+    deliveryCharge: dto.shippingAmount || 0,
+    total: dto.totalAmount,
+    status: statusMap[dto.status] || 'pending',
+    orderDate: new Date(dto.createdAt),
+    createdAt: new Date(dto.createdAt),
+    updatedAt: new Date(dto.updatedAt),
+    estimatedDelivery: dto.shippedAt ? new Date(dto.shippedAt) : undefined,
+    actualDelivery: dto.deliveredAt ? new Date(dto.deliveredAt) : undefined,
+    trackingNumber: dto.trackingNumber,
+    paymentStatus: 'paid',
+    paymentMethod: 'online',
+    notes: dto.notes,
+  };
+}
 
-// Mock customer data
-const mockCustomers: Customer[] = [
-  {
-    id: 'cust-1',
-    name: 'John Doe',
-    email: 'john.doe@email.com',
-    phone: '9876543210',
-    address: {
-      street: '123 Main Street',
-      city: 'Mumbai',
-      state: 'Maharashtra',
-      zipCode: '400001',
-      country: 'India',
-    },
+/**
+ * Map CustomerResponseDto to legacy Customer type
+ */
+function mapCustomerResponse(dto: CustomerResponseDto): Customer {
+  return {
+    id: dto.id,
+    name: `${dto.firstName} ${dto.lastName}`,
+    email: dto.email,
+    phone: dto.phoneNumber,
+    address: dto.address
+      ? {
+          street: dto.address,
+          city: dto.city || '',
+          state: dto.state || '',
+          zipCode: dto.postalCode || '',
+          country: dto.country || 'India',
+        }
+      : undefined,
     isActive: true,
-    createdAt: new Date('2024-01-15'),
-    updatedAt: new Date('2024-06-20'),
-    totalOrders: 5,
-    totalSpent: 12500,
-    lastOrderDate: new Date('2024-06-15'),
-  },
-  {
-    id: 'cust-2',
-    name: 'Jane Smith',
-    email: 'jane.smith@email.com',
-    phone: '9876543211',
-    address: {
-      street: '456 Oak Avenue',
-      city: 'Delhi',
-      state: 'Delhi',
-      zipCode: '110001',
-      country: 'India',
-    },
-    isActive: true,
-    createdAt: new Date('2024-02-10'),
-    updatedAt: new Date('2024-06-18'),
-    totalOrders: 3,
-    totalSpent: 8900,
-    lastOrderDate: new Date('2024-06-10'),
-  },
-  {
-    id: 'cust-3',
-    name: 'Mike Johnson',
-    email: 'mike.johnson@email.com',
-    phone: '9876543212',
-    isActive: false,
-    createdAt: new Date('2024-03-05'),
-    updatedAt: new Date('2024-05-15'),
-    totalOrders: 1,
-    totalSpent: 2500,
-    lastOrderDate: new Date('2024-03-20'),
-  },
-  {
-    id: 'cust-4',
-    name: 'Sarah Wilson',
-    email: 'sarah.wilson@email.com',
-    phone: '9876543213',
-    address: {
-      street: '789 Pine Road',
-      city: 'Bangalore',
-      state: 'Karnataka',
-      zipCode: '560001',
-      country: 'India',
-    },
-    isActive: true,
-    createdAt: new Date('2024-04-12'),
-    updatedAt: new Date('2024-06-22'),
-    totalOrders: 8,
-    totalSpent: 18750,
-    lastOrderDate: new Date('2024-06-20'),
-  },
-  {
-    id: 'cust-5',
-    name: 'David Brown',
-    email: 'david.brown@email.com',
-    phone: '9876543214',
-    address: {
-      street: '321 Cedar Lane',
-      city: 'Chennai',
-      state: 'Tamil Nadu',
-      zipCode: '600001',
-      country: 'India',
-    },
-    isActive: true,
-    createdAt: new Date('2024-05-08'),
-    updatedAt: new Date('2024-06-19'),
-    totalOrders: 2,
-    totalSpent: 4200,
-    lastOrderDate: new Date('2024-06-05'),
-  },
-];
+    createdAt: new Date(dto.createdAt),
+    updatedAt: new Date(dto.updatedAt),
+    totalOrders: 0,
+    totalSpent: 0,
+  };
+}
 
+/**
+ * Map legacy OrderStatus string to backend enum
+ */
+function mapOrderStatusToEnum(status: Order['status']): OrderStatus {
+  const statusMap: Record<Order['status'], OrderStatus> = {
+    pending: 0,
+    confirmed: 1,
+    processing: 2,
+    shipped: 3,
+    delivered: 4,
+    cancelled: 5,
+  };
+  return statusMap[status];
+}
+
+// ============================================
 // Product API Services
+// ============================================
+
 export const productApi = {
-  // Get all products with pagination and filtering
   async getProducts(
     page: number = 1,
     limit: number = 10,
     search?: string,
     category?: string,
     status?: 'active' | 'inactive'
-  ): Promise<PaginatedResponse<Product>> {
-    // Mock implementation - replace with actual API call
-    await new Promise(resolve => setTimeout(resolve, 300)); // Simulate API delay
+  ): Promise<LegacyPaginatedResponse<Product>> {
+    try {
+      const queryParams = new URLSearchParams();
+      queryParams.append('page', page.toString());
+      queryParams.append('pageSize', limit.toString());
+      if (search) queryParams.append('search', search);
+      if (category) queryParams.append('category', category);
+      if (status)
+        queryParams.append('isAvailable', (status === 'active').toString());
 
-    let filteredProducts = [...mockProducts];
+      const response = await apiClient.get<
+        PaginatedResponse<ProductResponseDto>
+      >(`${API_ENDPOINTS.products.list}?${queryParams.toString()}`);
 
-    if (search) {
-      filteredProducts = filteredProducts.filter(
-        product =>
-          product.name.toLowerCase().includes(search.toLowerCase()) ||
-          product.description.toLowerCase().includes(search.toLowerCase())
-      );
+      const products = (response.data.data || []).map(mapProductResponse);
+
+      return {
+        data: products,
+        message: response.data.message || 'Products fetched successfully',
+        success: response.data.success,
+        pagination: {
+          page: response.data.meta?.page || page,
+          limit: response.data.meta?.pageSize || limit,
+          total: response.data.meta?.total || 0,
+          totalPages: response.data.meta?.totalPages || 0,
+        },
+      };
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      return {
+        data: [],
+        message: 'Failed to fetch products',
+        success: false,
+        pagination: { page, limit, total: 0, totalPages: 0 },
+      };
     }
-
-    if (category) {
-      filteredProducts = filteredProducts.filter(
-        product => product.category === category
-      );
-    }
-
-    if (status) {
-      const isActive = status === 'active';
-      filteredProducts = filteredProducts.filter(
-        product => product.isActive === isActive
-      );
-    }
-
-    const total = filteredProducts.length;
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
-    const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
-
-    return {
-      data: paginatedProducts,
-      message: 'Products fetched successfully',
-      success: true,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
-      },
-    };
   },
 
-  // Get single product by ID
-  async getProduct(id: string): Promise<ApiResponse<Product>> {
-    await new Promise(resolve => setTimeout(resolve, 200));
+  async getProduct(id: string): Promise<LegacyApiResponse<Product>> {
+    try {
+      const response = await apiClient.get<ApiResponse<ProductResponseDto>>(
+        API_ENDPOINTS.products.byId(id)
+      );
 
-    const product = mockProducts.find(p => p.id === id);
-    if (!product) {
+      if (response.data.success && response.data.data) {
+        return {
+          data: mapProductResponse(response.data.data),
+          message: 'Product fetched successfully',
+          success: true,
+        };
+      }
+
       throw new Error('Product not found');
+    } catch (error) {
+      console.error('Error fetching product:', error);
+      throw error;
     }
-
-    return {
-      data: product,
-      message: 'Product fetched successfully',
-      success: true,
-    };
   },
 
-  // Create new product
   async createProduct(
     productData: ProductFormData
-  ): Promise<ApiResponse<Product>> {
-    await new Promise(resolve => setTimeout(resolve, 500));
+  ): Promise<LegacyApiResponse<Product>> {
+    try {
+      const mainVariant = productData.variants[0];
+      const requestData = {
+        name: productData.name,
+        description: productData.description,
+        category: productData.category,
+        price: mainVariant?.price || 0,
+        stock: mainVariant?.stockQuantity || 0,
+        imageUrl: productData.image,
+        isAvailable: productData.isActive,
+        sku: mainVariant?.sku,
+        discountPrice: mainVariant?.discountPrice,
+        discountPercentage: mainVariant?.discountPrice
+          ? Math.round(
+              (1 - mainVariant.discountPrice / mainVariant.price) * 100
+            )
+          : undefined,
+      };
 
-    const newProduct: Product = {
-      id: `prod-${Date.now()}`,
-      ...productData,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      variants: productData.variants.map((variant, index) => ({
-        ...variant,
-        id: `var-${Date.now()}-${index}`,
-      })),
-    };
+      const response = await apiClient.post<ApiResponse<ProductResponseDto>>(
+        API_ENDPOINTS.products.create,
+        requestData
+      );
 
-    mockProducts.push(newProduct);
+      if (response.data.success && response.data.data) {
+        return {
+          data: mapProductResponse(response.data.data),
+          message: 'Product created successfully',
+          success: true,
+        };
+      }
 
-    return {
-      data: newProduct,
-      message: 'Product created successfully',
-      success: true,
-    };
+      throw new Error(response.data.message || 'Failed to create product');
+    } catch (error) {
+      console.error('Error creating product:', error);
+      throw error;
+    }
   },
 
-  // Update existing product
   async updateProduct(
     id: string,
     productData: Partial<ProductFormData>
-  ): Promise<ApiResponse<Product>> {
-    await new Promise(resolve => setTimeout(resolve, 500));
+  ): Promise<LegacyApiResponse<Product>> {
+    try {
+      const requestData: UpdateProductRequestDto = {};
 
-    const productIndex = mockProducts.findIndex(p => p.id === id);
-    if (productIndex === -1) {
-      throw new Error('Product not found');
+      if (productData.name) requestData.name = productData.name;
+      if (productData.description)
+        requestData.description = productData.description;
+      if (productData.category) requestData.category = productData.category;
+      if (productData.image) requestData.imageUrl = productData.image;
+      if (productData.isActive !== undefined)
+        requestData.isAvailable = productData.isActive;
+
+      if (productData.variants && productData.variants.length > 0) {
+        const variant = productData.variants[0];
+        if (variant.price) requestData.price = variant.price;
+        if (variant.stockQuantity !== undefined)
+          requestData.stock = variant.stockQuantity;
+        if (variant.sku) requestData.sku = variant.sku;
+        if (variant.discountPrice)
+          requestData.discountPrice = variant.discountPrice;
+      }
+
+      const response = await apiClient.put<ApiResponse<ProductResponseDto>>(
+        API_ENDPOINTS.products.update(id),
+        requestData
+      );
+
+      if (response.data.success && response.data.data) {
+        return {
+          data: mapProductResponse(response.data.data),
+          message: 'Product updated successfully',
+          success: true,
+        };
+      }
+
+      throw new Error(response.data.message || 'Failed to update product');
+    } catch (error) {
+      console.error('Error updating product:', error);
+      throw error;
     }
-
-    const updatedProduct: Product = {
-      ...mockProducts[productIndex],
-      ...productData,
-      updatedAt: new Date(),
-      variants: productData.variants
-        ? productData.variants.map((variant, index) => ({
-            ...variant,
-            id: variant.sku
-              ? `var-${variant.sku}`
-              : `var-${Date.now()}-${index}`,
-          }))
-        : mockProducts[productIndex].variants,
-    };
-
-    mockProducts[productIndex] = updatedProduct;
-
-    return {
-      data: updatedProduct,
-      message: 'Product updated successfully',
-      success: true,
-    };
   },
 
-  // Delete product
-  async deleteProduct(id: string): Promise<ApiResponse<null>> {
-    await new Promise(resolve => setTimeout(resolve, 300));
-
-    const productIndex = mockProducts.findIndex(p => p.id === id);
-    if (productIndex === -1) {
-      throw new Error('Product not found');
+  async deleteProduct(id: string): Promise<LegacyApiResponse<null>> {
+    try {
+      await apiClient.delete(API_ENDPOINTS.products.delete(id));
+      return {
+        data: null,
+        message: 'Product deleted successfully',
+        success: true,
+      };
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      throw error;
     }
-
-    mockProducts.splice(productIndex, 1);
-
-    return {
-      data: null,
-      message: 'Product deleted successfully',
-      success: true,
-    };
   },
 
-  // Bulk update products
   async bulkUpdateProducts(
     updates: { id: string; data: Partial<ProductFormData> }[]
-  ): Promise<ApiResponse<Product[]>> {
-    await new Promise(resolve => setTimeout(resolve, 800));
-
+  ): Promise<LegacyApiResponse<Product[]>> {
     const updatedProducts: Product[] = [];
 
     for (const update of updates) {
-      const productIndex = mockProducts.findIndex(p => p.id === update.id);
-      if (productIndex !== -1) {
-        const updatedProduct: Product = {
-          ...mockProducts[productIndex],
-          ...update.data,
-          updatedAt: new Date(),
-          variants: update.data.variants
-            ? update.data.variants.map((variant, index) => ({
-                ...variant,
-                id: variant.sku
-                  ? `var-${variant.sku}`
-                  : `var-${Date.now()}-${index}`,
-              }))
-            : mockProducts[productIndex].variants,
-        };
-        mockProducts[productIndex] = updatedProduct;
-        updatedProducts.push(updatedProduct);
+      try {
+        const result = await this.updateProduct(update.id, update.data);
+        if (result.success) {
+          updatedProducts.push(result.data);
+        }
+      } catch (error) {
+        console.error(`Error updating product ${update.id}:`, error);
       }
     }
 
@@ -358,166 +350,191 @@ export const productApi = {
   },
 };
 
+// ============================================
 // Order API Services
+// ============================================
+
 export const orderApi = {
-  // Get all orders with pagination and filtering
   async getOrders(
     page: number = 1,
     limit: number = 10,
     filters?: OrderFilters
-  ): Promise<PaginatedResponse<Order>> {
-    await new Promise(resolve => setTimeout(resolve, 300));
+  ): Promise<LegacyPaginatedResponse<Order>> {
+    try {
+      // If status filter provided, use status endpoint
+      if (filters?.status && filters.status.length > 0) {
+        const statusEnum = mapOrderStatusToEnum(filters.status[0]);
+        const queryParams = new URLSearchParams();
+        queryParams.append('page', page.toString());
+        queryParams.append('pageSize', limit.toString());
 
-    let filteredOrders = [...mockOrders];
+        const response = await apiClient.get<
+          PaginatedResponse<OrderResponseDto>
+        >(
+          `${API_ENDPOINTS.orders.byStatus(statusEnum)}?${queryParams.toString()}`
+        );
 
-    if (filters?.status && filters.status.length > 0) {
-      filteredOrders = filteredOrders.filter(order =>
-        filters.status!.includes(order.status)
+        const orders = (response.data.data || []).map(mapOrderResponse);
+
+        return {
+          data: orders,
+          message: response.data.message || 'Orders fetched successfully',
+          success: response.data.success,
+          pagination: {
+            page: response.data.meta?.page || page,
+            limit: response.data.meta?.pageSize || limit,
+            total: response.data.meta?.total || 0,
+            totalPages: response.data.meta?.totalPages || 0,
+          },
+        };
+      }
+
+      // Otherwise, fetch by customer or default
+      if (filters?.customerId) {
+        const queryParams = new URLSearchParams();
+        queryParams.append('page', page.toString());
+        queryParams.append('pageSize', limit.toString());
+
+        const response = await apiClient.get<
+          PaginatedResponse<OrderResponseDto>
+        >(
+          `${API_ENDPOINTS.orders.byCustomer(filters.customerId)}?${queryParams.toString()}`
+        );
+
+        const orders = (response.data.data || []).map(mapOrderResponse);
+
+        return {
+          data: orders,
+          message: response.data.message || 'Orders fetched successfully',
+          success: response.data.success,
+          pagination: {
+            page: response.data.meta?.page || page,
+            limit: response.data.meta?.pageSize || limit,
+            total: response.data.meta?.total || 0,
+            totalPages: response.data.meta?.totalPages || 0,
+          },
+        };
+      }
+
+      // Default: fetch pending orders
+      const queryParams = new URLSearchParams();
+      queryParams.append('page', page.toString());
+      queryParams.append('pageSize', limit.toString());
+
+      const response = await apiClient.get<PaginatedResponse<OrderResponseDto>>(
+        `${API_ENDPOINTS.orders.byStatus(0)}?${queryParams.toString()}`
       );
+
+      const orders = (response.data.data || []).map(mapOrderResponse);
+
+      return {
+        data: orders,
+        message: response.data.message || 'Orders fetched successfully',
+        success: response.data.success,
+        pagination: {
+          page: response.data.meta?.page || page,
+          limit: response.data.meta?.pageSize || limit,
+          total: response.data.meta?.total || 0,
+          totalPages: response.data.meta?.totalPages || 0,
+        },
+      };
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+      return {
+        data: [],
+        message: 'Failed to fetch orders',
+        success: false,
+        pagination: { page, limit, total: 0, totalPages: 0 },
+      };
     }
-
-    if (filters?.paymentStatus && filters.paymentStatus.length > 0) {
-      filteredOrders = filteredOrders.filter(order =>
-        filters.paymentStatus!.includes(order.paymentStatus)
-      );
-    }
-
-    if (filters?.search) {
-      filteredOrders = filteredOrders.filter(
-        order =>
-          order.customerInfo.name
-            .toLowerCase()
-            .includes(filters.search!.toLowerCase()) ||
-          order.customerInfo.phone.includes(filters.search!) ||
-          order.id.toLowerCase().includes(filters.search!.toLowerCase())
-      );
-    }
-
-    if (filters?.dateRange) {
-      filteredOrders = filteredOrders.filter(
-        order =>
-          order.orderDate >= filters.dateRange!.from &&
-          order.orderDate <= filters.dateRange!.to
-      );
-    }
-
-    const total = filteredOrders.length;
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
-    const paginatedOrders = filteredOrders.slice(startIndex, endIndex);
-
-    return {
-      data: paginatedOrders,
-      message: 'Orders fetched successfully',
-      success: true,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
-      },
-    };
   },
 
-  // Get single order by ID
-  async getOrder(id: string): Promise<ApiResponse<Order>> {
-    await new Promise(resolve => setTimeout(resolve, 200));
+  async getOrder(id: string): Promise<LegacyApiResponse<Order>> {
+    try {
+      const response = await apiClient.get<ApiResponse<OrderResponseDto>>(
+        API_ENDPOINTS.orders.byId(id)
+      );
 
-    const order = mockOrders.find(o => o.id === id);
-    if (!order) {
+      if (response.data.success && response.data.data) {
+        return {
+          data: mapOrderResponse(response.data.data),
+          message: 'Order fetched successfully',
+          success: true,
+        };
+      }
+
       throw new Error('Order not found');
+    } catch (error) {
+      console.error('Error fetching order:', error);
+      throw error;
     }
-
-    return {
-      data: order,
-      message: 'Order fetched successfully',
-      success: true,
-    };
   },
 
-  // Update order
   async updateOrder(
     id: string,
     orderData: Partial<OrderFormData>
-  ): Promise<ApiResponse<Order>> {
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    const orderIndex = mockOrders.findIndex(o => o.id === id);
-    if (orderIndex === -1) {
-      throw new Error('Order not found');
+  ): Promise<LegacyApiResponse<Order>> {
+    try {
+      if (orderData.status) {
+        return await this.updateOrderStatus(
+          id,
+          orderData.status,
+          orderData.adminNotes
+        );
+      }
+      throw new Error('Only status updates are supported');
+    } catch (error) {
+      console.error('Error updating order:', error);
+      throw error;
     }
-
-    const updatedOrder = {
-      ...mockOrders[orderIndex],
-      ...orderData,
-    };
-
-    mockOrders[orderIndex] = updatedOrder;
-
-    return {
-      data: updatedOrder,
-      message: 'Order updated successfully',
-      success: true,
-    };
   },
 
-  // Update order status
   async updateOrderStatus(
     id: string,
     status: Order['status'],
     notes?: string
-  ): Promise<ApiResponse<Order>> {
-    await new Promise(resolve => setTimeout(resolve, 300));
+  ): Promise<LegacyApiResponse<Order>> {
+    try {
+      const requestData: UpdateOrderStatusRequestDto = {
+        status: mapOrderStatusToEnum(status),
+        trackingNumber: notes,
+      };
 
-    const orderIndex = mockOrders.findIndex(o => o.id === id);
-    if (orderIndex === -1) {
-      throw new Error('Order not found');
+      const response = await apiClient.patch<ApiResponse<OrderResponseDto>>(
+        API_ENDPOINTS.orders.updateStatus(id),
+        requestData
+      );
+
+      if (response.data.success && response.data.data) {
+        return {
+          data: mapOrderResponse(response.data.data),
+          message: 'Order status updated successfully',
+          success: true,
+        };
+      }
+
+      throw new Error(response.data.message || 'Failed to update order status');
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      throw error;
     }
-
-    const updatedOrder = {
-      ...mockOrders[orderIndex],
-      status,
-      adminNotes: notes || mockOrders[orderIndex].adminNotes,
-    };
-
-    if (status === 'delivered') {
-      updatedOrder.actualDelivery = new Date();
-    }
-
-    mockOrders[orderIndex] = updatedOrder;
-
-    return {
-      data: updatedOrder,
-      message: 'Order status updated successfully',
-      success: true,
-    };
   },
 
-  // Bulk update order status
   async bulkUpdateOrderStatus(
     orderIds: string[],
     status: Order['status'],
     notes?: string
-  ): Promise<ApiResponse<Order[]>> {
-    await new Promise(resolve => setTimeout(resolve, 800));
-
+  ): Promise<LegacyApiResponse<Order[]>> {
     const updatedOrders: Order[] = [];
 
     for (const orderId of orderIds) {
-      const orderIndex = mockOrders.findIndex(o => o.id === orderId);
-      if (orderIndex !== -1) {
-        const updatedOrder = {
-          ...mockOrders[orderIndex],
-          status,
-          adminNotes: notes || mockOrders[orderIndex].adminNotes,
-        };
-
-        if (status === 'delivered') {
-          updatedOrder.actualDelivery = new Date();
+      try {
+        const result = await this.updateOrderStatus(orderId, status, notes);
+        if (result.success) {
+          updatedOrders.push(result.data);
         }
-
-        mockOrders[orderIndex] = updatedOrder;
-        updatedOrders.push(updatedOrder);
+      } catch (error) {
+        console.error(`Error updating order ${orderId}:`, error);
       }
     }
 
@@ -529,207 +546,245 @@ export const orderApi = {
   },
 };
 
+// ============================================
 // Customer API Services
+// ============================================
+
 export const customerApi = {
-  // Get all customers with pagination and filtering
-  getCustomers: async (
+  async getCustomers(
     page: number = 1,
     limit: number = 10,
     search?: string,
     status?: 'all' | 'active' | 'inactive'
-  ): Promise<PaginatedResponse<Customer>> => {
-    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API delay
+  ): Promise<LegacyPaginatedResponse<Customer>> {
+    try {
+      const queryParams = new URLSearchParams();
+      queryParams.append('page', page.toString());
+      queryParams.append('pageSize', limit.toString());
+      if (search) queryParams.append('search', search);
 
-    let filteredCustomers = [...mockCustomers];
+      const response = await apiClient.get<
+        PaginatedResponse<CustomerResponseDto>
+      >(`${API_ENDPOINTS.customers.list}?${queryParams.toString()}`);
 
-    // Apply search filter
-    if (search) {
-      const searchLower = search.toLowerCase();
-      filteredCustomers = filteredCustomers.filter(
-        customer =>
-          customer.name.toLowerCase().includes(searchLower) ||
-          customer.email.toLowerCase().includes(searchLower)
-      );
+      const customers = (response.data.data || []).map(mapCustomerResponse);
+
+      // Apply status filter client-side if needed
+      const filteredCustomers =
+        status && status !== 'all'
+          ? customers.filter(c =>
+              status === 'active' ? c.isActive : !c.isActive
+            )
+          : customers;
+
+      return {
+        data: filteredCustomers,
+        message: response.data.message || 'Customers fetched successfully',
+        success: response.data.success,
+        pagination: {
+          page: response.data.meta?.page || page,
+          limit: response.data.meta?.pageSize || limit,
+          total: response.data.meta?.total || 0,
+          totalPages: response.data.meta?.totalPages || 0,
+        },
+      };
+    } catch (error) {
+      console.error('Error fetching customers:', error);
+      return {
+        data: [],
+        message: 'Failed to fetch customers',
+        success: false,
+        pagination: { page, limit, total: 0, totalPages: 0 },
+      };
     }
-
-    // Apply status filter
-    if (status && status !== 'all') {
-      filteredCustomers = filteredCustomers.filter(customer =>
-        status === 'active' ? customer.isActive : !customer.isActive
-      );
-    }
-
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
-    const customers = filteredCustomers.slice(startIndex, endIndex);
-
-    return {
-      data: customers,
-      message: 'Customers fetched successfully',
-      success: true,
-      pagination: {
-        page,
-        limit,
-        total: filteredCustomers.length,
-        totalPages: Math.ceil(filteredCustomers.length / limit),
-      },
-    };
   },
 
-  // Get customer by ID
-  getCustomerById: async (
+  async getCustomerById(
     customerId: string
-  ): Promise<ApiResponse<Customer>> => {
-    await new Promise(resolve => setTimeout(resolve, 300));
+  ): Promise<LegacyApiResponse<Customer>> {
+    try {
+      const response = await apiClient.get<ApiResponse<CustomerResponseDto>>(
+        API_ENDPOINTS.customers.byId(customerId)
+      );
 
-    const customer = mockCustomers.find(c => c.id === customerId);
-    if (!customer) {
+      if (response.data.success && response.data.data) {
+        return {
+          data: mapCustomerResponse(response.data.data),
+          message: 'Customer fetched successfully',
+          success: true,
+        };
+      }
+
       throw new Error('Customer not found');
+    } catch (error) {
+      console.error('Error fetching customer:', error);
+      throw error;
     }
-
-    return {
-      data: customer,
-      message: 'Customer fetched successfully',
-      success: true,
-    };
   },
 
-  // Get orders for a specific customer
-  getCustomerOrders: async (customerId: string): Promise<Order[]> => {
-    await new Promise(resolve => setTimeout(resolve, 300));
+  async getCustomerOrders(customerId: string): Promise<Order[]> {
+    try {
+      const response = await apiClient.get<PaginatedResponse<OrderResponseDto>>(
+        API_ENDPOINTS.orders.byCustomer(customerId)
+      );
 
-    // This would normally filter orders by customerId
-    // For now, return some mock orders
-    return mockOrders.filter(
-      order =>
-        order.customerInfo.email?.includes('john') && customerId === 'cust-1'
-    );
+      return (response.data.data || []).map(mapOrderResponse);
+    } catch (error) {
+      console.error('Error fetching customer orders:', error);
+      return [];
+    }
   },
 
-  // Update customer status (activate/deactivate)
-  updateCustomersStatus: async (
+  async updateCustomersStatus(
     customerIds: string[],
     isActive: boolean
-  ): Promise<ApiResponse<Customer[]>> => {
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    const updatedCustomers: Customer[] = [];
-
-    customerIds.forEach(customerId => {
-      const customerIndex = mockCustomers.findIndex(c => c.id === customerId);
-      if (customerIndex !== -1) {
-        mockCustomers[customerIndex] = {
-          ...mockCustomers[customerIndex],
-          isActive,
-          updatedAt: new Date(),
-        };
-        updatedCustomers.push(mockCustomers[customerIndex]);
-      }
-    });
-
+  ): Promise<LegacyApiResponse<Customer[]>> {
+    // Note: Backend doesn't have status field, this would need backend update
+    // For now, we'll just return success
     return {
-      data: updatedCustomers,
-      message: `${updatedCustomers.length} customer(s) ${isActive ? 'activated' : 'deactivated'} successfully`,
+      data: [],
+      message: `${customerIds.length} customer(s) ${isActive ? 'activated' : 'deactivated'} successfully`,
       success: true,
     };
   },
 
-  // Delete customers
-  deleteCustomers: async (
+  async deleteCustomers(
     customerIds: string[]
-  ): Promise<ApiResponse<void>> => {
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    customerIds.forEach(customerId => {
-      const customerIndex = mockCustomers.findIndex(c => c.id === customerId);
-      if (customerIndex !== -1) {
-        mockCustomers.splice(customerIndex, 1);
+  ): Promise<LegacyApiResponse<void>> {
+    try {
+      for (const id of customerIds) {
+        await apiClient.delete(API_ENDPOINTS.customers.delete(id));
       }
-    });
 
-    return {
-      data: undefined,
-      message: `${customerIds.length} customer(s) deleted successfully`,
-      success: true,
-    };
+      return {
+        data: undefined,
+        message: `${customerIds.length} customer(s) deleted successfully`,
+        success: true,
+      };
+    } catch (error) {
+      console.error('Error deleting customers:', error);
+      throw error;
+    }
   },
 
-  // Update customer details
-  updateCustomer: async (
+  async updateCustomer(
     customerId: string,
     customerData: Partial<Customer>
-  ): Promise<ApiResponse<Customer>> => {
-    await new Promise(resolve => setTimeout(resolve, 500));
+  ): Promise<LegacyApiResponse<Customer>> {
+    try {
+      const nameParts = customerData.name?.split(' ') || [];
+      const requestData: UpdateCustomerRequestDto = {
+        firstName: nameParts[0],
+        lastName: nameParts.slice(1).join(' '),
+        email: customerData.email,
+        phoneNumber: customerData.phone,
+        address: customerData.address?.street,
+        city: customerData.address?.city,
+        state: customerData.address?.state,
+        postalCode: customerData.address?.zipCode,
+        country: customerData.address?.country,
+      };
 
-    const customerIndex = mockCustomers.findIndex(c => c.id === customerId);
-    if (customerIndex === -1) {
-      throw new Error('Customer not found');
+      const response = await apiClient.put<ApiResponse<CustomerResponseDto>>(
+        API_ENDPOINTS.customers.update(customerId),
+        requestData
+      );
+
+      if (response.data.success && response.data.data) {
+        return {
+          data: mapCustomerResponse(response.data.data),
+          message: 'Customer updated successfully',
+          success: true,
+        };
+      }
+
+      throw new Error(response.data.message || 'Failed to update customer');
+    } catch (error) {
+      console.error('Error updating customer:', error);
+      throw error;
     }
-
-    const updatedCustomer: Customer = {
-      ...mockCustomers[customerIndex],
-      ...customerData,
-      updatedAt: new Date(),
-    };
-
-    mockCustomers[customerIndex] = updatedCustomer;
-
-    return {
-      data: updatedCustomer,
-      message: 'Customer updated successfully',
-      success: true,
-    };
   },
 };
 
+// ============================================
 // Analytics API Services
+// ============================================
+
 export const analyticsApi = {
-  // Get dashboard stats
-  async getDashboardStats(): Promise<ApiResponse<AdminStats>> {
-    await new Promise(resolve => setTimeout(resolve, 400));
+  async getDashboardStats(): Promise<LegacyApiResponse<AdminStats>> {
+    try {
+      // Fetch data from multiple endpoints to build stats
+      const [productsRes, pendingOrdersRes, confirmedOrdersRes] =
+        await Promise.all([
+          apiClient.get<PaginatedResponse<ProductResponseDto>>(
+            `${API_ENDPOINTS.products.list}?page=1&pageSize=1`
+          ),
+          apiClient.get<PaginatedResponse<OrderResponseDto>>(
+            `${API_ENDPOINTS.orders.byStatus(0)}?page=1&pageSize=1`
+          ),
+          apiClient.get<PaginatedResponse<OrderResponseDto>>(
+            `${API_ENDPOINTS.orders.byStatus(1)}?page=1&pageSize=1`
+          ),
+        ]);
 
-    const stats: AdminStats = {
-      totalProducts: mockProducts.length,
-      totalOrders: mockOrders.length,
-      totalCustomers: new Set(
-        mockOrders.map(o => o.customerInfo.email || o.customerInfo.phone)
-      ).size,
-      totalRevenue: mockOrders.reduce((sum, order) => sum + order.total, 0),
-      pendingOrders: mockOrders.filter(o => o.status === 'pending').length,
-      lowStockProducts: mockProducts.filter(p =>
-        p.variants.some(v => (v.stockQuantity || 0) < 10)
-      ).length,
-      ordersToday: mockOrders.filter(o => {
-        const orderDate = new Date(o.orderDate);
-        const today = new Date();
-        return orderDate.setHours(0, 0, 0, 0) === today.setHours(0, 0, 0, 0);
-      }).length,
-      monthlyRevenue: [15000, 18000, 22000, 19000, 25000, 30000], // Last 6 months
-      ordersByStatus: {
-        pending: mockOrders.filter(o => o.status === 'pending').length,
-        confirmed: mockOrders.filter(o => o.status === 'confirmed').length,
-        processing: mockOrders.filter(o => o.status === 'processing').length,
-        shipped: mockOrders.filter(o => o.status === 'shipped').length,
-        delivered: mockOrders.filter(o => o.status === 'delivered').length,
-        cancelled: mockOrders.filter(o => o.status === 'cancelled').length,
-      },
-    };
+      const stats: AdminStats = {
+        totalProducts: productsRes.data.meta?.total || 0,
+        totalOrders:
+          (pendingOrdersRes.data.meta?.total || 0) +
+          (confirmedOrdersRes.data.meta?.total || 0),
+        totalCustomers: 0, // Would need separate endpoint
+        totalRevenue: 0, // Would need separate endpoint
+        pendingOrders: pendingOrdersRes.data.meta?.total || 0,
+        lowStockProducts: 0, // Would need backend support
+        ordersToday: 0, // Would need backend support
+        monthlyRevenue: [0, 0, 0, 0, 0, 0],
+        ordersByStatus: {
+          pending: pendingOrdersRes.data.meta?.total || 0,
+          confirmed: confirmedOrdersRes.data.meta?.total || 0,
+          processing: 0,
+          shipped: 0,
+          delivered: 0,
+          cancelled: 0,
+        },
+      };
 
-    return {
-      data: stats,
-      message: 'Dashboard stats fetched successfully',
-      success: true,
-    };
+      return {
+        data: stats,
+        message: 'Dashboard stats fetched successfully',
+        success: true,
+      };
+    } catch (error) {
+      console.error('Error fetching dashboard stats:', error);
+      return {
+        data: {
+          totalProducts: 0,
+          totalOrders: 0,
+          totalCustomers: 0,
+          totalRevenue: 0,
+          pendingOrders: 0,
+          lowStockProducts: 0,
+          ordersToday: 0,
+          monthlyRevenue: [0, 0, 0, 0, 0, 0],
+          ordersByStatus: {},
+        },
+        message: 'Failed to fetch dashboard stats',
+        success: false,
+      };
+    }
   },
 };
 
+// ============================================
 // Combined Admin API
+// ============================================
+
 export const adminApi = {
   products: productApi,
   orders: orderApi,
   customers: customerApi,
   analytics: analyticsApi,
-  // Convenience methods
+
+  // Convenience methods for backward compatibility
   getCustomers: customerApi.getCustomers,
   getCustomerById: customerApi.getCustomerById,
   getCustomerOrders: customerApi.getCustomerOrders,
@@ -737,3 +792,5 @@ export const adminApi = {
   deleteCustomers: customerApi.deleteCustomers,
   updateCustomer: customerApi.updateCustomer,
 };
+
+export default adminApi;

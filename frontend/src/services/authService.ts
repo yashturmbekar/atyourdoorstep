@@ -1,43 +1,38 @@
-import apiClient, { ApiResponse, getErrorMessage } from '../api/apiClient';
+/**
+ * Auth Service
+ * Handles all authentication-related API calls to AuthService
+ * Following Clean Architecture and instruction file standards
+ */
+
+import apiClient, { getErrorMessage } from '../api/apiClient';
 import { API_ENDPOINTS } from '../api/endpoints';
+import type {
+  ApiResponse,
+  AuthResponseDto,
+  UserDto,
+  RegisterRequestDto,
+  LoginRequestDto,
+  RevokeTokenRequestDto,
+} from '../types/api.types';
 
-export interface RegisterRequest {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-  phoneNumber?: string;
-}
+// Re-export types for backward compatibility
+export type RegisterRequest = RegisterRequestDto;
+export type LoginRequest = LoginRequestDto;
+export type AuthResponse = AuthResponseDto;
+export type User = UserDto;
 
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface AuthResponse {
-  accessToken: string;
-  refreshToken: string;
-  expiresAt: string;
-  user: User;
-}
-
-export interface User {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  phoneNumber?: string;
-  roles: string[];
-  createdAt: string;
-}
-
+/**
+ * Auth Service - All authentication-related API operations
+ */
 export const authService = {
   /**
    * Register a new user
+   * @param data - Registration data
+   * @returns Auth response with tokens and user
    */
-  async register(data: RegisterRequest): Promise<AuthResponse> {
+  async register(data: RegisterRequestDto): Promise<AuthResponseDto> {
     try {
-      const response = await apiClient.post<ApiResponse<AuthResponse>>(
+      const response = await apiClient.post<ApiResponse<AuthResponseDto>>(
         API_ENDPOINTS.auth.register,
         data
       );
@@ -55,10 +50,12 @@ export const authService = {
 
   /**
    * Login with email and password
+   * @param data - Login credentials
+   * @returns Auth response with tokens and user
    */
-  async login(data: LoginRequest): Promise<AuthResponse> {
+  async login(data: LoginRequestDto): Promise<AuthResponseDto> {
     try {
-      const response = await apiClient.post<ApiResponse<AuthResponse>>(
+      const response = await apiClient.post<ApiResponse<AuthResponseDto>>(
         API_ENDPOINTS.auth.login,
         data
       );
@@ -75,7 +72,7 @@ export const authService = {
   },
 
   /**
-   * Logout user
+   * Logout current user
    */
   async logout(): Promise<void> {
     try {
@@ -89,10 +86,11 @@ export const authService = {
 
   /**
    * Get current authenticated user
+   * @returns Current user data
    */
-  async getCurrentUser(): Promise<User> {
+  async getCurrentUser(): Promise<UserDto> {
     try {
-      const response = await apiClient.get<ApiResponse<User>>(
+      const response = await apiClient.get<ApiResponse<UserDto>>(
         API_ENDPOINTS.auth.me
       );
 
@@ -108,27 +106,30 @@ export const authService = {
   },
 
   /**
-   * Revoke refresh token
+   * Revoke a refresh token
+   * @param refreshToken - Token to revoke
    */
   async revokeToken(refreshToken: string): Promise<void> {
     try {
-      await apiClient.post(API_ENDPOINTS.auth.revoke, { refreshToken });
+      const data: RevokeTokenRequestDto = { refreshToken };
+      await apiClient.post(API_ENDPOINTS.auth.revoke, data);
     } catch (error) {
       throw new Error(getErrorMessage(error));
     }
   },
 
   /**
-   * Store authentication tokens
+   * Store authentication tokens in localStorage
+   * @param authResponse - Auth response containing tokens
    */
-  storeTokens(authResponse: AuthResponse): void {
+  storeTokens(authResponse: AuthResponseDto): void {
     localStorage.setItem('accessToken', authResponse.accessToken);
     localStorage.setItem('refreshToken', authResponse.refreshToken);
     localStorage.setItem('user', JSON.stringify(authResponse.user));
   },
 
   /**
-   * Clear all authentication data
+   * Clear all authentication data from storage
    */
   clearTokens(): void {
     localStorage.removeItem('accessToken');
@@ -153,12 +154,12 @@ export const authService = {
   /**
    * Get stored user data
    */
-  getStoredUser(): User | null {
+  getStoredUser(): UserDto | null {
     const userJson = localStorage.getItem('user');
     if (!userJson) return null;
 
     try {
-      return JSON.parse(userJson) as User;
+      return JSON.parse(userJson) as UserDto;
     } catch {
       return null;
     }
@@ -173,6 +174,7 @@ export const authService = {
 
   /**
    * Check if user has specific role
+   * @param role - Role to check
    */
   hasRole(role: string): boolean {
     const user = this.getStoredUser();
@@ -184,6 +186,13 @@ export const authService = {
    */
   isAdmin(): boolean {
     return this.hasRole('Admin');
+  },
+
+  /**
+   * Check if user is manager
+   */
+  isManager(): boolean {
+    return this.hasRole('Manager') || this.isAdmin();
   },
 };
 

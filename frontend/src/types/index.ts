@@ -1,5 +1,8 @@
 // Common type definitions for the application
 
+// Re-export API types
+export * from './api.types';
+
 export interface User {
   id: string;
   name: string;
