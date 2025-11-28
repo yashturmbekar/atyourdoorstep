@@ -1,8 +1,23 @@
-import React, { createContext, useReducer } from 'react';
+/**
+ * CartContext - Dynamic Delivery Settings from ContentService
+ * Uses delivery charges from CMS instead of hardcoded constants
+ */
+import React, {
+  createContext,
+  useReducer,
+  useEffect,
+  useState,
+  useCallback,
+} from 'react';
 import type { ReactNode } from 'react';
 import type { Product, ProductVariant, CartItem, Cart } from '../types';
 import { generateId, calculateDeliveryCharge } from '../utils';
-import { DELIVERY_CHARGES } from '../constants';
+
+// Fallback delivery charges when API is not available
+const DEFAULT_DELIVERY_CHARGES = {
+  freeDeliveryThreshold: 500,
+  standardCharge: 50,
+};
 
 // Cart Actions
 type CartAction =
@@ -12,7 +27,11 @@ type CartAction =
     }
   | { type: 'REMOVE_ITEM'; payload: { id: string } }
   | { type: 'UPDATE_QUANTITY'; payload: { id: string; quantity: number } }
-  | { type: 'CLEAR_CART' };
+  | { type: 'CLEAR_CART' }
+  | {
+      type: 'RECALCULATE_DELIVERY';
+      payload: { freeDeliveryThreshold: number; standardCharge: number };
+    };
 
 // Cart Context
 interface CartContextType {
@@ -36,6 +55,17 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export { CartContext };
 export type { CartContextType };
 
+// Delivery charges configuration (mutable for dynamic updates)
+let deliveryChargesConfig = { ...DEFAULT_DELIVERY_CHARGES };
+
+// Function to update delivery charges config
+export const updateDeliveryChargesConfig = (config: {
+  freeDeliveryThreshold: number;
+  standardCharge: number;
+}) => {
+  deliveryChargesConfig = { ...config };
+};
+
 // Cart Reducer
 const cartReducer = (state: Cart, action: CartAction): Cart => {
   // Ensure state is properly normalized (handles migration from old cart structure)
@@ -43,6 +73,22 @@ const cartReducer = (state: Cart, action: CartAction): Cart => {
     state.subtotal !== undefined ? state : normalizeCartState(state);
 
   switch (action.type) {
+    case 'RECALCULATE_DELIVERY': {
+      const { freeDeliveryThreshold, standardCharge } = action.payload;
+      const subtotal = normalizedState.subtotal || 0;
+      const deliveryCharge = calculateDeliveryCharge(
+        subtotal,
+        freeDeliveryThreshold,
+        standardCharge
+      );
+
+      return {
+        ...normalizedState,
+        deliveryCharge,
+        total: calculateTotal(subtotal, deliveryCharge),
+      };
+    }
+
     case 'ADD_ITEM': {
       const { product, variant, quantity } = action.payload;
 
@@ -182,8 +228,8 @@ const calculateCartDeliveryCharge = (subtotal: number): number => {
 
   const deliveryCharge = calculateDeliveryCharge(
     subtotal,
-    DELIVERY_CHARGES.freeDeliveryThreshold,
-    DELIVERY_CHARGES.standardCharge
+    deliveryChargesConfig.freeDeliveryThreshold,
+    deliveryChargesConfig.standardCharge
   );
 
   return isNaN(deliveryCharge) ? 0 : deliveryCharge;
@@ -232,6 +278,53 @@ interface CartProviderProps {
 
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [cart, dispatch] = useReducer(cartReducer, initialState);
+  const [deliverySettings, setDeliverySettings] = useState(
+    DEFAULT_DELIVERY_CHARGES
+  );
+
+  // Fetch delivery settings from API on mount
+  useEffect(() => {
+    const fetchDeliverySettings = async () => {
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_CONTENT_API_BASE_URL || '/api/content'}/delivery-settings/charges`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.data) {
+            const newSettings = {
+              freeDeliveryThreshold:
+                data.data.freeDeliveryThreshold ??
+                DEFAULT_DELIVERY_CHARGES.freeDeliveryThreshold,
+              standardCharge:
+                data.data.standardCharge ??
+                DEFAULT_DELIVERY_CHARGES.standardCharge,
+            };
+            setDeliverySettings(newSettings);
+            updateDeliveryChargesConfig(newSettings);
+
+            // Recalculate delivery for current cart
+            dispatch({
+              type: 'RECALCULATE_DELIVERY',
+              payload: newSettings,
+            });
+          }
+        }
+      } catch (error) {
+        console.warn(
+          'Failed to fetch delivery settings, using defaults:',
+          error
+        );
+      }
+    };
+
+    fetchDeliverySettings();
+  }, []);
+
+  // Update delivery config when settings change
+  useEffect(() => {
+    updateDeliveryChargesConfig(deliverySettings);
+  }, [deliverySettings]);
 
   // Debug logging
   React.useEffect(() => {
@@ -244,33 +337,35 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     });
   }, [cart]);
 
-  const addToCart = (
-    product: Product,
-    variant: ProductVariant,
-    quantity: number
-  ) => {
-    dispatch({ type: 'ADD_ITEM', payload: { product, variant, quantity } });
-  };
+  const addToCart = useCallback(
+    (product: Product, variant: ProductVariant, quantity: number) => {
+      dispatch({ type: 'ADD_ITEM', payload: { product, variant, quantity } });
+    },
+    []
+  );
 
-  const removeFromCart = (id: string) => {
+  const removeFromCart = useCallback((id: string) => {
     dispatch({ type: 'REMOVE_ITEM', payload: { id } });
-  };
+  }, []);
 
-  const updateQuantity = (id: string, quantity: number) => {
+  const updateQuantity = useCallback((id: string, quantity: number) => {
     dispatch({ type: 'UPDATE_QUANTITY', payload: { id, quantity } });
-  };
+  }, []);
 
-  const clearCart = () => {
+  const clearCart = useCallback(() => {
     dispatch({ type: 'CLEAR_CART' });
-  };
+  }, []);
 
-  const getCartItemCount = () => cart.itemCount;
+  const getCartItemCount = useCallback(() => cart.itemCount, [cart.itemCount]);
 
-  const getCartTotal = () => cart.total;
+  const getCartTotal = useCallback(() => cart.total, [cart.total]);
 
-  const getCartSubtotal = () => cart.subtotal;
+  const getCartSubtotal = useCallback(() => cart.subtotal, [cart.subtotal]);
 
-  const getCartDeliveryCharge = () => cart.deliveryCharge;
+  const getCartDeliveryCharge = useCallback(
+    () => cart.deliveryCharge,
+    [cart.deliveryCharge]
+  );
 
   const value: CartContextType = {
     cart,

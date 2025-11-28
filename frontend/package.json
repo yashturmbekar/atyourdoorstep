@@ -17,6 +17,7 @@
     "build-with-validation": "npm run validate-rag && npm run build"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.64.2",
     "@types/react-router-dom": "^5.3.3",
     "axios": "^1.13.2",
     "glob": "^11.0.3",

@@ -1,54 +1,107 @@
-import { useState, useEffect } from 'react';
+/**
+ * Testimonials Component - Dynamic Content from ContentService
+ * Displays customer testimonials from CMS
+ */
+import { useState, useEffect, useMemo } from 'react';
+import { useActiveTestimonials } from '../../../hooks/useContent';
 import './Testimonials.css';
+
+interface TestimonialData {
+  id: string;
+  name: string;
+  role: string;
+  image: string;
+  rating: number;
+  text: string;
+}
+
+// Fallback testimonials
+const FALLBACK_TESTIMONIALS: TestimonialData[] = [
+  {
+    id: 'fallback-1',
+    name: 'Priya Sharma',
+    role: 'Mumbai Resident',
+    image: 'PS',
+    rating: 5,
+    text: "The mangoes were unbelievably fresh and sweet! You can taste the authentic Ratnagiri flavor in every bite. Best Alphonso mangoes I've had outside of Maharashtra.",
+  },
+  {
+    id: 'fallback-2',
+    name: 'Ramesh Kumar',
+    role: 'Bangalore Food Lover',
+    image: 'RK',
+    rating: 5,
+    text: 'Your jaggery reminds me of the kind we had growing up in my village. So pure and rich in taste - no artificial sweetness. Finally found authentic jaggery in the city!',
+  },
+  {
+    id: 'fallback-3',
+    name: 'Neha Joshi',
+    role: 'Pune Homemaker',
+    image: 'NJ',
+    rating: 5,
+    text: "Finally found oil that smells and tastes just like my grandmother's kitchen! The cold-pressed groundnut oil is amazing - you can actually taste the difference.",
+  },
+  {
+    id: 'fallback-4',
+    name: 'Arjun Patel',
+    role: 'Delhi Chef',
+    image: 'AP',
+    rating: 5,
+    text: "As a chef, I'm very particular about ingredients. AtYourDoorStep's products are restaurant-quality. The coconut oil and sesame oil have incredible aroma and purity.",
+  },
+  {
+    id: 'fallback-5',
+    name: 'Kavitha Reddy',
+    role: 'Hyderabad Health Enthusiast',
+    image: 'KR',
+    rating: 5,
+    text: "Switched to their organic jaggery and cold-pressed oils completely. The health benefits are noticeable, and knowing they're chemical-free gives me peace of mind.",
+  },
+  {
+    id: 'fallback-6',
+    name: 'Vikram Singh',
+    role: 'Gurgaon Executive',
+    image: 'VS',
+    rating: 5,
+    text: 'Ordered mangoes for my parents in Punjab - they were thrilled! The packaging was excellent, and every mango was perfectly ripe. Will definitely order again next season.',
+  },
+];
+
+// Helper function to get initials from name
+function getInitials(name: string): string {
+  return name
+    .split(' ')
+    .map(part => part.charAt(0).toUpperCase())
+    .join('')
+    .slice(0, 2);
+}
 
 export const Testimonials = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const testimonials = [
-    {
-      name: 'Priya Sharma',
-      role: 'Mumbai Resident',
-      image: 'PS',
-      rating: 5,
-      text: "The mangoes were unbelievably fresh and sweet! You can taste the authentic Ratnagiri flavor in every bite. Best Alphonso mangoes I've had outside of Maharashtra.",
-    },
-    {
-      name: 'Ramesh Kumar',
-      role: 'Bangalore Food Lover',
-      image: 'RK',
-      rating: 5,
-      text: 'Your jaggery reminds me of the kind we had growing up in my village. So pure and rich in taste - no artificial sweetness. Finally found authentic jaggery in the city!',
-    },
-    {
-      name: 'Neha Joshi',
-      role: 'Pune Homemaker',
-      image: 'NJ',
-      rating: 5,
-      text: "Finally found oil that smells and tastes just like my grandmother's kitchen! The cold-pressed groundnut oil is amazing - you can actually taste the difference.",
-    },
-    {
-      name: 'Arjun Patel',
-      role: 'Delhi Chef',
-      image: 'AP',
-      rating: 5,
-      text: "As a chef, I'm very particular about ingredients. AtYourDoorStep's products are restaurant-quality. The coconut oil and sesame oil have incredible aroma and purity.",
-    },
-    {
-      name: 'Kavitha Reddy',
-      role: 'Hyderabad Health Enthusiast',
-      image: 'KR',
-      rating: 5,
-      text: "Switched to their organic jaggery and cold-pressed oils completely. The health benefits are noticeable, and knowing they're chemical-free gives me peace of mind.",
-    },
-    {
-      name: 'Vikram Singh',
-      role: 'Gurgaon Executive',
-      image: 'VS',
-      rating: 5,
-      text: 'Ordered mangoes for my parents in Punjab - they were thrilled! The packaging was excellent, and every mango was perfectly ripe. Will definitely order again next season.',
-    },
-  ];
+
+  // Fetch dynamic content from ContentService
+  const { data: testimonialsResponse, isLoading } = useActiveTestimonials();
+
+  // Transform testimonials data
+  const testimonials: TestimonialData[] = useMemo(() => {
+    if (!testimonialsResponse?.data || testimonialsResponse.data.length === 0) {
+      return FALLBACK_TESTIMONIALS;
+    }
+
+    return testimonialsResponse.data.map(testimonial => ({
+      id: testimonial.id,
+      name: testimonial.customerName,
+      role:
+        testimonial.customerLocation || testimonial.customerTitle || 'Customer',
+      image:
+        testimonial.customerImageUrl || getInitials(testimonial.customerName),
+      rating: testimonial.rating || 5,
+      text: testimonial.content,
+    }));
+  }, [testimonialsResponse]);
 
   useEffect(() => {
+    if (testimonials.length === 0) return;
     const timer = setInterval(() => {
       setCurrentIndex(prevIndex =>
         prevIndex === testimonials.length - 1 ? 0 : prevIndex + 1
@@ -73,6 +126,23 @@ export const Testimonials = () => {
   const goToTestimonial = (index: number) => {
     setCurrentIndex(index);
   };
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <section
+        id="testimonials"
+        className="testimonials section testimonials-loading"
+      >
+        <div className="container">
+          <div className="section-header text-center">
+            <span className="section-label">Testimonials</span>
+            <h2>Loading...</h2>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="testimonials" className="testimonials section">

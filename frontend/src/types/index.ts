@@ -3,6 +3,78 @@
 // Re-export API types
 export * from './api.types';
 
+// Re-export Content types (excluding those that conflict with api.types)
+export type {
+  // Categories
+  CreateCategoryRequestDto,
+  UpdateCategoryRequestDto,
+  CategoryResponseDto,
+  PublicCategoryResponseDto,
+  // Content Products (renamed to avoid conflict)
+  CreateContentProductRequestDto,
+  UpdateContentProductRequestDto,
+  ContentProductResponseDto,
+  ProductListResponseDto,
+  PublicProductResponseDto,
+  CreateVariantRequestDto,
+  UpdateVariantRequestDto,
+  ProductVariantDto,
+  CreateProductImageRequestDto,
+  ProductImageDto,
+  // Testimonials
+  CreateTestimonialRequestDto,
+  UpdateTestimonialRequestDto,
+  TestimonialResponseDto,
+  PublicTestimonialResponseDto,
+  // Site Settings
+  CreateSiteSettingRequestDto,
+  UpdateSiteSettingRequestDto,
+  SiteSettingResponseDto,
+  SiteSettingsGroupResponseDto,
+  PublicSiteInfoResponseDto,
+  // Hero Slides
+  CreateHeroSlideRequestDto,
+  UpdateHeroSlideRequestDto,
+  HeroSlideResponseDto,
+  PublicHeroSlideResponseDto,
+  // Statistics
+  CreateStatisticRequestDto,
+  UpdateStatisticRequestDto,
+  StatisticResponseDto,
+  // USP Items
+  CreateUspItemRequestDto,
+  UpdateUspItemRequestDto,
+  UspItemResponseDto,
+  // Company Story
+  CreateCompanyStorySectionRequestDto,
+  UpdateCompanyStorySectionRequestDto,
+  CreateCompanyStoryItemRequestDto,
+  CompanyStoryItemDto,
+  CompanyStorySectionResponseDto,
+  // Inquiry Types
+  CreateInquiryTypeRequestDto,
+  UpdateInquiryTypeRequestDto,
+  InquiryTypeResponseDto,
+  // Delivery Settings
+  CreateDeliverySettingsRequestDto,
+  UpdateDeliverySettingsRequestDto,
+  DeliverySettingsResponseDto,
+  DeliveryChargeResponseDto,
+  PublicDeliveryChargesResponseDto,
+  // Contact Submissions
+  CreateContactSubmissionRequestDto,
+  UpdateContactSubmissionRequestDto,
+  ContactSubmissionResponseDto,
+  // Content Blocks
+  CreateContentBlockRequestDto,
+  UpdateContentBlockRequestDto,
+  ContentBlockResponseDto,
+  // Query Params
+  ContentQueryParams,
+  ProductContentQueryParams,
+  ContactQueryParams,
+} from './content.types';
+
 export interface User {
   id: string;
   name: string;

@@ -23,6 +23,17 @@ import {
   AdminCustomersPage,
   AdminAnalyticsPage,
   AdminSettingsPage,
+  // Content Management Pages
+  AdminContentPage,
+  AdminCategoriesPage,
+  AdminHeroSlidesPage,
+  AdminTestimonialsPage,
+  AdminStatisticsPage,
+  AdminSiteSettingsPage,
+  AdminUspItemsPage,
+  AdminCompanyStoryPage,
+  AdminDeliverySettingsPage,
+  AdminContactsPage,
 } from './pages';
 import { useAdminAuth } from './hooks/useAdminAuth';
 import './styles/globals.css';
@@ -74,6 +85,30 @@ const AdminRoutes: React.FC = () => {
         <Route path="customers" element={<AdminCustomersPage />} />
         <Route path="analytics" element={<AdminAnalyticsPage />} />
         <Route path="settings" element={<AdminSettingsPage />} />
+
+        {/* Content Management Routes */}
+        <Route path="content" element={<AdminContentPage />} />
+        <Route path="content/categories" element={<AdminCategoriesPage />} />
+        <Route path="content/hero-slides" element={<AdminHeroSlidesPage />} />
+        <Route
+          path="content/testimonials"
+          element={<AdminTestimonialsPage />}
+        />
+        <Route path="content/statistics" element={<AdminStatisticsPage />} />
+        <Route
+          path="content/site-settings"
+          element={<AdminSiteSettingsPage />}
+        />
+        <Route path="content/usp-items" element={<AdminUspItemsPage />} />
+        <Route
+          path="content/company-story"
+          element={<AdminCompanyStoryPage />}
+        />
+        <Route
+          path="content/delivery"
+          element={<AdminDeliverySettingsPage />}
+        />
+        <Route path="content/contacts" element={<AdminContactsPage />} />
       </Routes>
     </AdminLayout>
   );

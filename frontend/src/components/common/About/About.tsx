@@ -1,88 +1,125 @@
+/**
+ * About Component - Dynamic Content from ContentService
+ * Displays company story sections and statistics from CMS
+ */
+import { useMemo } from 'react';
+import {
+  useActiveCompanyStory,
+  useActiveStatistics,
+} from '../../../hooks/useContent';
 import './About.css';
 
-//test1234
-export const About = () => {
-  const cards = [
-    {
-      title: 'Our Story',
-      icon: '📖',
-      content: (
-        <>
-          <p>
-            We began over 30 years ago with a small, traditional jaggery unit
-            near sugarcane fields — built on values of purity, tradition, and
-            hard work.
-          </p>
-          <p>
-            At the heart of this growth lies a simple yet powerful mission: To
-            bring honest, chemical-free, and high-quality products into Indian
-            households, while making the process as easy and accessible as
-            possible.
-          </p>
-          <p>
-            Today, AtYourDoorstep is more than just a brand — it's a promise of
-            purity with convenience, rooted in Indian traditions and powered by
-            modern delivery.
-          </p>
-        </>
-      ),
-    },
-    {
-      title: 'Our Spaces',
-      icon: '🏭',
-      content: (
-        <>
-          <p>
-            <strong>Our Mango Orchards:</strong> Located in Ratnagiri, thriving
-            on red laterite soil and clean air, producing premium Alphonso
-            mangoes.
-          </p>
-          <p>
-            <strong>Our Jaggery Warehouse:</strong> Built near sugarcane farms,
-            where juice is boiled in iron pans over firewood, the traditional
-            way.
-          </p>
-          <p>
-            <strong>Our Cold-Pressing Unit:</strong> Operates in a controlled
-            hygienic environment, where quality seeds are cold-pressed without
-            heat or chemicals.
-          </p>
-        </>
-      ),
-    },
-    {
-      title: 'Our Products',
-      icon: '🌱',
-      content: (
-        <>
-          <p>
-            <strong>Jaggery:</strong> With over 30 years in the industry, our
-            jaggery is made using age-old methods in our own processing facility
-            — rich in minerals, free from chemicals.
-          </p>
-          <p>
-            <strong>Cold-Pressed Oils:</strong> Since 2021, we've been
-            extracting unrefined oils (coconut, sesame, groundnut, mustard)
-            using the traditional wooden ghani method in our cold-pressing
-            facility — keeping nutrients intact.
-          </p>
-          <p>
-            <strong>Mangoes:</strong> For the past 4 years, we've been
-            hand-picking the finest GI-tagged Alphonso mangoes from Ratnagiri.
-            No carbide, no shortcuts — just naturally ripened, sun-kissed
-            fruits.
-          </p>
-        </>
-      ),
-    },
-  ];
+// Fallback data when API is not available
+const FALLBACK_CARDS = [
+  {
+    title: 'Our Story',
+    icon: '📖',
+    content: `We began over 30 years ago with a small, traditional jaggery unit near sugarcane fields — built on values of purity, tradition, and hard work.
 
-  const stats = [
-    { number: '30+', label: 'Years of Experience' },
-    { number: '100%', label: 'Chemical Free' },
-    { number: '3', label: 'Premium Products' },
-    { number: '1000+', label: 'Happy Customers' },
-  ];
+At the heart of this growth lies a simple yet powerful mission: To bring honest, chemical-free, and high-quality products into Indian households, while making the process as easy and accessible as possible.
+
+Today, AtYourDoorstep is more than just a brand — it's a promise of purity with convenience, rooted in Indian traditions and powered by modern delivery.`,
+  },
+  {
+    title: 'Our Spaces',
+    icon: '🏭',
+    content: `Our Mango Orchards: Located in Ratnagiri, thriving on red laterite soil and clean air, producing premium Alphonso mangoes.
+
+Our Jaggery Warehouse: Built near sugarcane farms, where juice is boiled in iron pans over firewood, the traditional way.
+
+Our Cold-Pressing Unit: Operates in a controlled hygienic environment, where quality seeds are cold-pressed without heat or chemicals.`,
+  },
+  {
+    title: 'Our Products',
+    icon: '🌱',
+    content: `Jaggery: With over 30 years in the industry, our jaggery is made using age-old methods in our own processing facility — rich in minerals, free from chemicals.
+
+Cold-Pressed Oils: Since 2021, we've been extracting unrefined oils (coconut, sesame, groundnut, mustard) using the traditional wooden ghani method in our cold-pressing facility — keeping nutrients intact.
+
+Mangoes: For the past 4 years, we've been hand-picking the finest GI-tagged Alphonso mangoes from Ratnagiri. No carbide, no shortcuts — just naturally ripened, sun-kissed fruits.`,
+  },
+];
+
+const FALLBACK_STATS = [
+  { number: '30+', label: 'Years of Experience' },
+  { number: '100%', label: 'Chemical Free' },
+  { number: '3', label: 'Premium Products' },
+  { number: '1000+', label: 'Happy Customers' },
+];
+
+// Helper function to get icon from section type
+function getIconFromType(sectionType: string, title: string): string {
+  const type = sectionType?.toLowerCase() || title?.toLowerCase() || '';
+  if (type.includes('story') || type.includes('history')) return '📖';
+  if (
+    type.includes('space') ||
+    type.includes('facility') ||
+    type.includes('warehouse')
+  )
+    return '🏭';
+  if (type.includes('product') || type.includes('offering')) return '🌱';
+  if (type.includes('mission') || type.includes('vision')) return '🎯';
+  if (type.includes('team') || type.includes('people')) return '👥';
+  if (type.includes('value')) return '💎';
+  return '✨';
+}
+
+export const About = () => {
+  // Fetch dynamic content from ContentService
+  const { data: companyStoryResponse, isLoading: storyLoading } =
+    useActiveCompanyStory();
+  const { data: statisticsResponse, isLoading: statsLoading } =
+    useActiveStatistics();
+
+  // Transform company story data
+  const cards = useMemo(() => {
+    if (!companyStoryResponse?.data || companyStoryResponse.data.length === 0) {
+      return FALLBACK_CARDS;
+    }
+
+    return companyStoryResponse.data
+      .filter(section => section.isActive)
+      .sort((a, b) => a.displayOrder - b.displayOrder)
+      .map(section => ({
+        title: section.title,
+        icon: getIconFromType(section.sectionType, section.title),
+        content: section.content || '',
+        items: section.items || [],
+      }));
+  }, [companyStoryResponse]);
+
+  // Transform statistics data
+  const stats = useMemo(() => {
+    if (!statisticsResponse?.data || statisticsResponse.data.length === 0) {
+      return FALLBACK_STATS;
+    }
+
+    return statisticsResponse.data
+      .filter(stat => stat.isActive)
+      .sort((a, b) => a.displayOrder - b.displayOrder)
+      .map(stat => ({
+        number: `${stat.value}${stat.suffix || ''}`,
+        label: stat.label,
+      }));
+  }, [statisticsResponse]);
+
+  // Loading state
+  if (storyLoading || statsLoading) {
+    return (
+      <section id="about" className="about section about-loading">
+        <div className="container">
+          <div className="section-header">
+            <span className="section-label">About Us</span>
+            <h2>Loading...</h2>
+          </div>
+          <div className="about-skeleton">
+            <div className="skeleton-stats"></div>
+            <div className="skeleton-cards"></div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -156,7 +193,13 @@ export const About = () => {
                   {card.title}
                 </h3>
                 <div className="card-content" itemProp="description">
-                  {card.content}
+                  {typeof card.content === 'string'
+                    ? card.content
+                        .split('\n\n')
+                        .map((paragraph, pIndex) => (
+                          <p key={pIndex}>{paragraph}</p>
+                        ))
+                    : card.content}
                 </div>
               </div>
             ))}

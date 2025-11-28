@@ -1,4 +1,8 @@
-import React, { useState } from 'react';
+/**
+ * Checkout Component - Dynamic Content from ContentService
+ * Uses delivery charges from CMS instead of hardcoded constants
+ */
+import React, { useState, useMemo } from 'react';
 import type {
   Product,
   ProductVariant,
@@ -14,8 +18,14 @@ import {
   validateEmail,
   validatePincode,
 } from '../../../utils';
-import { DELIVERY_CHARGES } from '../../../constants';
+import { useDeliveryCharges } from '../../../hooks/useContent';
 import './Checkout.css';
+
+// Fallback delivery charges when API is not available
+const FALLBACK_DELIVERY_CHARGES = {
+  freeDeliveryThreshold: 500,
+  standardCharge: 50,
+};
 
 interface CheckoutProps {
   // For single product checkout (Order Now)
@@ -48,6 +58,25 @@ export const Checkout: React.FC<CheckoutProps> = ({
   onClose,
   onOrderConfirm,
 }) => {
+  // Fetch dynamic delivery charges from ContentService
+  const { data: deliveryChargesResponse } = useDeliveryCharges();
+
+  // Get delivery charges from API or use fallback
+  const deliveryChargesConfig = useMemo(() => {
+    if (deliveryChargesResponse?.data) {
+      const data = deliveryChargesResponse.data;
+      return {
+        freeDeliveryThreshold:
+          data.freeDeliveryThreshold ??
+          FALLBACK_DELIVERY_CHARGES.freeDeliveryThreshold,
+        standardCharge:
+          data.standardDeliveryCharge ??
+          FALLBACK_DELIVERY_CHARGES.standardCharge,
+      };
+    }
+    return FALLBACK_DELIVERY_CHARGES;
+  }, [deliveryChargesResponse]);
+
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo>({
     name: '',
     phone: '',
@@ -71,8 +100,8 @@ export const Checkout: React.FC<CheckoutProps> = ({
     ? cartDeliveryCharge || 0
     : calculateDeliveryCharge(
         subtotal,
-        DELIVERY_CHARGES.freeDeliveryThreshold,
-        DELIVERY_CHARGES.standardCharge
+        deliveryChargesConfig.freeDeliveryThreshold,
+        deliveryChargesConfig.standardCharge
       );
   const total = isCartCheckout ? cartTotal || 0 : subtotal + deliveryCharge;
 
@@ -212,7 +241,9 @@ export const Checkout: React.FC<CheckoutProps> = ({
                     </div>
                     <div className="item-details">
                       <h4 className="item-name">{item.product.name}</h4>
-                      <p className="item-variant">Pack of {item.variant.size}</p>
+                      <p className="item-variant">
+                        Pack of {item.variant.size}
+                      </p>
                       <p className="item-quantity">Quantity: {item.quantity}</p>
                     </div>
                     <div className="item-price">

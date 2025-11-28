@@ -1,17 +1,45 @@
-import { useState } from 'react';
+/**
+ * Header Component - Dynamic Content from ContentService
+ * Displays site branding and navigation with data from CMS
+ */
+import { useState, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../../../hooks';
+import { useSiteInfo } from '../../../hooks/useContent';
 import './Header.css';
 
 interface HeaderProps {
   onCartClick?: () => void;
 }
 
+// Fallback site info when API is not available
+const FALLBACK_SITE_INFO = {
+  name: 'AtYourDoorStep',
+  tagline: 'Quality You Can Trust, Delivered',
+  logoUrl: '/images/AtYourDoorStep.png',
+};
+
 export const Header: React.FC<HeaderProps> = ({ onCartClick }) => {
   const { getCartItemCount } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // Fetch dynamic content from ContentService
+  const { data: siteInfoResponse, isLoading } = useSiteInfo();
+
+  // Transform API data to component format
+  const siteInfo = useMemo(() => {
+    if (siteInfoResponse?.data) {
+      const data = siteInfoResponse.data;
+      return {
+        name: data.companyName || FALLBACK_SITE_INFO.name,
+        tagline: data.tagLine || FALLBACK_SITE_INFO.tagline,
+        logoUrl: data.logo || FALLBACK_SITE_INFO.logoUrl,
+      };
+    }
+    return FALLBACK_SITE_INFO;
+  }, [siteInfoResponse]);
 
   const cartItemCount = getCartItemCount();
 
@@ -55,13 +83,18 @@ export const Header: React.FC<HeaderProps> = ({ onCartClick }) => {
             style={{ cursor: 'pointer' }}
           >
             <img
-              src="/images/AtYourDoorStep.png"
-              alt="AtYourDoorStep Logo"
+              src={siteInfo.logoUrl}
+              alt={`${siteInfo.name} Logo`}
               className="logo-image"
+              onError={e => {
+                e.currentTarget.src = '/images/placeholder.png';
+              }}
             />
             <div className="logo-text">
-              <span className="tagline">Quality You Can Trust, Delivered</span>
-              <h2>AtYourDoorStep</h2>
+              <span className="tagline">
+                {isLoading ? '...' : siteInfo.tagline}
+              </span>
+              <h2>{isLoading ? '...' : siteInfo.name}</h2>
             </div>
           </div>
           <nav className={`nav ${isMenuOpen ? 'nav-open' : ''}`}>

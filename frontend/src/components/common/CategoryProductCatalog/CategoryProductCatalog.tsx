@@ -1,12 +1,52 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { Product, ProductVariant } from '../../../types';
 import { ProductCard } from '../ProductCard';
-import { PRODUCTS } from '../../../constants';
+import {
+  useActiveCategories,
+  useFeaturedProducts,
+} from '../../../hooks/useContent';
 import { useCart } from '../../../hooks';
 import './CategoryProductCatalog.css';
 
+// Fallback products when API is not available
+const FALLBACK_PRODUCTS: Product[] = [
+  {
+    id: 'alphonso-1',
+    name: 'Premium Alphonso Mangoes',
+    category: 'alphonso',
+    description:
+      'Fresh, premium quality Alphonso mangoes - the king of mangoes.',
+    image: '/images/mangoes-carousel.png',
+    variants: [
+      {
+        id: 'alphonso-2dozen',
+        size: '2 dozen',
+        price: 1600,
+        unit: 'kg',
+        inStock: true,
+      },
+    ],
+  },
+];
+
+// Fallback category names
+const FALLBACK_CATEGORY_NAMES: Record<string, string> = {
+  alphonso: 'Alphonso Mangoes',
+  jaggery: 'Jaggery Products',
+  oil: 'Cold Pressed Oils',
+};
+
+// Fallback category descriptions
+const FALLBACK_CATEGORY_DESCRIPTIONS: Record<string, string> = {
+  alphonso:
+    'Fresh, premium quality Alphonso mangoes - the king of mangoes. Sweet, juicy, and aromatic.',
+  jaggery:
+    'Pure, organic jaggery products made from sugarcane using traditional methods.',
+  oil: 'Pure cold-pressed oils extracted using traditional methods. Rich in nutrients and flavor.',
+};
+
 interface CategoryProductCatalogProps {
-  category: 'alphonso' | 'jaggery' | 'oil';
+  category: string;
   onOrderNow: (
     product: Product,
     variant: ProductVariant,
@@ -24,16 +64,67 @@ export const CategoryProductCatalog: React.FC<CategoryProductCatalogProps> = ({
 }) => {
   const { getCartItemCount } = useCart();
 
-  const cartItemCount = getCartItemCount();
-  const categoryNames = {
-    alphonso: 'Alphonso Mangoes',
-    jaggery: 'Jaggery Products',
-    oil: 'Cold Pressed Oils',
-  };
+  // Fetch dynamic content from ContentService
+  const { data: categoriesResponse } = useActiveCategories();
+  const { data: productsResponse } = useFeaturedProducts();
 
-  const filteredProducts = PRODUCTS.filter(
-    product => product.category === category
-  );
+  // Transform API categories to category names map
+  const categoryNames = useMemo(() => {
+    if (categoriesResponse?.data && categoriesResponse.data.length > 0) {
+      const namesMap: Record<string, string> = {};
+      categoriesResponse.data.forEach(cat => {
+        namesMap[cat.slug] = cat.name;
+      });
+      return namesMap;
+    }
+    return FALLBACK_CATEGORY_NAMES;
+  }, [categoriesResponse]);
+
+  // Get category description from API or fallback
+  const categoryDescription = useMemo(() => {
+    if (categoriesResponse?.data && categoriesResponse.data.length > 0) {
+      const cat = categoriesResponse.data.find(c => c.slug === category);
+      if (cat?.description) return cat.description;
+    }
+    return FALLBACK_CATEGORY_DESCRIPTIONS[category] || '';
+  }, [categoriesResponse, category]);
+
+  // Transform API products to component format and filter by category
+  const filteredProducts: Product[] = useMemo(() => {
+    if (productsResponse?.data && productsResponse.data.length > 0) {
+      return productsResponse.data
+        .filter(apiProduct => apiProduct.categorySlug === category)
+        .map(apiProduct => ({
+          id: apiProduct.id,
+          name: apiProduct.name,
+          category: apiProduct.categorySlug || category,
+          image: apiProduct.primaryImageUrl || '/images/placeholder.png',
+          description:
+            apiProduct.shortDescription || apiProduct.fullDescription || '',
+          features: apiProduct.features || [],
+          variants: apiProduct.variants?.map(v => ({
+            id: v.id,
+            size: v.size || 'Standard',
+            price: v.price || apiProduct.basePrice,
+            unit: v.unit || 'unit',
+            inStock: v.isAvailable && v.stockQuantity > 0,
+          })) || [
+            {
+              id: apiProduct.id,
+              size: 'Standard',
+              price: apiProduct.basePrice,
+              unit: 'unit',
+              inStock: true,
+            },
+          ],
+        }));
+    }
+
+    // Fallback to hardcoded PRODUCTS constant
+    return FALLBACK_PRODUCTS.filter(product => product.category === category);
+  }, [productsResponse, category]);
+
+  const cartItemCount = getCartItemCount();
 
   return (
     <div className="category-catalog-overlay">
@@ -96,14 +187,7 @@ export const CategoryProductCatalog: React.FC<CategoryProductCatalogProps> = ({
 
         <div className="category-catalog-content">
           <div className="category-description">
-            <p>
-              {category === 'alphonso' &&
-                'Fresh, premium quality Alphonso mangoes - the king of mangoes. Sweet, juicy, and aromatic.'}
-              {category === 'jaggery' &&
-                'Pure, organic jaggery products made from sugarcane using traditional methods.'}
-              {category === 'oil' &&
-                'Pure cold-pressed oils extracted using traditional methods. Rich in nutrients and flavor.'}
-            </p>
+            <p>{categoryDescription}</p>
           </div>
           <div
             className={`category-products-grid products-count-${filteredProducts.length}`}

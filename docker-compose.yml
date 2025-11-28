@@ -89,7 +89,7 @@ services:
   contentservice:
     build:
       context: .
-      dockerfile: backend/docker/ContentService.Dockerfile
+      dockerfile: backend/services/ContentService/Dockerfile
     container_name: contentservice
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}

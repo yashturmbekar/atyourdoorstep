@@ -1275,3 +1275,141 @@ dotnet test
 - Build Admin dashboard for content management
 
 ---
+
+## [2025-11-28] — Phase 8.2 & 8.3: Gateway, Docker & Frontend Integration - COMPLETED ✅
+
+### Status: Completed
+
+**Gateway & Infrastructure Updates:**
+
+**Files Modified:**
+
+1. **docker-compose.yml:**
+
+   - Fixed ContentService Dockerfile path from `backend/docker/ContentService.Dockerfile` to `backend/services/ContentService/Dockerfile`
+
+2. **API Gateway (appsettings.json & appsettings.Production.json):**
+
+   - Already configured with all ContentService routes:
+     - `/api/products/*` → content-cluster
+     - `/api/categories/*` → content-cluster
+     - `/api/testimonials/*` → content-cluster
+     - `/api/sitesettings/*` → content-cluster
+     - `/api/heroslides/*` → content-cluster
+     - `/api/statistics/*` → content-cluster
+     - `/api/uspitems/*` → content-cluster
+     - `/api/companystory/*` → content-cluster
+     - `/api/deliverysettings/*` → content-cluster
+     - `/api/inquirytypes/*` → content-cluster
+     - `/api/contact/*` → content-cluster
+
+3. **ContentService.API.csproj:**
+
+   - Added `Microsoft.EntityFrameworkCore.Design` package for migrations
+
+4. **EF Core Migrations:**
+   - Created InitialCreate migration in `ContentService.Infrastructure/Persistence/Migrations`
+
+**Frontend Services Created:**
+
+**Files Created (3 files):**
+
+1. **src/types/content.types.ts** - Complete TypeScript types matching backend DTOs:
+
+   - Category DTOs (Create, Update, Response, Public)
+   - Product DTOs with Variants & Images
+   - Testimonial DTOs
+   - Site Settings DTOs
+   - Hero Slide DTOs
+   - Statistic DTOs
+   - USP Item DTOs
+   - Company Story DTOs
+   - Inquiry Type DTOs
+   - Delivery Settings DTOs
+   - Contact Submission DTOs
+   - Query parameter interfaces
+
+2. **src/services/contentService.ts** - Complete API service layer:
+
+   - `categoryService` - CRUD for categories
+   - `contentProductService` - CRUD for CMS products with variants/images
+   - `testimonialService` - CRUD for testimonials
+   - `siteSettingsService` - Site settings management
+   - `heroSlidesService` - Hero carousel management
+   - `statisticsService` - Statistics/metrics management
+   - `uspItemsService` - USP items management
+   - `companyStoryService` - Company story sections
+   - `deliverySettingsService` - Delivery configuration
+   - `inquiryTypesService` - Contact form inquiry types
+   - `contactService` - Contact form submissions
+
+3. **src/hooks/useContent.ts** - React Query hooks:
+   - Query keys for cache management
+   - Category hooks: `useCategories`, `useActiveCategories`, `useCategoryById`, `useCategoryBySlug`
+   - Product hooks: `useContentProducts`, `useFeaturedProducts`, `useProductById`, `useProductBySlug`
+   - Testimonial hooks: `useTestimonials`, `useActiveTestimonials`, `useFeaturedTestimonials`
+   - Site info hooks: `useSiteSettings`, `useSiteInfo`, `useSiteSettingsByGroup`
+   - Hero slides hooks: `useHeroSlides`, `useActiveHeroSlides`
+   - Statistics hooks: `useStatistics`, `useActiveStatistics`
+   - USP hooks: `useUspItems`, `useActiveUspItems`
+   - Company story hooks: `useCompanyStory`, `useActiveCompanyStory`
+   - Delivery hooks: `useDeliverySettings`, `useDeliveryCharges`
+   - Inquiry hooks: `useInquiryTypes`, `useActiveInquiryTypes`
+   - Contact hooks: `useContacts`, `useContactById`, `useSubmitContact`
+   - Mutation hooks for all CRUD operations
+
+**Files Modified:**
+
+4. **src/api/endpoints.ts:**
+
+   - Added complete `content` endpoint configuration for all 11 content types
+
+5. **src/services/index.ts:**
+
+   - Exported all content services
+   - Re-exported content types
+
+6. **src/hooks/index.ts:**
+
+   - Exported all content hooks
+
+7. **src/types/index.ts:**
+   - Re-exported content types
+
+**Solution Updates:**
+
+- ContentService.UnitTests already in solution
+- ContentService.IntegrationTests already in solution
+
+**Commands Executed:**
+
+```powershell
+# Create EF Core migration
+cd backend/services/ContentService/src/ContentService.Infrastructure
+dotnet ef migrations add InitialCreate --startup-project "../ContentService.API/ContentService.API.csproj" --output-dir Persistence/Migrations
+```
+
+**Architecture Benefits:**
+
+- Type-safe frontend-to-backend communication
+- React Query for intelligent caching and background updates
+- Consistent patterns across all content types
+- Automatic cache invalidation on mutations
+- Stale time configuration for performance
+- Query key structure for granular cache control
+
+**Phase 8 Overall Status:**
+
+- ✅ Phase 8.1: ContentService Backend - COMPLETED
+- ✅ Phase 8.2: Gateway & Docker Integration - COMPLETED
+- ✅ Phase 8.3: Frontend Services & Hooks - COMPLETED
+- ⏳ Phase 8.4: Admin Dashboard Content Management - PENDING
+
+**Next Steps:**
+
+1. Apply database migration to create ContentService tables
+2. Update frontend components to use dynamic content hooks
+3. Build Admin Dashboard content management pages
+4. Test full integration end-to-end
+
+---

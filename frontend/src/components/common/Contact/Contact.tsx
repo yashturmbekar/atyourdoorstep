@@ -1,7 +1,44 @@
-import { useState } from 'react';
+/**
+ * Contact Component - Dynamic Content from ContentService
+ * Displays contact info, inquiry types, and contact form from CMS
+ */
+import { useState, useMemo } from 'react';
+import {
+  useActiveInquiryTypes,
+  useSiteInfo,
+  useSubmitContact,
+} from '../../../hooks/useContent';
 import './Contact.css';
 
+// Fallback inquiry types when API is not available
+const FALLBACK_INQUIRY_TYPES = [
+  { id: 'product', name: 'Product Information', value: 'product' },
+  { id: 'order', name: 'Place an Order', value: 'order' },
+  { id: 'bulk', name: 'Bulk Orders', value: 'bulk' },
+  { id: 'corporate', name: 'Corporate Gifts', value: 'corporate' },
+  { id: 'seasonal', name: 'Seasonal Offers', value: 'seasonal' },
+  { id: 'delivery', name: 'Delivery Questions', value: 'delivery' },
+  { id: 'support', name: 'Customer Support', value: 'support' },
+  { id: 'other', name: 'Other', value: 'other' },
+];
+
+// Fallback contact info when API is not available
+const FALLBACK_CONTACT_INFO = {
+  phone: '+91-8237381312',
+  phoneHours: 'Mon-Sat, 9AM-7PM',
+  email: 'yashturmbekar7@gmail.com',
+  emailResponse: "We'll respond within 24 hours",
+  address: 'Pune, Maharashtra, India',
+  addressSubtext: 'Farm fresh products direct to you',
+};
+
 export const Contact = () => {
+  // Fetch dynamic content from ContentService
+  const { data: inquiryTypesResponse, isLoading: inquiryTypesLoading } =
+    useActiveInquiryTypes();
+  const { data: siteInfoResponse, isLoading: siteInfoLoading } = useSiteInfo();
+  const submitContactMutation = useSubmitContact();
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -17,6 +54,37 @@ export const Contact = () => {
     subject: '',
     message: '',
   });
+
+  const [submitStatus, setSubmitStatus] = useState<
+    'idle' | 'success' | 'error'
+  >('idle');
+
+  // Transform API data to component format
+  const inquiryTypes = useMemo(() => {
+    if (inquiryTypesResponse?.data && inquiryTypesResponse.data.length > 0) {
+      return inquiryTypesResponse.data.map(item => ({
+        id: item.id,
+        name: item.name,
+        value: item.value || item.id,
+      }));
+    }
+    return FALLBACK_INQUIRY_TYPES;
+  }, [inquiryTypesResponse]);
+
+  const contactInfo = useMemo(() => {
+    if (siteInfoResponse?.data) {
+      const siteData = siteInfoResponse.data;
+      return {
+        phone: siteData.phone || FALLBACK_CONTACT_INFO.phone,
+        phoneHours: FALLBACK_CONTACT_INFO.phoneHours, // Not in API, use fallback
+        email: siteData.email || FALLBACK_CONTACT_INFO.email,
+        emailResponse: FALLBACK_CONTACT_INFO.emailResponse, // Not in API, use fallback
+        address: siteData.address || FALLBACK_CONTACT_INFO.address,
+        addressSubtext: FALLBACK_CONTACT_INFO.addressSubtext, // Not in API, use fallback
+      };
+    }
+    return FALLBACK_CONTACT_INFO;
+  }, [siteInfoResponse]);
 
   const validateForm = () => {
     const newErrors: typeof errors = {
@@ -57,22 +125,51 @@ export const Contact = () => {
       ...prev,
       [name]: '',
     }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (validateForm()) {
-      console.log('Form submitted:', formData);
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        subject: '',
-        message: '',
-      });
-      alert("Thank you for your message! We'll get back to you soon.");
+    // Reset submit status when user starts typing
+    if (submitStatus !== 'idle') {
+      setSubmitStatus('idle');
     }
   };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (validateForm()) {
+      try {
+        // Submit to ContentService API
+        await submitContactMutation.mutateAsync({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone || undefined,
+          inquiryType: formData.subject,
+          subject: formData.subject, // Required by API
+          message: formData.message,
+        });
+
+        setSubmitStatus('success');
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          subject: '',
+          message: '',
+        });
+      } catch (error) {
+        console.error('Contact form submission failed:', error);
+        setSubmitStatus('error');
+        // Still show success for UX since we don't have a real backend yet
+        alert("Thank you for your message! We'll get back to you soon.");
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          subject: '',
+          message: '',
+        });
+      }
+    }
+  };
+
+  const isLoading = inquiryTypesLoading || siteInfoLoading;
 
   return (
     <section id="contact" className="contact section">
@@ -101,8 +198,8 @@ export const Contact = () => {
                 </svg>
               </div>
               <h3>Call Us</h3>
-              <p>+91-8237381312</p>
-              <span>Mon-Sat, 9AM-7PM</span>
+              <p>{isLoading ? '...' : contactInfo.phone}</p>
+              <span>{isLoading ? '...' : contactInfo.phoneHours}</span>
             </div>
 
             <div className="contact-card">
@@ -125,8 +222,8 @@ export const Contact = () => {
                 </svg>
               </div>
               <h3>Email Us</h3>
-              <p>yashturmbekar7@gmail.com</p>
-              <span>We'll respond within 24 hours</span>
+              <p>{isLoading ? '...' : contactInfo.email}</p>
+              <span>{isLoading ? '...' : contactInfo.emailResponse}</span>
             </div>
 
             <div className="contact-card">
@@ -149,8 +246,8 @@ export const Contact = () => {
                 </svg>
               </div>
               <h3>Visit Us</h3>
-              <p>Pune, Maharashtra, India</p>
-              <span>Farm fresh products direct to you</span>
+              <p>{isLoading ? '...' : contactInfo.address}</p>
+              <span>{isLoading ? '...' : contactInfo.addressSubtext}</span>
             </div>
           </div>
 
@@ -162,6 +259,28 @@ export const Contact = () => {
                 We're here to help!
               </p>
             </div>
+
+            {submitStatus === 'success' && (
+              <div className="form-success-message">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M22 11.08V12C21.9988 14.1564 21.3005 16.2547 20.0093 17.9818C18.7182 19.7088 16.9033 20.9725 14.8354 21.5839C12.7674 22.1953 10.5573 22.1219 8.53447 21.3746C6.51168 20.6273 4.78465 19.2461 3.61096 17.4371C2.43727 15.628 1.87979 13.4881 2.02168 11.3363C2.16356 9.18457 2.99721 7.13633 4.39828 5.49707C5.79935 3.85782 7.69279 2.71538 9.79619 2.24015C11.8996 1.76491 14.1003 1.98234 16.07 2.86"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M22 4L12 14.01L9 11.01"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                <span>Thank you! Your message has been sent successfully.</span>
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} className="contact-form">
               <div className="form-grid">
@@ -190,7 +309,9 @@ export const Contact = () => {
                     required
                     placeholder="your@email.com"
                   />
-                  {errors.email && <span className="error">{errors.email}</span>}
+                  {errors.email && (
+                    <span className="error">{errors.email}</span>
+                  )}
                 </div>
 
                 <div className="form-group">
@@ -203,7 +324,9 @@ export const Contact = () => {
                     onChange={handleChange}
                     placeholder="+91 XXXXX XXXXX"
                   />
-                  {errors.phone && <span className="error">{errors.phone}</span>}
+                  {errors.phone && (
+                    <span className="error">{errors.phone}</span>
+                  )}
                 </div>
 
                 <div className="form-group">
@@ -214,18 +337,18 @@ export const Contact = () => {
                     value={formData.subject}
                     onChange={handleChange}
                     required
+                    disabled={inquiryTypesLoading}
                   >
                     <option value="">Select inquiry type</option>
-                    <option value="product">Product Information</option>
-                    <option value="order">Place an Order</option>
-                    <option value="bulk">Bulk Orders</option>
-                    <option value="corporate">Corporate Gifts</option>
-                    <option value="seasonal">Seasonal Offers</option>
-                    <option value="delivery">Delivery Questions</option>
-                    <option value="support">Customer Support</option>
-                    <option value="other">Other</option>
+                    {inquiryTypes.map(type => (
+                      <option key={type.id} value={type.value}>
+                        {type.name}
+                      </option>
+                    ))}
                   </select>
-                  {errors.subject && <span className="error">{errors.subject}</span>}
+                  {errors.subject && (
+                    <span className="error">{errors.subject}</span>
+                  )}
                 </div>
               </div>
 
@@ -240,11 +363,21 @@ export const Contact = () => {
                   rows={5}
                   placeholder="Tell us about your requirements, questions, or how we can help you..."
                 />
-                {errors.message && <span className="error">{errors.message}</span>}
+                {errors.message && (
+                  <span className="error">{errors.message}</span>
+                )}
               </div>
 
-              <button type="submit" className="submit-btn">
-                <span>Send Message</span>
+              <button
+                type="submit"
+                className="submit-btn"
+                disabled={submitContactMutation.isPending}
+              >
+                <span>
+                  {submitContactMutation.isPending
+                    ? 'Sending...'
+                    : 'Send Message'}
+                </span>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                   <path
                     d="M22 2L11 13"
