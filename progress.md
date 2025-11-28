@@ -859,6 +859,180 @@ AtYourDoorStep/
 
 ---
 
+## [2025-11-28] — Phase 8: Dynamic Content System - IN PROGRESS 🔄
+
+### Objective
+
+Convert the entire website from hardcoded static content to a fully dynamic, admin-controlled CMS system.
+
+### Status: IN PROGRESS
+
+### Analysis Completed
+
+Identified all hardcoded data across the frontend:
+
+| Category         | Location                    | Items                     | Priority |
+| ---------------- | --------------------------- | ------------------------- | -------- |
+| Products         | `constants/products.ts`     | 11 products, 4 categories | HIGH     |
+| Product Variants | `constants/products.ts`     | 30+ size/price variants   | HIGH     |
+| Testimonials     | `Testimonials.tsx`, JSON    | 6 reviews                 | HIGH     |
+| Company Info     | `About.tsx`, `Footer.tsx`   | Stats, Story, Mission     | HIGH     |
+| Contact Info     | `Contact.tsx`, `Footer.tsx` | Phone, Email, Address     | HIGH     |
+| Social Media     | `socialMedia.ts`            | 4 platforms               | MEDIUM   |
+| Hero Content     | `Hero.tsx`                  | Carousel slides, stats    | HIGH     |
+| USPs             | `WhyChooseUs.tsx`           | 6 reasons, 4 stats        | MEDIUM   |
+| SEO Config       | `seo.ts`, `utils`           | Page meta data            | MEDIUM   |
+| Delivery Config  | `products.ts`               | Charges, thresholds       | HIGH     |
+
+### Database Schema Design
+
+#### New ContentService Microservice
+
+**Tables to Create:**
+
+1. **products** - Enhanced with full CMS fields
+
+   - id, name, slug, description, short_description
+   - category_id, image_url, is_available, is_featured
+   - display_order, season_start, season_end
+   - meta_title, meta_description
+   - created_at, updated_at, is_deleted
+
+2. **product_variants** - Size/price variants
+
+   - id, product_id, size, unit, price
+   - compare_at_price, sku, stock_quantity
+   - is_in_stock, display_order
+
+3. **categories** - Product categories
+
+   - id, name, slug, description, icon
+   - image_url, display_order, is_active, parent_id
+
+4. **product_features** - Product bullet points
+
+   - id, product_id, feature_text, display_order
+
+5. **testimonials** - Customer reviews
+
+   - id, customer_name, customer_role, avatar_url
+   - rating, review_text, is_featured, is_approved
+
+6. **site_settings** - Key-value configuration
+
+   - id, setting_key, setting_value, setting_type, category
+
+7. **content_blocks** - Dynamic content sections
+
+   - id, block_key, title, content, image_url
+   - additional_data (JSONB), page, section
+
+8. **hero_slides** - Homepage carousel
+
+   - id, product_id, title, subtitle, description
+   - highlight_text, image_url, cta_text, cta_link
+   - gradient colors, display_order, is_active
+
+9. **hero_slide_features** - Slide bullet points
+
+   - id, hero_slide_id, feature_text, display_order
+
+10. **statistics** - Display stats
+
+    - id, stat_key, stat_value, stat_label
+    - section, display_order, is_active
+
+11. **usp_items** - Why Choose Us cards
+
+    - id, title, description, icon
+    - display_order, is_active
+
+12. **company_story_sections** - About page sections
+
+    - id, section_key, title, icon, display_order
+
+13. **company_story_items** - About section items
+
+    - id, section_id, title, content, display_order
+
+14. **inquiry_types** - Contact form options
+
+    - id, name, display_order, is_active
+
+15. **delivery_settings** - Delivery configuration
+    - id, free_delivery_threshold, standard_charge
+    - express_charge, updated_at
+
+### Implementation Tasks
+
+#### Phase 8.1: Backend - ContentService (IN PROGRESS)
+
+- [ ] Create ContentService microservice structure
+- [ ] Define all domain entities
+- [ ] Create EF Core DbContext with configurations
+- [ ] Create migrations
+- [ ] Implement seed data from current hardcoded values
+- [ ] Create repositories and services
+- [ ] Create API controllers
+
+#### Phase 8.2: Update Gateway
+
+- [ ] Add ContentService routes to Gateway
+
+#### Phase 8.3: Frontend Services
+
+- [ ] Create content services to fetch dynamic data
+- [ ] Update all components to use API data
+- [ ] Add loading states and error handling
+- [ ] Implement React Query caching
+
+#### Phase 8.4: Admin Dashboard
+
+- [ ] Product Management (CRUD with variants)
+- [ ] Category Management
+- [ ] Testimonial Management
+- [ ] Content Block Editor
+- [ ] Site Settings Editor
+- [ ] Hero Slide Manager
+
+### Seed Data to Migrate
+
+**Products (11 items):**
+
+1. Premium Alphonso Mangoes - ₹1600/2 dozen
+2. Sun Product Alphonso Mangoes - ₹4000/5 dozen
+3. Organic Jaggery Block - ₹80/kg
+4. Organic Jaggery Powder - ₹150-280 (2 variants)
+5. Cold Pressed Sunflower Oil - ₹320-1500 (3 variants)
+6. Cold Pressed Groundnut Oil - ₹380-1800 (3 variants)
+7. Cold Pressed Sesame Oil - ₹120-480 (3 variants)
+8. Cold Pressed Almond Oil - ₹300-800 (4 variants)
+9. Cold Pressed Mustard Oil - ₹180-1600 (4 variants)
+10. Cold Pressed Coconut Oil - ₹220-1800 (4 variants)
+
+**Categories (4 items):**
+
+- All Products 🛍️
+- Alphonso Mangoes 🥭
+- Jaggery Products 🍯
+- Cold Pressed Oils 🛢️
+
+**Testimonials (6 items):**
+
+- Priya Sharma, Ramesh Kumar, Neha Joshi
+- Arjun Patel, Kavitha Reddy, Vikram Singh
+
+**Site Settings:**
+
+- Phone: +91-8237381312
+- Email: yashturmbekar7@gmail.com
+- Address: Pune, Maharashtra, India
+- Business Hours: Mon-Sat, 9AM-7PM
+- Free Delivery: ₹1000 threshold
+- Delivery Charges: ₹50 standard, ₹100 express
+
+---
+
 ## Notes
 
 - Using Clean Architecture + DDD principles
@@ -866,3 +1040,238 @@ AtYourDoorStep/
 - JWT authentication with refresh token rotation
 - All timestamps in UTC ISO 8601
 - No secrets in code - environment variables only
+
+---
+
+## [2025-11-28] — Phase 8: ContentService Complete Implementation ✅
+
+### Status: COMPLETED
+
+**ContentService - Full CMS Microservice Implementation:**
+
+**Backend Files Created/Modified (35+ files):**
+
+**1. Domain Layer (17 entities):**
+
+- `ContentService.Domain/Entities/Category.cs` - Product categories with hierarchy
+- `ContentService.Domain/Entities/Product.cs` - Products with full CMS fields
+- `ContentService.Domain/Entities/ProductVariant.cs` - Size/price variants
+- `ContentService.Domain/Entities/ProductFeature.cs` - Product bullet points
+- `ContentService.Domain/Entities/ProductImage.cs` - Product images
+- `ContentService.Domain/Entities/Testimonial.cs` - Customer reviews
+- `ContentService.Domain/Entities/SiteSetting.cs` - Key-value configuration
+- `ContentService.Domain/Entities/ContentBlock.cs` - Dynamic content sections
+- `ContentService.Domain/Entities/HeroSlide.cs` - Homepage carousel slides
+- `ContentService.Domain/Entities/HeroSlideFeature.cs` - Slide bullet points
+- `ContentService.Domain/Entities/Statistic.cs` - Display stats
+- `ContentService.Domain/Entities/UspItem.cs` - Why Choose Us cards
+- `ContentService.Domain/Entities/CompanyStorySection.cs` - About page sections
+- `ContentService.Domain/Entities/CompanyStoryItem.cs` - About section items
+- `ContentService.Domain/Entities/InquiryType.cs` - Contact form options
+- `ContentService.Domain/Entities/DeliverySettings.cs` - Delivery configuration
+- `ContentService.Domain/Entities/ContactSubmission.cs` - Contact form submissions
+
+**2. Application Layer:**
+
+- `ContentService.Application/Interfaces/IContentRepositories.cs` - All repository interfaces
+- `ContentService.Application/DTOs/ContentDtos.cs` - Request/Response DTOs
+- `ContentService.Application/Validators/ContentValidators.cs` - FluentValidation rules
+
+**3. Infrastructure Layer:**
+
+- `ContentService.Infrastructure/Persistence/ContentDbContext.cs` - EF Core DbContext with snake_case naming, unique indexes, relationships
+- `ContentService.Infrastructure/Persistence/ContentDbSeeder.cs` - Comprehensive seed data from hardcoded frontend values
+- `ContentService.Infrastructure/Repositories/ContentRepositories.cs` - All repository implementations
+
+**4. API Layer (14 Controllers):**
+
+- `ContentService.API/Controllers/CategoriesController.cs`
+- `ContentService.API/Controllers/ProductsController.cs`
+- `ContentService.API/Controllers/TestimonialsController.cs`
+- `ContentService.API/Controllers/SiteSettingsController.cs`
+- `ContentService.API/Controllers/ContentBlocksController.cs`
+- `ContentService.API/Controllers/HeroSlidesController.cs`
+- `ContentService.API/Controllers/StatisticsController.cs`
+- `ContentService.API/Controllers/UspItemsController.cs`
+- `ContentService.API/Controllers/CompanyStoryController.cs`
+- `ContentService.API/Controllers/InquiryTypesController.cs`
+- `ContentService.API/Controllers/DeliverySettingsController.cs`
+- `ContentService.API/Controllers/ContactSubmissionsController.cs`
+- `ContentService.API/Program.cs` - Complete configuration with DI, JWT, Serilog, Health checks
+
+**5. Docker & Kubernetes:**
+
+- `ContentService/Dockerfile` - Multi-stage Docker build
+- `ContentService/helm/k8s-manifests.yaml` - Kubernetes deployment, service, configmap
+
+**6. Tests (25 unit tests, 7 integration tests):**
+
+- `ContentService/tests/ContentService.UnitTests/Domain/ProductEntityTests.cs`
+- `ContentService/tests/ContentService.UnitTests/Domain/CategoryEntityTests.cs`
+- `ContentService/tests/ContentService.UnitTests/Domain/TestimonialEntityTests.cs`
+- `ContentService/tests/ContentService.UnitTests/Domain/SiteSettingEntityTests.cs`
+- `ContentService/tests/ContentService.IntegrationTests/Controllers/CategoriesControllerTests.cs`
+- `ContentService/tests/ContentService.IntegrationTests/Controllers/ProductsControllerTests.cs`
+- `ContentService/tests/ContentService.IntegrationTests/Controllers/TestimonialsControllerTests.cs`
+- `ContentService/tests/ContentService.IntegrationTests/HealthCheckTests.cs`
+
+**Property Alignment Fixes (Entity → Controller/DTO consistency):**
+
+| Entity           | Old Properties                     | New Properties                    |
+| ---------------- | ---------------------------------- | --------------------------------- |
+| Statistic        | StatKey, StatValue, StatLabel      | Label, Value                      |
+| SiteSetting      | SettingKey, SettingValue, Category | Key, Value, Group                 |
+| Testimonial      | CustomerRole, ReviewText           | CustomerTitle, Content            |
+| Product          | Description                        | ShortDescription, FullDescription |
+| ProductVariant   | CompareAtPrice                     | DiscountedPrice                   |
+| ProductFeature   | FeatureText                        | Feature                           |
+| ProductImage     | ImageUrl                           | Url                               |
+| HeroSlideFeature | FeatureText                        | Feature                           |
+| CompanyStoryItem | Content                            | Description                       |
+
+**Files Fixed for Build Success:**
+
+- ContentDbContext.cs - Updated all property references
+- ContentRepositories.cs - Updated all LINQ queries
+- ContentDbSeeder.cs - Updated all seed data property names
+- IContentRepositories.cs - Updated interface method signatures
+- All 14 Controllers - Aligned method calls with repository interfaces
+
+**API Endpoints (50+ endpoints):**
+
+```
+Categories:
+  GET    /api/categories
+  GET    /api/categories/active
+  GET    /api/categories/{id}
+  GET    /api/categories/slug/{slug}
+  POST   /api/categories
+  PUT    /api/categories/{id}
+  DELETE /api/categories/{id}
+
+Products:
+  GET    /api/products
+  GET    /api/products/featured
+  GET    /api/products/{id}
+  GET    /api/products/slug/{slug}
+  GET    /api/products/category/{categorySlug}
+  POST   /api/products
+  PUT    /api/products/{id}
+  DELETE /api/products/{id}
+
+Testimonials:
+  GET    /api/testimonials
+  GET    /api/testimonials/featured
+  GET    /api/testimonials/approved
+  GET    /api/testimonials/{id}
+  POST   /api/testimonials
+  PUT    /api/testimonials/{id}
+  DELETE /api/testimonials/{id}
+  PATCH  /api/testimonials/{id}/approve
+  PATCH  /api/testimonials/{id}/feature
+
+SiteSettings:
+  GET    /api/sitesettings
+  GET    /api/sitesettings/public
+  GET    /api/sitesettings/group/{group}
+  GET    /api/sitesettings/{id}
+  GET    /api/sitesettings/key/{key}
+  POST   /api/sitesettings
+  PUT    /api/sitesettings/{id}
+  DELETE /api/sitesettings/{id}
+
+HeroSlides:
+  GET    /api/heroslides
+  GET    /api/heroslides/active
+  GET    /api/heroslides/{id}
+  POST   /api/heroslides
+  PUT    /api/heroslides/{id}
+  DELETE /api/heroslides/{id}
+
+Statistics:
+  GET    /api/statistics
+  GET    /api/statistics/active
+  GET    /api/statistics/section/{section}
+  POST   /api/statistics
+  PUT    /api/statistics/{id}
+  DELETE /api/statistics/{id}
+
+UspItems:
+  GET    /api/uspitems
+  GET    /api/uspitems/active
+  POST   /api/uspitems
+  PUT    /api/uspitems/{id}
+  DELETE /api/uspitems/{id}
+
+CompanyStory:
+  GET    /api/companystory
+  POST   /api/companystory
+  PUT    /api/companystory/{id}
+  DELETE /api/companystory/{id}
+
+DeliverySettings:
+  GET    /api/deliverysettings
+  PUT    /api/deliverysettings
+
+ContactSubmissions:
+  GET    /api/contactsubmissions
+  GET    /api/contactsubmissions/{id}
+  POST   /api/contactsubmissions
+  PATCH  /api/contactsubmissions/{id}/read
+
+Health:
+  GET    /health
+  GET    /health/ready
+```
+
+**Seed Data Migrated:**
+
+- **Products (10):** Alphonso Mangoes (2 variants), Organic Jaggery (2 types), Cold Pressed Oils (Groundnut, Sunflower, Sesame, Coconut, Mustard, Almond) with multiple size variants
+- **Categories (4):** All Products, Alphonso Mangoes, Jaggery Products, Cold Pressed Oils
+- **Testimonials (6):** Priya Sharma, Ramesh Kumar, Neha Joshi, Arjun Patel, Kavitha Reddy, Vikram Singh
+- **Site Settings (14):** Contact info, Social media links, General settings, SEO settings
+- **Hero Slides (3):** Alphonso Mangoes, Cold-Pressed Oils, Organic Jaggery with features
+- **Statistics (11):** Hero section (3), About section (4), Why Choose Us (4)
+- **USP Items (6):** Pure & Natural, Farm to Table, Traditional Methods, etc.
+- **Company Story (3 sections):** Our Story, Our Spaces, Our Products
+- **Inquiry Types (4):** General Inquiry, Product Question, Order Issue, Feedback
+
+**Build Status:** ✅ SUCCESS (2 minor nullable warnings)
+
+**Test Status:** ✅ 25 Unit Tests PASSED
+
+**Commands Executed:**
+
+```powershell
+# Build ContentService
+cd backend/services/ContentService/src/ContentService.API
+dotnet build
+
+# Run Unit Tests
+cd backend/services/ContentService/tests/ContentService.UnitTests
+dotnet test
+
+# Results: 25 tests passed, 0 failed
+```
+
+**Architecture Benefits:**
+
+- Complete CMS for all frontend content
+- Admin can modify all website content without code changes
+- Consistent API pattern across all endpoints
+- Full CRUD for all entities
+- Featured/Active filtering built-in
+- Soft delete support
+- Pagination support
+- Snake_case database naming
+- Comprehensive seed data
+
+**Next Steps:**
+
+- Run database migrations
+- Update API Gateway with ContentService routes
+- Create frontend hooks and services to consume API
+- Update React components to use dynamic data
+- Build Admin dashboard for content management
+
+---

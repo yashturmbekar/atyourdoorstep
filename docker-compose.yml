@@ -86,6 +86,24 @@ services:
       - atyourdoorstep-network
     restart: unless-stopped
 
+  contentservice:
+    build:
+      context: .
+      dockerfile: backend/docker/ContentService.Dockerfile
+    container_name: contentservice
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=atyourdoorstep_content;Username=postgres;Password=${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5004:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - atyourdoorstep-network
+    restart: unless-stopped
+
   gateway:
     build:
       context: .
@@ -104,6 +122,7 @@ services:
       - authservice
       - orderservice
       - notificationservice
+      - contentservice
     networks:
       - atyourdoorstep-network
     restart: unless-stopped
