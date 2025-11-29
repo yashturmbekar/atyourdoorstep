@@ -13,6 +13,21 @@ import {
   FiLogOut,
   FiChevronRight,
   FiBell,
+  FiGrid,
+  FiImage,
+  FiMessageSquare,
+  FiTrendingUp,
+  FiInfo,
+  FiTruck,
+  FiMail,
+  FiCreditCard,
+  FiStar,
+  FiFileText,
+  FiGlobe,
+  FiLayers,
+  FiShield,
+  FiChevronDown,
+  FiChevronUp,
 } from 'react-icons/fi';
 import { useAdminAuth } from '../../../hooks/useAdminAuth';
 import './AdminLayout.css';
@@ -31,14 +46,29 @@ interface NavigationItem {
 
 interface NavigationSection {
   section: string;
+  icon?: IconType;
+  collapsible?: boolean;
   items: NavigationItem[];
 }
 
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [collapsedSections, setCollapsedSections] = useState<Set<string>>(new Set());
   const location = useLocation();
   const { adminUser, logout } = useAdminAuth();
+
+  const toggleSection = (section: string) => {
+    setCollapsedSections(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(section)) {
+        newSet.delete(section);
+      } else {
+        newSet.add(section);
+      }
+      return newSet;
+    });
+  };
 
   const navigation: NavigationSection[] = [
     {
@@ -50,42 +80,152 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           icon: FiHome,
           exact: true,
         },
+      ],
+    },
+    {
+      section: 'Products & Inventory',
+      icon: FiPackage,
+      collapsible: true,
+      items: [
         {
-          name: 'Products',
+          name: 'All Products',
           href: '/admin/products',
           icon: FiPackage,
-          badge: 3, // Low stock count
+          badge: 3,
         },
+        {
+          name: 'Add New Product',
+          href: '/admin/products/new',
+          icon: FiPackage,
+        },
+        {
+          name: 'Categories',
+          href: '/admin/content/categories',
+          icon: FiGrid,
+        },
+      ],
+    },
+    {
+      section: 'Orders & Customers',
+      icon: FiShoppingCart,
+      collapsible: true,
+      items: [
         {
           name: 'Orders',
           href: '/admin/orders',
           icon: FiShoppingCart,
-          badge: 5, // Pending orders
+          badge: 5,
         },
         {
           name: 'Customers',
           href: '/admin/customers',
           icon: FiUsers,
         },
-      ],
-    },
-    {
-      section: 'Analytics',
-      items: [
         {
-          name: 'Analytics',
-          href: '/admin/analytics',
-          icon: FiBarChart,
+          name: 'Contact Inquiries',
+          href: '/admin/content/contacts',
+          icon: FiMail,
         },
       ],
     },
     {
-      section: 'System',
+      section: 'Site Content',
+      icon: FiFileText,
+      collapsible: true,
       items: [
         {
-          name: 'Settings',
+          name: 'Content Dashboard',
+          href: '/admin/content',
+          icon: FiLayers,
+        },
+        {
+          name: 'Hero Slides',
+          href: '/admin/content/hero-slides',
+          icon: FiImage,
+        },
+        {
+          name: 'Testimonials',
+          href: '/admin/content/testimonials',
+          icon: FiMessageSquare,
+        },
+        {
+          name: 'Statistics',
+          href: '/admin/content/statistics',
+          icon: FiTrendingUp,
+        },
+        {
+          name: 'USP Items',
+          href: '/admin/content/usp-items',
+          icon: FiStar,
+        },
+        {
+          name: 'Company Story',
+          href: '/admin/content/company-story',
+          icon: FiInfo,
+        },
+      ],
+    },
+    {
+      section: 'Settings & Config',
+      icon: FiSettings,
+      collapsible: true,
+      items: [
+        {
+          name: 'Site Settings',
+          href: '/admin/content/site-settings',
+          icon: FiGlobe,
+        },
+        {
+          name: 'Delivery Settings',
+          href: '/admin/content/delivery',
+          icon: FiTruck,
+        },
+        {
+          name: 'Payment Settings',
+          href: '/admin/settings/payments',
+          icon: FiCreditCard,
+        },
+        {
+          name: 'Notifications',
+          href: '/admin/settings/notifications',
+          icon: FiBell,
+        },
+        {
+          name: 'SEO & Social',
+          href: '/admin/settings/seo',
+          icon: FiGlobe,
+        },
+        {
+          name: 'Security',
+          href: '/admin/settings/security',
+          icon: FiShield,
+        },
+        {
+          name: 'General Settings',
           href: '/admin/settings',
           icon: FiSettings,
+        },
+      ],
+    },
+    {
+      section: 'Analytics & Reports',
+      icon: FiBarChart,
+      collapsible: true,
+      items: [
+        {
+          name: 'Dashboard Analytics',
+          href: '/admin/analytics',
+          icon: FiBarChart,
+        },
+        {
+          name: 'Sales Reports',
+          href: '/admin/analytics/sales',
+          icon: FiTrendingUp,
+        },
+        {
+          name: 'Inventory Reports',
+          href: '/admin/analytics/inventory',
+          icon: FiPackage,
         },
       ],
     },

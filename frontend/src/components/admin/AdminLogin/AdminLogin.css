@@ -490,3 +490,21 @@
     font-size: 1rem;
   }
 }
+
+/* Security Notice */
+.security-notice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.security-notice svg {
+  color: var(--success-color);
+}

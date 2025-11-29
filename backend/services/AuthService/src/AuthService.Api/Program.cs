@@ -163,12 +163,23 @@ app.MapControllers();
 app.MapHealthChecks("/health");
 app.MapGet("/health/ready", () => Results.Ok(new { status = "ready", timestamp = DateTime.UtcNow }));
 
-// Run migrations on startup (development only)
+// Create database and apply seed data on startup (development only)
 if (app.Environment.IsDevelopment())
 {
     using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
-    await dbContext.Database.MigrateAsync();
+    
+    // For development: EnsureCreated will create DB with schema and seed data
+    // Note: This doesn't run migrations - use MigrateAsync for production
+    var created = await dbContext.Database.EnsureCreatedAsync();
+    if (created)
+    {
+        Log.Information("Database created with seed data");
+    }
+    else
+    {
+        Log.Information("Database already exists");
+    }
 }
 
 Log.Information("AuthService started successfully");

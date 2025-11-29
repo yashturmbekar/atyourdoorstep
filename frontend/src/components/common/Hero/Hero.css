@@ -521,7 +521,7 @@
 }
 
 .feature-item svg {
-  color: var(--accent-primary);
+  color: var(--accent-color, #10b981);
   flex-shrink: 0;
 }
 

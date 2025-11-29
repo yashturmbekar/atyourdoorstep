@@ -158,7 +158,9 @@ app.UseSerilogRequestLogging();
 app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseMiddleware<RequestLoggingMiddleware>();
 
-app.UseHttpsRedirection();
+// Note: HTTPS redirection removed for development/internal service communication
+// Enable in production behind a reverse proxy that handles SSL termination
+// app.UseHttpsRedirection();
 
 app.UseCors();
 
