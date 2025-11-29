@@ -222,7 +222,7 @@ const AdminDashboard: React.FC = () => {
             />
           </div>
         ) : (
-          <BentoGrid columns={3} gap="md" className="stats-bento-grid">
+          <BentoGrid columns={6} gap="md" className="stats-bento-grid">
             <BentoItem className="admin-animate-fade-in-up admin-stagger-1">
               <BentoStat
                 title="Total Products"

@@ -8,7 +8,7 @@ import './BentoGrid.css';
 
 export interface BentoGridProps {
   children: React.ReactNode;
-  columns?: 2 | 3 | 4;
+  columns?: 2 | 3 | 4 | 6;
   gap?: 'sm' | 'md' | 'lg';
   className?: string;
 }
