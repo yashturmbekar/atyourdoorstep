@@ -48,20 +48,34 @@ const FALLBACK_STATS = [
 ];
 
 // Helper function to get icon from section type
-function getIconFromType(sectionType: string, title: string): string {
-  const type = sectionType?.toLowerCase() || title?.toLowerCase() || '';
-  if (type.includes('story') || type.includes('history')) return '📖';
+function getIconFromTitle(title: string): string {
+  const lowerTitle = title?.toLowerCase() || '';
+  if (lowerTitle.includes('story') || lowerTitle.includes('history'))
+    return '📖';
   if (
-    type.includes('space') ||
-    type.includes('facility') ||
-    type.includes('warehouse')
+    lowerTitle.includes('space') ||
+    lowerTitle.includes('facility') ||
+    lowerTitle.includes('warehouse')
   )
     return '🏭';
-  if (type.includes('product') || type.includes('offering')) return '🌱';
-  if (type.includes('mission') || type.includes('vision')) return '🎯';
-  if (type.includes('team') || type.includes('people')) return '👥';
-  if (type.includes('value')) return '💎';
+  if (lowerTitle.includes('product') || lowerTitle.includes('offering'))
+    return '🌱';
+  if (lowerTitle.includes('mission') || lowerTitle.includes('vision'))
+    return '🎯';
+  if (lowerTitle.includes('team') || lowerTitle.includes('people')) return '👥';
+  if (lowerTitle.includes('value')) return '💎';
   return '✨';
+}
+
+// Helper function to combine items into content paragraphs
+function itemsToContent(
+  items: Array<{ title?: string; description: string }>
+): string {
+  if (!items || items.length === 0) return '';
+  return items
+    .sort((a, b) => (a as any).displayOrder - (b as any).displayOrder)
+    .map(item => item.description)
+    .join('\n\n');
 }
 
 export const About = () => {
@@ -82,8 +96,8 @@ export const About = () => {
       .sort((a, b) => a.displayOrder - b.displayOrder)
       .map(section => ({
         title: section.title,
-        icon: getIconFromType(section.sectionType, section.title),
-        content: section.content || '',
+        icon: getIconFromTitle(section.title),
+        content: itemsToContent(section.items || []),
         items: section.items || [],
       }));
   }, [companyStoryResponse]);

@@ -77,6 +77,53 @@ public class SiteSettingsController : ControllerBase
     }
 
     /// <summary>
+    /// Get public site info (structured format for frontend)
+    /// </summary>
+    [HttpGet("public/info")]
+    public async Task<ActionResult<ApiResponse<PublicSiteInfoResponse>>> GetPublicSiteInfo(CancellationToken cancellationToken)
+    {
+        var settings = await _siteSettingRepository.GetPublicSettingsAsync(cancellationToken);
+        var dict = settings.ToDictionary(s => s.Key, s => s.Value);
+
+        var socialLinks = new Dictionary<string, string>();
+        var socialKeys = new[] { "facebook", "twitter", "instagram", "linkedin", "youtube", "tiktok", "whatsapp" };
+        foreach (var key in socialKeys)
+        {
+            // Try both formats: "social.facebook" and "social_facebook"
+            var socialKey1 = $"social.{key}";
+            var socialKey2 = $"social_{key}";
+            if (dict.TryGetValue(socialKey1, out var value1) && !string.IsNullOrEmpty(value1))
+            {
+                socialLinks[key] = value1;
+            }
+            else if (dict.TryGetValue(socialKey2, out var value2) && !string.IsNullOrEmpty(value2))
+            {
+                socialLinks[key] = value2;
+            }
+        }
+
+        var dto = new PublicSiteInfoResponse
+        {
+            // Support both naming conventions
+            CompanyName = dict.GetValueOrDefault("general.site_name", 
+                          dict.GetValueOrDefault("company_name", "At Your Doorstep")),
+            TagLine = dict.GetValueOrDefault("general.tagline", 
+                      dict.GetValueOrDefault("tagline", "")),
+            Logo = dict.GetValueOrDefault("general.logo", 
+                   dict.GetValueOrDefault("logo", "")),
+            Email = dict.GetValueOrDefault("contact.email", 
+                    dict.GetValueOrDefault("contact_email", "")),
+            Phone = dict.GetValueOrDefault("contact.phone", 
+                    dict.GetValueOrDefault("contact_phone", "")),
+            Address = dict.GetValueOrDefault("contact.address", 
+                      dict.GetValueOrDefault("contact_address", "")),
+            SocialLinks = socialLinks
+        };
+
+        return Ok(ApiResponse<PublicSiteInfoResponse>.Ok(dto));
+    }
+
+    /// <summary>
     /// Create or update a setting (Admin only)
     /// </summary>
     [HttpPost]

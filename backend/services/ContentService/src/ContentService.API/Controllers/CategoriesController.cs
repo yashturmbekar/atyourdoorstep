@@ -23,10 +23,21 @@ public class CategoriesController : ControllerBase
     }
 
     /// <summary>
-    /// Get all categories
+    /// Get all categories (admin)
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult<ApiResponse<IEnumerable<CategoryDto>>>> GetCategories(CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse<IEnumerable<CategoryDto>>>> GetAllCategories(CancellationToken cancellationToken)
+    {
+        var categories = await _categoryRepository.GetAllAsync(cancellationToken);
+        var dtos = categories.OrderBy(c => c.DisplayOrder).Select(MapToDto);
+        return Ok(ApiResponse<IEnumerable<CategoryDto>>.Ok(dtos));
+    }
+
+    /// <summary>
+    /// Get all active categories (public)
+    /// </summary>
+    [HttpGet("active")]
+    public async Task<ActionResult<ApiResponse<IEnumerable<CategoryDto>>>> GetActiveCategories(CancellationToken cancellationToken)
     {
         var categories = await _categoryRepository.GetActiveAsync(cancellationToken);
         var dtos = categories.Select(MapToDto);

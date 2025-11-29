@@ -444,10 +444,8 @@ export interface CompanyStoryItemDto {
 
 export interface CompanyStorySectionResponseDto {
   id: string;
-  sectionType: string;
   title: string;
   subtitle?: string;
-  content: string;
   imageUrl?: string;
   displayOrder: number;
   isActive: boolean;

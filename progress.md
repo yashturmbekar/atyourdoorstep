@@ -1413,3 +1413,128 @@ dotnet ef migrations add InitialCreate --startup-project "../ContentService.API/
 4. Test full integration end-to-end
 
 ---
+
+## [2025-11-29] — Phase 8.5: Backend API Endpoint Fixes - COMPLETED ✅
+
+### Status: Completed
+
+**Issue:** Frontend was receiving 404 errors for `/active` endpoints that didn't exist in backend controllers.
+
+**Root Cause Analysis:**
+
+- Frontend `endpoints.ts` defined `/api/[entity]/active` paths
+- Backend controllers only had `[HttpGet]` returning active items by default
+- Admin needs access to all items (including inactive), public needs only active
+
+**Backend Controllers Fixed (9 controllers):**
+
+1. **SiteSettingsController.cs:**
+
+   - Added `[HttpGet("public/info")]` endpoint for structured site info
+
+2. **HeroSlidesController.cs:**
+
+   - Split `[HttpGet]` into:
+     - `[HttpGet]` - Returns all slides (admin)
+     - `[HttpGet("active")]` - Returns active slides only (public)
+
+3. **TestimonialsController.cs:**
+
+   - Split `[HttpGet]` into:
+     - `[HttpGet]` - Returns all testimonials (admin)
+     - `[HttpGet("active")]` - Returns active testimonials only (public)
+
+4. **StatisticsController.cs:**
+
+   - Split `[HttpGet]` into:
+     - `[HttpGet]` - Returns all statistics (admin)
+     - `[HttpGet("active")]` - Returns active statistics only (public)
+
+5. **UspItemsController.cs:**
+
+   - Split `[HttpGet]` into:
+     - `[HttpGet]` - Returns all USP items (admin)
+     - `[HttpGet("active")]` - Returns active USP items only (public)
+
+6. **CompanyStoryController.cs:**
+
+   - Split `[HttpGet]` into:
+     - `[HttpGet]` - Returns all sections (admin)
+     - `[HttpGet("active")]` - Returns active sections only (public)
+
+7. **CategoriesController.cs:**
+
+   - Split `[HttpGet]` into:
+     - `[HttpGet]` - Returns all categories (admin)
+     - `[HttpGet("active")]` - Returns active categories only (public)
+
+8. **InquiryTypesController.cs:**
+
+   - Split `[HttpGet]` into:
+     - `[HttpGet]` - Returns all inquiry types (admin)
+     - `[HttpGet("active")]` - Returns active inquiry types only (public)
+
+9. **DeliverySettingsController.cs:**
+   - Added `[HttpGet("charges")]` endpoint for public delivery charges
+
+**New DTO Used:**
+
+- `PublicSiteInfoResponse` - Structured site info for frontend
+- `PublicDeliveryChargesResponse` - Delivery charges for checkout
+
+**API Endpoints Added:**
+
+```
+GET /api/sitesettings/public/info     → Structured site info
+GET /api/heroslides/active            → Active hero slides
+GET /api/testimonials/active          → Active testimonials
+GET /api/statistics/active            → Active statistics
+GET /api/uspitems/active              → Active USP items
+GET /api/companystory/active          → Active company story
+GET /api/categories/active            → Active categories
+GET /api/inquirytypes/active          → Active inquiry types
+GET /api/deliverysettings/charges     → Public delivery charges
+```
+
+**Commands Executed:**
+
+```powershell
+# Rebuild ContentService with endpoint fixes
+docker-compose build contentservice
+
+# Restart ContentService container
+docker-compose up -d contentservice
+
+# Test endpoints
+curl http://localhost:5000/api/sitesettings/public/info  # ✅ 200 OK
+curl http://localhost:5000/api/heroslides/active         # ✅ 200 OK
+curl http://localhost:5000/api/testimonials/active       # ✅ 200 OK
+curl http://localhost:5000/api/uspitems/active           # ✅ 200 OK
+curl http://localhost:5000/api/statistics/active         # ✅ 200 OK
+curl http://localhost:5000/api/deliverysettings/charges  # ✅ 200 OK
+```
+
+**Build Status:** ✅ SUCCESS
+
+**All Docker Services Running:**
+
+- postgres (port 5432) ✅
+- authservice (port 5001) ✅
+- orderservice (port 5002) ✅
+- notificationservice (port 5003) ✅
+- contentservice (port 5004) ✅
+- gateway (port 5000) ✅
+
+**Frontend Dev Server:** Running at http://localhost:5173
+
+**Architecture Pattern Established:**
+
+- `[HttpGet]` → Returns ALL items for admin management
+- `[HttpGet("active")]` → Returns only ACTIVE items for public display
+- Consistent pattern across all content controllers
+
+---
+
+```
+
+```

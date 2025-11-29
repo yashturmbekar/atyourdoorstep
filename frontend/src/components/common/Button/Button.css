@@ -21,6 +21,13 @@
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
+  z-index: 1;
+}
+
+/* Ensure button text and icons stay above ::before pseudo-element */
+.button > * {
+  position: relative;
+  z-index: 2;
 }
 
 .button::before {
@@ -37,6 +44,8 @@
     transparent
   );
   transition: left 0.5s ease;
+  z-index: 0;
+  pointer-events: none;
 }
 
 .button:hover::before {

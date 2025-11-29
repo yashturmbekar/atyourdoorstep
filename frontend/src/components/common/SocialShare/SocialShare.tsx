@@ -1,5 +1,12 @@
+import { useMemo } from 'react';
 import { getSocialShareUrls } from '../../../constants/socialMedia';
+import { useSiteInfo } from '../../../hooks/useContent';
 import './SocialShare.css';
+
+// Fallback values when API is not available
+const FALLBACK_TITLE = 'AtYourDoorStep - Premium Natural Products';
+const FALLBACK_DESCRIPTION =
+  'Authentic Ratnagiri Alphonso mangoes, pure cold-pressed oils, and organic jaggery delivered to your doorstep';
 
 interface SocialShareProps {
   url?: string;
@@ -11,12 +18,31 @@ interface SocialShareProps {
 
 export const SocialShare = ({
   url = window.location.href,
-  title = 'AtYourDoorStep - Premium Natural Products',
-  description = 'Authentic Ratnagiri Alphonso mangoes, pure cold-pressed oils, and organic jaggery delivered to your doorstep',
+  title,
+  description,
   className = '',
   showLabels = false,
 }: SocialShareProps) => {
-  const shareText = `${title} - ${description}`;
+  // Fetch dynamic site info from ContentService
+  const { data: siteInfoResponse } = useSiteInfo();
+
+  // Get title and description from props, API, or fallback
+  const shareTitle = useMemo(() => {
+    if (title) return title;
+    if (siteInfoResponse?.data) {
+      const { companyName, tagLine } = siteInfoResponse.data;
+      if (companyName) return `${companyName}${tagLine ? ` - ${tagLine}` : ''}`;
+    }
+    return FALLBACK_TITLE;
+  }, [title, siteInfoResponse]);
+
+  const shareDescription = useMemo(() => {
+    if (description) return description;
+    // Site info doesn't have description, use fallback
+    return FALLBACK_DESCRIPTION;
+  }, [description]);
+
+  const shareText = `${shareTitle} - ${shareDescription}`;
   const shareUrls = getSocialShareUrls(url, shareText);
 
   const handleShare = (_platform: string, shareUrl: string) => {

@@ -23,10 +23,21 @@ public class HeroSlidesController : ControllerBase
     }
 
     /// <summary>
-    /// Get all active hero slides
+    /// Get all hero slides (admin)
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult<ApiResponse<IEnumerable<HeroSlideDto>>>> GetHeroSlides(CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse<IEnumerable<HeroSlideDto>>>> GetAllHeroSlides(CancellationToken cancellationToken)
+    {
+        var slides = await _heroSlideRepository.GetAllAsync(cancellationToken);
+        var dtos = slides.OrderBy(s => s.DisplayOrder).Select(MapToDto);
+        return Ok(ApiResponse<IEnumerable<HeroSlideDto>>.Ok(dtos));
+    }
+
+    /// <summary>
+    /// Get all active hero slides (public)
+    /// </summary>
+    [HttpGet("active")]
+    public async Task<ActionResult<ApiResponse<IEnumerable<HeroSlideDto>>>> GetActiveHeroSlides(CancellationToken cancellationToken)
     {
         var slides = await _heroSlideRepository.GetActiveSlidesAsync(cancellationToken);
         var dtos = slides.Select(MapToDto);

@@ -23,10 +23,29 @@ public class UspItemsController : ControllerBase
     }
 
     /// <summary>
-    /// Get all active USP items
+    /// Get all USP items (admin)
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult<ApiResponse<IEnumerable<UspItemDto>>>> GetUspItems(CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse<IEnumerable<UspItemDto>>>> GetAllUspItems(CancellationToken cancellationToken)
+    {
+        var items = await _uspItemRepository.GetAllAsync(cancellationToken);
+        var dtos = items.OrderBy(i => i.DisplayOrder).Select(i => new UspItemDto
+        {
+            Id = i.Id,
+            Title = i.Title,
+            Description = i.Description,
+            Icon = i.Icon,
+            DisplayOrder = i.DisplayOrder,
+            IsActive = i.IsActive
+        });
+        return Ok(ApiResponse<IEnumerable<UspItemDto>>.Ok(dtos));
+    }
+
+    /// <summary>
+    /// Get all active USP items (public)
+    /// </summary>
+    [HttpGet("active")]
+    public async Task<ActionResult<ApiResponse<IEnumerable<UspItemDto>>>> GetActiveUspItems(CancellationToken cancellationToken)
     {
         var items = await _uspItemRepository.GetActiveAsync(cancellationToken);
         var dtos = items.Select(i => new UspItemDto

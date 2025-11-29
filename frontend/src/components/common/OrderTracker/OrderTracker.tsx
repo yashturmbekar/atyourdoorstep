@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { Order } from '../../../types';
 import { Button } from '../Button';
+import { useSiteInfo } from '../../../hooks/useContent';
 import { formatPrice, formatDate } from '../../../utils';
 import './OrderTracker.css';
+
+// Fallback contact info
+const FALLBACK_PHONE = '+91-8237381312';
 
 interface OrderTrackerProps {
   order: Order;
@@ -13,6 +17,14 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({
   order,
   onClose,
 }) => {
+  // Fetch dynamic site info from ContentService
+  const { data: siteInfoResponse } = useSiteInfo();
+
+  // Get phone number from API or use fallback
+  const contactPhone = useMemo(() => {
+    return siteInfoResponse?.data?.phone || FALLBACK_PHONE;
+  }, [siteInfoResponse]);
+
   const getStatusIcon = (status: Order['status']): string => {
     switch (status) {
       case 'pending':
@@ -175,8 +187,11 @@ export const OrderTracker: React.FC<OrderTrackerProps> = ({
           <div className="order-contact-info">
             <p className="contact-text">
               Need help with your order? Contact us at{' '}
-              <a href="tel:+919876543210" className="contact-link">
-                +91 98765 43210
+              <a
+                href={`tel:${contactPhone.replace(/[^+\d]/g, '')}`}
+                className="contact-link"
+              >
+                {contactPhone}
               </a>
             </p>
           </div>

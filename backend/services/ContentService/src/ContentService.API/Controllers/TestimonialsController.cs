@@ -23,10 +23,21 @@ public class TestimonialsController : ControllerBase
     }
 
     /// <summary>
-    /// Get all active testimonials
+    /// Get all testimonials (admin)
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult<ApiResponse<IEnumerable<TestimonialDto>>>> GetTestimonials(CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse<IEnumerable<TestimonialDto>>>> GetAllTestimonials(CancellationToken cancellationToken)
+    {
+        var testimonials = await _testimonialRepository.GetAllAsync(cancellationToken);
+        var dtos = testimonials.OrderBy(t => t.DisplayOrder).Select(MapToDto);
+        return Ok(ApiResponse<IEnumerable<TestimonialDto>>.Ok(dtos));
+    }
+
+    /// <summary>
+    /// Get all active testimonials (public)
+    /// </summary>
+    [HttpGet("active")]
+    public async Task<ActionResult<ApiResponse<IEnumerable<TestimonialDto>>>> GetActiveTestimonials(CancellationToken cancellationToken)
     {
         var testimonials = await _testimonialRepository.GetActiveTestimonialsAsync(cancellationToken);
         var dtos = testimonials.Select(MapToDto);

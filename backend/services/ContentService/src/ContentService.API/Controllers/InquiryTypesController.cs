@@ -23,10 +23,28 @@ public class InquiryTypesController : ControllerBase
     }
 
     /// <summary>
-    /// Get all active inquiry types
+    /// Get all inquiry types (admin)
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult<ApiResponse<IEnumerable<InquiryTypeDto>>>> GetInquiryTypes(CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse<IEnumerable<InquiryTypeDto>>>> GetAllInquiryTypes(CancellationToken cancellationToken)
+    {
+        var types = await _inquiryTypeRepository.GetAllAsync(cancellationToken);
+        var dtos = types.OrderBy(t => t.DisplayOrder).Select(t => new InquiryTypeDto
+        {
+            Id = t.Id,
+            Name = t.Name,
+            Value = t.Value,
+            DisplayOrder = t.DisplayOrder,
+            IsActive = t.IsActive
+        });
+        return Ok(ApiResponse<IEnumerable<InquiryTypeDto>>.Ok(dtos));
+    }
+
+    /// <summary>
+    /// Get all active inquiry types (public)
+    /// </summary>
+    [HttpGet("active")]
+    public async Task<ActionResult<ApiResponse<IEnumerable<InquiryTypeDto>>>> GetActiveInquiryTypes(CancellationToken cancellationToken)
     {
         var types = await _inquiryTypeRepository.GetActiveTypesAsync(cancellationToken);
         var dtos = types.Select(t => new InquiryTypeDto

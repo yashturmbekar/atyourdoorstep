@@ -23,10 +23,37 @@ public class CompanyStoryController : ControllerBase
     }
 
     /// <summary>
-    /// Get all company story sections with items
+    /// Get all company story sections with items (admin)
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult<ApiResponse<IEnumerable<CompanyStorySectionDto>>>> GetCompanyStory(CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse<IEnumerable<CompanyStorySectionDto>>>> GetAllCompanyStory(CancellationToken cancellationToken)
+    {
+        var sections = await _companyStoryRepository.GetAllAsync(cancellationToken);
+        var dtos = sections.OrderBy(s => s.DisplayOrder).Select(s => new CompanyStorySectionDto
+        {
+            Id = s.Id,
+            Title = s.Title,
+            Subtitle = s.Subtitle,
+            ImageUrl = s.ImageUrl,
+            DisplayOrder = s.DisplayOrder,
+            IsActive = s.IsActive,
+            Items = s.Items?.OrderBy(i => i.DisplayOrder).Select(i => new CompanyStoryItemDto
+            {
+                Id = i.Id,
+                Title = i.Title,
+                Description = i.Description,
+                Icon = i.Icon,
+                DisplayOrder = i.DisplayOrder
+            }).ToList() ?? new List<CompanyStoryItemDto>()
+        });
+        return Ok(ApiResponse<IEnumerable<CompanyStorySectionDto>>.Ok(dtos));
+    }
+
+    /// <summary>
+    /// Get all active company story sections with items (public)
+    /// </summary>
+    [HttpGet("active")]
+    public async Task<ActionResult<ApiResponse<IEnumerable<CompanyStorySectionDto>>>> GetActiveCompanyStory(CancellationToken cancellationToken)
     {
         var sections = await _companyStoryRepository.GetActiveSectionsWithItemsAsync(cancellationToken);
         var dtos = sections.Select(s => new CompanyStorySectionDto

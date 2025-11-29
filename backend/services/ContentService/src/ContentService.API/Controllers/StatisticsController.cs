@@ -23,10 +23,30 @@ public class StatisticsController : ControllerBase
     }
 
     /// <summary>
-    /// Get all active statistics
+    /// Get all statistics (admin)
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult<ApiResponse<IEnumerable<StatisticDto>>>> GetStatistics(CancellationToken cancellationToken)
+    public async Task<ActionResult<ApiResponse<IEnumerable<StatisticDto>>>> GetAllStatistics(CancellationToken cancellationToken)
+    {
+        var stats = await _statisticRepository.GetAllAsync(cancellationToken);
+        var dtos = stats.OrderBy(s => s.DisplayOrder).Select(s => new StatisticDto
+        {
+            Id = s.Id,
+            Label = s.Label,
+            Value = s.Value,
+            Suffix = s.Suffix,
+            Icon = s.Icon,
+            DisplayOrder = s.DisplayOrder,
+            IsActive = s.IsActive
+        });
+        return Ok(ApiResponse<IEnumerable<StatisticDto>>.Ok(dtos));
+    }
+
+    /// <summary>
+    /// Get all active statistics (public)
+    /// </summary>
+    [HttpGet("active")]
+    public async Task<ActionResult<ApiResponse<IEnumerable<StatisticDto>>>> GetActiveStatistics(CancellationToken cancellationToken)
     {
         var stats = await _statisticRepository.GetActiveStatisticsAsync(cancellationToken);
         var dtos = stats.Select(s => new StatisticDto

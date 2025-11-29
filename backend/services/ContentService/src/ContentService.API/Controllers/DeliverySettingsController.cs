@@ -45,6 +45,36 @@ public class DeliverySettingsController : ControllerBase
     }
 
     /// <summary>
+    /// Get delivery charges only (for checkout)
+    /// </summary>
+    [HttpGet("charges")]
+    public async Task<ActionResult<ApiResponse<PublicDeliveryChargesResponse>>> GetDeliveryCharges(CancellationToken cancellationToken)
+    {
+        var settings = await _deliverySettingsRepository.GetActiveSettingsAsync(cancellationToken);
+        if (settings == null)
+        {
+            // Return default values if no settings found
+            return Ok(ApiResponse<PublicDeliveryChargesResponse>.Ok(new PublicDeliveryChargesResponse
+            {
+                FreeDeliveryThreshold = 500,
+                StandardDeliveryCharge = 50,
+                ExpressDeliveryCharge = 100,
+                EstimatedDeliveryDays = 3,
+                ExpressDeliveryDays = 1
+            }));
+        }
+
+        return Ok(ApiResponse<PublicDeliveryChargesResponse>.Ok(new PublicDeliveryChargesResponse
+        {
+            FreeDeliveryThreshold = settings.FreeDeliveryThreshold,
+            StandardDeliveryCharge = settings.StandardDeliveryCharge,
+            ExpressDeliveryCharge = settings.ExpressDeliveryCharge,
+            EstimatedDeliveryDays = settings.EstimatedDeliveryDays,
+            ExpressDeliveryDays = settings.ExpressDeliveryDays
+        }));
+    }
+
+    /// <summary>
     /// Create or update delivery settings (Admin only)
     /// </summary>
     [HttpPost]

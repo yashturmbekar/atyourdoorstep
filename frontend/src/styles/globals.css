@@ -445,6 +445,13 @@ select:focus {
   overflow: hidden;
   backdrop-filter: blur(10px);
   white-space: nowrap;
+  isolation: isolate;
+}
+
+/* Ensure button SVG icons stay above ::before pseudo-element */
+.btn svg {
+  position: relative;
+  z-index: 2;
 }
 
 .btn::before {
@@ -461,6 +468,8 @@ select:focus {
     transparent
   );
   transition: left 0.5s ease;
+  z-index: 0;
+  pointer-events: none;
 }
 
 .btn:hover::before {

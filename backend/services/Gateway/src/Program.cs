@@ -5,6 +5,15 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Load Docker-specific configuration if running in Docker
+// Docker containers have a specific hostname pattern
+var isDocker = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true" ||
+               File.Exists("/.dockerenv");
+if (isDocker)
+{
+    builder.Configuration.AddJsonFile("appsettings.Docker.json", optional: true, reloadOnChange: true);
+}
+
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
