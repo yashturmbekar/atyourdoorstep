@@ -84,7 +84,13 @@ const AdminRoutes: React.FC = () => {
         <Route path="orders" element={<AdminOrdersPage />} />
         <Route path="customers" element={<AdminCustomersPage />} />
         <Route path="analytics" element={<AdminAnalyticsPage />} />
+        <Route path="analytics/sales" element={<AdminAnalyticsPage />} />
+        <Route path="analytics/inventory" element={<AdminAnalyticsPage />} />
         <Route path="settings" element={<AdminSettingsPage />} />
+        <Route path="settings/payments" element={<AdminSettingsPage />} />
+        <Route path="settings/notifications" element={<AdminSettingsPage />} />
+        <Route path="settings/seo" element={<AdminSettingsPage />} />
+        <Route path="settings/security" element={<AdminSettingsPage />} />
 
         {/* Content Management Routes */}
         <Route path="content" element={<AdminContentPage />} />

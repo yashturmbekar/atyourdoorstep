@@ -119,49 +119,81 @@ export interface CustomerResponseDto {
 }
 
 // ============================================
-// Product Service DTOs
+// Product Service DTOs - Matching Backend ContentService
 // ============================================
 
-export interface CreateProductRequestDto {
-  name: string;
-  description: string;
+export interface ProductVariantResponseDto {
+  id: string;
+  size: string;
+  unit: string;
   price: number;
-  category: string;
-  stock: number;
-  imageUrl?: string;
-  isAvailable?: boolean;
+  discountedPrice?: number;
+  stockQuantity: number;
   sku?: string;
-  discountPrice?: number;
-  discountPercentage?: number;
+  isAvailable: boolean;
 }
 
-export interface UpdateProductRequestDto {
-  name?: string;
-  description?: string;
-  price?: number;
-  category?: string;
-  stock?: number;
-  imageUrl?: string;
-  isAvailable?: boolean;
-  sku?: string;
-  discountPrice?: number;
-  discountPercentage?: number;
+export interface ProductImageResponseDto {
+  id: string;
+  url: string;
+  altText?: string;
+  isPrimary: boolean;
 }
 
 export interface ProductResponseDto {
   id: string;
   name: string;
-  description: string;
-  price: number;
-  category: string;
-  stock: number;
-  imageUrl?: string;
+  slug: string;
+  shortDescription: string;
+  fullDescription?: string;
+  categoryId: string;
+  categoryName?: string;
+  basePrice: number;
+  discountedPrice?: number;
+  isFeatured: boolean;
   isAvailable: boolean;
-  sku?: string;
-  discountPrice?: number;
-  discountPercentage?: number;
-  createdAt: string;
-  updatedAt: string;
+  seasonStart?: string;
+  seasonEnd?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  primaryImageUrl?: string;
+  variants: ProductVariantResponseDto[];
+  features: string[];
+  images: ProductImageResponseDto[];
+}
+
+export interface CreateProductRequestDto {
+  name: string;
+  shortDescription: string;
+  fullDescription?: string;
+  categoryId: string;
+  basePrice: number;
+  discountedPrice?: number;
+  isFeatured?: boolean;
+  isAvailable?: boolean;
+  seasonStart?: string;
+  seasonEnd?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  features?: string[];
+  variants?: Omit<ProductVariantResponseDto, 'id'>[];
+  images?: { url: string; altText?: string }[];
+}
+
+export interface UpdateProductRequestDto {
+  name?: string;
+  shortDescription?: string;
+  fullDescription?: string;
+  categoryId?: string;
+  basePrice?: number;
+  discountedPrice?: number;
+  isFeatured?: boolean;
+  isAvailable?: boolean;
+  seasonStart?: string;
+  seasonEnd?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  features?: string[];
 }
 
 // ============================================

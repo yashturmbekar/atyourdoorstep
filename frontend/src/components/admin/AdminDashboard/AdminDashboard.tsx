@@ -1,229 +1,113 @@
-import React, { useState, useEffect } from 'react';
+/**
+ * Admin Dashboard Component
+ * Production-ready dashboard with real API data integration
+ * Following Clean Architecture principles from copilot-instructions.md
+ */
+
+import React from 'react';
 import { Link } from 'react-router-dom';
 import {
   FiPackage,
   FiShoppingCart,
   FiDollarSign,
   FiTrendingUp,
-  FiTrendingDown,
   FiArrowRight,
   FiPlus,
   FiEye,
   FiAlertTriangle,
   FiUsers,
   FiCalendar,
+  FiRefreshCw,
+  FiHome,
+  FiSettings,
 } from 'react-icons/fi';
-import { analyticsApi } from '../../../services/adminApi';
-import type { AdminStats, Order } from '../../../types';
+import {
+  useDashboardStats,
+  useRecentOrders,
+  useLowStockProducts,
+  useTodaysOrders,
+  useRevenueStats,
+} from '../../../hooks/admin';
+import {
+  Breadcrumb,
+  Card,
+  CardHeader,
+  CardBody,
+  Skeleton,
+  StatCardSkeleton,
+  TableSkeleton,
+  EmptyState,
+  Badge,
+  Button,
+  BentoGrid,
+  BentoItem,
+  BentoStat,
+} from '../ui';
+import type { Order } from '../../../types';
 import './AdminDashboard.css';
 
+// ============================================
+// SUB-COMPONENTS
+// ============================================
+
+/**
+ * Error State Component
+ */
+const ErrorState: React.FC<{ message: string; onRetry?: () => void }> = ({
+  message,
+  onRetry,
+}) => (
+  <div className="error-state">
+    <FiAlertTriangle className="error-state-icon" />
+    <p>{message}</p>
+    {onRetry && (
+      <button className="retry-btn" onClick={onRetry}>
+        <FiRefreshCw /> Retry
+      </button>
+    )}
+  </div>
+);
+
+// Breadcrumb items
+const breadcrumbItems = [
+  { label: 'Home', href: '/admin', icon: <FiHome /> },
+  { label: 'Dashboard' },
+];
+
+// ============================================
+// MAIN COMPONENT
+// ============================================
+
 const AdminDashboard: React.FC = () => {
-  const [stats, setStats] = useState<AdminStats | null>(null);
-  const [recentOrders] = useState<Order[]>([
-    {
-      id: 'ORD-001',
-      customerInfo: {
-        name: 'John Doe',
-        phone: '9876543210',
-        email: 'john@example.com',
-        address: '123 Main St, Andheri',
-        city: 'Mumbai',
-        pincode: '400001',
-      },
-      items: [
-        {
-          productId: 'PROD-001',
-          productName: 'Alphonso Mangoes',
-          variantId: 'VAR-001',
-          variantSize: '2 dozen',
-          price: 800,
-          quantity: 2,
-          total: 1600,
-        },
-      ],
-      subtotal: 1600,
-      deliveryCharge: 50,
-      total: 1650,
-      status: 'pending',
-      orderDate: new Date('2024-12-28'),
-      createdAt: new Date('2024-12-28'),
-      updatedAt: new Date('2024-12-28'),
-      estimatedDelivery: new Date('2024-12-30'),
-      paymentStatus: 'pending',
-      paymentMethod: 'cod',
-      assignedTo: 'Delivery Agent #1',
-    },
-    {
-      id: 'ORD-002',
-      customerInfo: {
-        name: 'Jane Smith',
-        phone: '9876543211',
-        email: 'jane@example.com',
-        address: '456 Oak Ave, CP',
-        city: 'Delhi',
-        pincode: '110001',
-      },
-      items: [
-        {
-          productId: 'PROD-002',
-          productName: 'Cold Pressed Sunflower Oil',
-          variantId: 'VAR-002',
-          variantSize: '1L',
-          price: 1200,
-          quantity: 2,
-          total: 2400,
-        },
-      ],
-      subtotal: 2400,
-      deliveryCharge: 50,
-      total: 2450,
-      status: 'confirmed',
-      orderDate: new Date('2024-12-27'),
-      createdAt: new Date('2024-12-27'),
-      updatedAt: new Date('2024-12-27'),
-      estimatedDelivery: new Date('2024-12-29'),
-      trackingNumber: 'TRK123456789',
-      paymentStatus: 'paid',
-      paymentMethod: 'online',
-      assignedTo: 'Delivery Agent #2',
-    },
-    {
-      id: 'ORD-003',
-      customerInfo: {
-        name: 'Raj Patel',
-        phone: '9876543212',
-        email: 'raj@example.com',
-        address: '789 MG Road, Koramangala',
-        city: 'Bangalore',
-        pincode: '560034',
-      },
-      items: [
-        {
-          productId: 'PROD-003',
-          productName: 'Organic Jaggery Powder',
-          variantId: 'VAR-003',
-          variantSize: '500g',
-          price: 300,
-          quantity: 2,
-          total: 600,
-        },
-        {
-          productId: 'PROD-004',
-          productName: 'Cold Pressed Coconut Oil',
-          variantId: 'VAR-004',
-          variantSize: '500ml',
-          price: 450,
-          quantity: 1,
-          total: 450,
-        },
-      ],
-      subtotal: 1050,
-      deliveryCharge: 75,
-      total: 1125,
-      status: 'shipped',
-      orderDate: new Date('2024-12-26'),
-      createdAt: new Date('2024-12-26'),
-      updatedAt: new Date('2024-12-27'),
-      estimatedDelivery: new Date('2024-12-28'),
-      trackingNumber: 'TRK987654321',
-      paymentStatus: 'paid',
-      paymentMethod: 'upi',
-      assignedTo: 'Delivery Agent #3',
-    },
-    {
-      id: 'ORD-004',
-      customerInfo: {
-        name: 'Priya Sharma',
-        phone: '9876543213',
-        email: 'priya@example.com',
-        address: '321 Park Street, Salt Lake',
-        city: 'Kolkata',
-        pincode: '700064',
-      },
-      items: [
-        {
-          productId: 'PROD-005',
-          productName: 'Kesar Mangoes',
-          variantId: 'VAR-005',
-          variantSize: '1 dozen',
-          price: 600,
-          quantity: 1,
-          total: 600,
-        },
-      ],
-      subtotal: 600,
-      deliveryCharge: 60,
-      total: 660,
-      status: 'delivered',
-      orderDate: new Date('2024-12-25'),
-      createdAt: new Date('2024-12-25'),
-      updatedAt: new Date('2024-12-26'),
-      estimatedDelivery: new Date('2024-12-27'),
-      actualDelivery: new Date('2024-12-26'),
-      trackingNumber: 'TRK456789123',
-      paymentStatus: 'paid',
-      paymentMethod: 'card',
-      assignedTo: 'Delivery Agent #1',
-    },
-    {
-      id: 'ORD-005',
-      customerInfo: {
-        name: 'Amit Kumar',
-        phone: '9876543214',
-        email: 'amit@example.com',
-        address: '654 Civil Lines, Model Town',
-        city: 'Pune',
-        pincode: '411001',
-      },
-      items: [
-        {
-          productId: 'PROD-006',
-          productName: 'Traditional Ghee',
-          variantId: 'VAR-006',
-          variantSize: '1kg',
-          price: 800,
-          quantity: 1,
-          total: 800,
-        },
-        {
-          productId: 'PROD-007',
-          productName: 'Organic Honey',
-          variantId: 'VAR-007',
-          variantSize: '500g',
-          price: 400,
-          quantity: 1,
-          total: 400,
-        },
-      ],
-      subtotal: 1200,
-      deliveryCharge: 50,
-      total: 1250,
-      status: 'cancelled',
-      orderDate: new Date('2024-12-24'),
-      createdAt: new Date('2024-12-24'),
-      updatedAt: new Date('2024-12-25'),
-      paymentStatus: 'refunded',
-      paymentMethod: 'online',
-      notes: 'Customer requested cancellation due to address change',
-    },
-  ]);
-  const [isLoading, setIsLoading] = useState(true);
+  // Fetch all dashboard data using React Query hooks
+  const {
+    data: stats,
+    isLoading: statsLoading,
+    isError: statsError,
+    refetch: refetchStats,
+  } = useDashboardStats();
 
-  useEffect(() => {
-    loadDashboardData();
-  }, []);
+  const {
+    data: recentOrders,
+    isLoading: ordersLoading,
+    isError: ordersError,
+    refetch: refetchOrders,
+  } = useRecentOrders(5);
 
-  const loadDashboardData = async () => {
-    try {
-      setIsLoading(true);
-      const response = await analyticsApi.getDashboardStats();
-      setStats(response.data);
-    } catch (error) {
-      console.error('Error loading dashboard data:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const {
+    data: lowStockProducts,
+    isLoading: lowStockLoading,
+    isError: lowStockError,
+    refetch: refetchLowStock,
+  } = useLowStockProducts(10);
+
+  const { data: todaysOrdersData } = useTodaysOrders();
+
+  const { data: revenueData } = useRevenueStats();
+
+  // ============================================
+  // UTILITY FUNCTIONS
+  // ============================================
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -232,13 +116,14 @@ const AdminDashboard: React.FC = () => {
     }).format(amount);
   };
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date: Date | string) => {
+    const d = typeof date === 'string' ? new Date(date) : date;
     return new Intl.DateTimeFormat('en-IN', {
       day: 'numeric',
       month: 'short',
       hour: '2-digit',
       minute: '2-digit',
-    }).format(date);
+    }).format(d);
   };
 
   const getPaymentMethodIcon = (method: string) => {
@@ -256,461 +141,550 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  const getStatusClass = (status: string) => {
-    const statusClasses: Record<string, string> = {
-      pending: 'pending',
-      confirmed: 'confirmed',
-      processing: 'processing',
-      shipped: 'shipped',
-      delivered: 'delivered',
-      cancelled: 'cancelled',
+  const getStatusVariant = (
+    status: string
+  ): 'success' | 'warning' | 'error' | 'info' | 'default' => {
+    const variants: Record<
+      string,
+      'success' | 'warning' | 'error' | 'info' | 'default'
+    > = {
+      pending: 'warning',
+      confirmed: 'info',
+      processing: 'info',
+      shipped: 'default',
+      delivered: 'success',
+      cancelled: 'error',
     };
-    return statusClasses[status] || 'pending';
+    return variants[status] || 'default';
   };
 
-  if (isLoading) {
-    return (
-      <div className="admin-dashboard">
-        <div className="page-header">
+  // Calculate change percentages (mock for now - would come from API)
+  const getChangePercent = (metric: string) => {
+    // In production, this would be calculated from historical data
+    const changes: Record<string, { value: number; positive: boolean }> = {
+      products: { value: 12, positive: true },
+      orders: { value: 8, positive: true },
+      revenue: { value: 18, positive: true },
+      customers: { value: 15, positive: true },
+    };
+    return changes[metric] || { value: 0, positive: true };
+  };
+
+  // ============================================
+  // RENDER
+  // ============================================
+
+  return (
+    <div className="admin-dashboard">
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb items={breadcrumbItems} className="admin-animate-fade-in" />
+
+      <div className="page-header">
+        <div className="page-header-content">
           <h1 className="page-title">Dashboard</h1>
           <p className="page-subtitle">
             Welcome back! Here's what's happening with your store.
           </p>
         </div>
-        <div
-          style={{ display: 'flex', justifyContent: 'center', padding: '4rem' }}
-        >
-          <div
-            style={{ fontSize: '1.125rem', color: 'var(--color-text-light)' }}
+        <div className="page-header-actions">
+          <button
+            className="header-action-btn"
+            onClick={() => {
+              refetchStats();
+              refetchOrders();
+              refetchLowStock();
+            }}
+            title="Refresh all data"
           >
-            Loading dashboard...
-          </div>
+            <FiRefreshCw /> Refresh
+          </button>
+          <Link to="/admin/settings" className="header-action-btn secondary">
+            <FiSettings /> Settings
+          </Link>
         </div>
       </div>
-    );
-  }
 
-  return (
-    <div className="admin-dashboard">
-      <div className="page-header">
-        <h1 className="page-title">Dashboard</h1>
-        <p className="page-subtitle">
-          Welcome back! Here's what's happening with your store.
-        </p>
-      </div>
-      {/* Stats Cards */}
+      {/* Stats Cards using Bento Grid */}
       <div className="dashboard-stats">
-        <div className="stat-card">
-          <div className="stat-header">
-            <div className="stat-title">Total Products</div>
-            <div className="stat-icon primary">
-              <FiPackage />
-            </div>
+        {statsLoading ? (
+          <BentoGrid columns={3} gap="md">
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <BentoItem key={i} className="admin-stagger-${i}">
+                <StatCardSkeleton />
+              </BentoItem>
+            ))}
+          </BentoGrid>
+        ) : statsError ? (
+          <div className="stats-error">
+            <ErrorState
+              message="Failed to load dashboard statistics"
+              onRetry={() => refetchStats()}
+            />
           </div>
-          <div className="stat-value">{stats?.totalProducts || 0}</div>
-          <div className="stat-change positive">
-            <FiTrendingUp />
-            <span>+12% from last month</span>
-          </div>
-        </div>
+        ) : (
+          <BentoGrid columns={3} gap="md" className="stats-bento-grid">
+            <BentoItem className="admin-animate-fade-in-up admin-stagger-1">
+              <BentoStat
+                title="Total Products"
+                value={stats?.totalProducts || 0}
+                change={getChangePercent('products')}
+                icon={<FiPackage />}
+                trend="from last month"
+                variant="primary"
+              />
+            </BentoItem>
 
-        <div className="stat-card">
-          <div className="stat-header">
-            <div className="stat-title">Total Orders</div>
-            <div className="stat-icon success">
-              <FiShoppingCart />
-            </div>
-          </div>
-          <div className="stat-value">{stats?.totalOrders || 0}</div>
-          <div className="stat-change positive">
-            <FiTrendingUp />
-            <span>+8% from last month</span>
-          </div>
-        </div>
+            <BentoItem className="admin-animate-fade-in-up admin-stagger-2">
+              <BentoStat
+                title="Total Orders"
+                value={stats?.totalOrders || 0}
+                change={getChangePercent('orders')}
+                icon={<FiShoppingCart />}
+                trend="from last month"
+                variant="success"
+              />
+            </BentoItem>
 
-        <div className="stat-card">
-          <div className="stat-header">
-            <div className="stat-title">Total Revenue</div>
-            <div className="stat-icon success">
-              <FiDollarSign />
-            </div>
-          </div>
-          <div className="stat-value">
-            {formatCurrency(stats?.totalRevenue || 0)}
-          </div>
-          <div className="stat-change positive">
-            <FiTrendingUp />
-            <span>+18% from last month</span>
-          </div>
-        </div>
+            <BentoItem className="admin-animate-fade-in-up admin-stagger-3">
+              <BentoStat
+                title="Total Revenue"
+                value={formatCurrency(
+                  revenueData?.totalRevenue || stats?.totalRevenue || 0
+                )}
+                change={getChangePercent('revenue')}
+                icon={<FiDollarSign />}
+                trend="from last month"
+                variant="success"
+              />
+            </BentoItem>
 
-        <div className="stat-card">
-          <div className="stat-header">
-            <div className="stat-title">Low Stock Items</div>
-            <div className="stat-icon danger">
-              <FiAlertTriangle />
-            </div>
-          </div>
-          <div className="stat-value">{stats?.lowStockProducts || 0}</div>
-          <div className="stat-change negative">
-            <FiTrendingDown />
-            <span>Requires restocking</span>
-          </div>
-        </div>
+            <BentoItem className="admin-animate-fade-in-up admin-stagger-4">
+              <BentoStat
+                title="Low Stock Items"
+                value={lowStockProducts?.length || stats?.lowStockProducts || 0}
+                change={{ value: 0, positive: false }}
+                icon={<FiAlertTriangle />}
+                trend="Requires restocking"
+                variant="danger"
+              />
+            </BentoItem>
 
-        <div className="stat-card">
-          <div className="stat-header">
-            <div className="stat-title">Total Customers</div>
-            <div className="stat-icon info">
-              <FiUsers />
-            </div>
-          </div>
-          <div className="stat-value">{stats?.totalCustomers || 247}</div>
-          <div className="stat-change positive">
-            <FiTrendingUp />
-            <span>+15% from last month</span>
-          </div>
-        </div>
+            <BentoItem className="admin-animate-fade-in-up admin-stagger-5">
+              <BentoStat
+                title="Total Customers"
+                value={stats?.totalCustomers || 0}
+                change={getChangePercent('customers')}
+                icon={<FiUsers />}
+                trend="from last month"
+                variant="primary"
+              />
+            </BentoItem>
 
-        <div className="stat-card">
-          <div className="stat-header">
-            <div className="stat-title">Orders Today</div>
-            <div className="stat-icon warning">
-              <FiCalendar />
-            </div>
-          </div>
-          <div className="stat-value">{stats?.ordersToday || 12}</div>
-          <div className="stat-change positive">
-            <FiTrendingUp />
-            <span>+3 from yesterday</span>
-          </div>
-        </div>
-      </div>{' '}
+            <BentoItem className="admin-animate-fade-in-up admin-stagger-6">
+              <BentoStat
+                title="Orders Today"
+                value={todaysOrdersData?.count || stats?.ordersToday || 0}
+                icon={<FiCalendar />}
+                trend={`${formatCurrency(todaysOrdersData?.totalValue || 0)} total value`}
+                variant="warning"
+              />
+            </BentoItem>
+          </BentoGrid>
+        )}
+      </div>
+
       {/* Main Content */}
       <div className="dashboard-content">
-        {/* Quick Actions - Moved above Recent Orders */}
-        <div className="dashboard-quick-actions-section">
-          <div className="dashboard-card">
-            <div className="card-header">
-              <h2 className="card-title">Quick Actions</h2>
-            </div>
+        {/* Quick Actions */}
+        <Card className="dashboard-quick-actions-section admin-animate-fade-in-up">
+          <CardHeader>
+            <h2 className="card-title">Quick Actions</h2>
+          </CardHeader>
+          <CardBody>
             <div className="quick-actions">
               <Link to="/admin/products/new" className="quick-action">
-                <div className="action-icon">
+                <div className="action-icon primary">
                   <FiPlus />
                 </div>
                 <div className="action-text">
                   <div className="action-title">Add Product</div>
                   <div className="action-subtitle">Create a new product</div>
                 </div>
+                <FiArrowRight className="action-arrow" />
               </Link>
 
               <Link to="/admin/orders" className="quick-action">
-                <div className="action-icon">
+                <div className="action-icon success">
                   <FiEye />
                 </div>
                 <div className="action-text">
                   <div className="action-title">View Orders</div>
-                  <div className="action-subtitle">Manage customer orders</div>
+                  <div className="action-subtitle">
+                    <Badge variant="warning" size="sm">
+                      {stats?.pendingOrders || 0} pending
+                    </Badge>
+                  </div>
                 </div>
+                <FiArrowRight className="action-arrow" />
               </Link>
 
               <Link to="/admin/products" className="quick-action">
-                <div className="action-icon">
+                <div className="action-icon info">
                   <FiPackage />
                 </div>
                 <div className="action-text">
                   <div className="action-title">Manage Products</div>
                   <div className="action-subtitle">Edit existing products</div>
                 </div>
+                <FiArrowRight className="action-arrow" />
               </Link>
 
               <Link to="/admin/analytics" className="quick-action">
-                <div className="action-icon">
+                <div className="action-icon warning">
                   <FiTrendingUp />
                 </div>
                 <div className="action-text">
                   <div className="action-title">View Analytics</div>
                   <div className="action-subtitle">Sales and performance</div>
                 </div>
+                <FiArrowRight className="action-arrow" />
               </Link>
             </div>
-          </div>
-        </div>
+          </CardBody>
+        </Card>
 
         {/* Recent Orders */}
-        <div className="dashboard-card">
-          <div className="card-header">
+        <Card className="admin-animate-fade-in-up">
+          <CardHeader>
             <h2 className="card-title">Recent Orders</h2>
             <div className="orders-header-actions">
-              <select className="orders-filter">
-                <option value="all">All Orders</option>
-                <option value="pending">Pending</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="shipped">Shipped</option>
-                <option value="delivered">Delivered</option>
-              </select>
+              <button
+                className="refresh-btn"
+                onClick={() => refetchOrders()}
+                title="Refresh orders"
+              >
+                <FiRefreshCw />
+              </button>
               <Link to="/admin/orders" className="card-action">
                 View All <FiArrowRight />
               </Link>
             </div>
-          </div>
-
-          <div className="orders-summary">
-            <div className="summary-item">
-              <span className="summary-label">Today's Orders:</span>
-              <span className="summary-value">
-                {
-                  recentOrders.filter(
-                    order =>
-                      new Date(order.orderDate).toDateString() ===
-                      new Date().toDateString()
-                  ).length
-                }
-              </span>
-            </div>
-            {/* Removed Pending Orders summary item */}
-            <div className="summary-item">
-              <span className="summary-label">Processing:</span>
-              <span className="summary-value processing">
-                {
-                  recentOrders.filter(order =>
-                    ['confirmed', 'processing', 'shipped'].includes(
-                      order.status
-                    )
-                  ).length
-                }
-              </span>
-            </div>
-            <div className="summary-item">
-              <span className="summary-label">Total Value:</span>
-              <span className="summary-value">
-                {formatCurrency(
-                  recentOrders.reduce((sum, order) => sum + order.total, 0)
-                )}
-              </span>
-            </div>
-          </div>
-
-          <div className="orders-table-container">
-            {/* Enhanced Table Structure */}
-            <div className="orders-table">
-              {/* Table Header */}
-              <div className="orders-table-header">
-                <div className="table-header-cell order-header">Order</div>
-                <div className="table-header-cell customer-header">
-                  Customer
-                </div>
-                <div className="table-header-cell items-header">Items</div>
-                <div className="table-header-cell payment-header">Payment</div>
-                <div className="table-header-cell delivery-header">
-                  Delivery
-                </div>
-                <div className="table-header-cell actions-header">Actions</div>
+          </CardHeader>
+          <CardBody>
+            {/* Orders Summary */}
+            <div className="orders-summary">
+              <div className="summary-item">
+                <span className="summary-label">Today's Orders:</span>
+                <span className="summary-value">
+                  {todaysOrdersData?.count || 0}
+                </span>
               </div>
+              <div className="summary-item">
+                <span className="summary-label">Pending:</span>
+                <Badge variant="warning" size="sm">
+                  {stats?.pendingOrders || 0}
+                </Badge>
+              </div>
+              <div className="summary-item">
+                <span className="summary-label">Total Value:</span>
+                <span className="summary-value highlight">
+                  {formatCurrency(
+                    recentOrders?.reduce(
+                      (sum, order) => sum + order.total,
+                      0
+                    ) || 0
+                  )}
+                </span>
+              </div>
+            </div>
 
-              {/* Table Body */}
-              <div className="orders-table-body">
-                {recentOrders.slice(0, 5).map((order, index) => (
-                  <div
-                    key={order.id}
-                    className="table-row"
-                    data-order-index={index}
-                  >
-                    {/* Order Column */}
-                    <div className="table-cell order-cell">
-                      <div className="order-id-wrapper">
-                        <div className="order-id">#{order.id}</div>
-                        <div className="order-date">
-                          {formatDate(order.orderDate)}
-                        </div>
-                      </div>
-                      <div className="status-wrapper">
-                        <span
-                          className={`order-status status-${getStatusClass(order.status)}`}
-                        >
-                          {order.status}
-                        </span>
-                      </div>
+            {/* Orders Table */}
+            <div className="orders-table-container">
+              {ordersLoading ? (
+                <TableSkeleton rows={5} columns={6} />
+              ) : ordersError ? (
+                <ErrorState
+                  message="Failed to load recent orders"
+                  onRetry={() => refetchOrders()}
+                />
+              ) : !recentOrders || recentOrders.length === 0 ? (
+                <EmptyState
+                  title="No orders yet"
+                  description="Orders will appear here once customers start ordering."
+                  icon={<FiShoppingCart />}
+                  action={
+                    <Button
+                      variant="primary"
+                      onClick={() => (window.location.href = '/admin/products')}
+                    >
+                      View Products
+                    </Button>
+                  }
+                />
+              ) : (
+                <div className="orders-table">
+                  {/* Table Header */}
+                  <div className="orders-table-header">
+                    <div className="table-header-cell order-header">Order</div>
+                    <div className="table-header-cell customer-header">
+                      Customer
                     </div>
-
-                    {/* Customer Column */}
-                    <div className="table-cell customer-cell">
-                      <div className="customer-main">
-                        <div className="customer-name">
-                          {order.customerInfo.name}
-                        </div>
-                        <div className="customer-contact">
-                          {order.customerInfo.phone}
-                        </div>
-                      </div>
-                      <div className="customer-location">
-                        {order.customerInfo.city}, {order.customerInfo.pincode}
-                      </div>
+                    <div className="table-header-cell items-header">Items</div>
+                    <div className="table-header-cell payment-header">
+                      Payment
                     </div>
-
-                    {/* Items Column */}
-                    <div className="table-cell items-cell">
-                      <div className="items-summary">
-                        <div className="items-count">
-                          {order.items.reduce(
-                            (total, item) => total + item.quantity,
-                            0
-                          )}{' '}
-                          item
-                          {order.items.reduce(
-                            (total, item) => total + item.quantity,
-                            0
-                          ) !== 1
-                            ? 's'
-                            : ''}
-                        </div>
-                        <div className="items-details">
-                          {order.items.slice(0, 2).map((item, idx) => (
-                            <div key={idx} className="item-line">
-                              {item.quantity}× {item.productName}
-                            </div>
-                          ))}
-                          {order.items.length > 2 && (
-                            <div className="items-more">
-                              +{order.items.length - 2} more
-                            </div>
-                          )}
-                        </div>
-                      </div>
+                    <div className="table-header-cell delivery-header">
+                      Delivery
                     </div>
-
-                    {/* Payment Column */}
-                    <div className="table-cell payment-cell">
-                      <div className="payment-info">
-                        <div className="payment-method">
-                          <span className="payment-icon">
-                            {getPaymentMethodIcon(order.paymentMethod)}
-                          </span>
-                          <span className="payment-type">
-                            {order.paymentMethod.toUpperCase()}
-                          </span>
-                        </div>
-                        <div className="payment-status-wrapper">
-                          <span
-                            className={`payment-status status-${order.paymentStatus}`}
-                          >
-                            {order.paymentStatus}
-                          </span>
-                        </div>
-                        <div className="order-amount">
-                          {formatCurrency(order.total)}
-                        </div>
-                      </div>
+                    <div className="table-header-cell actions-header">
+                      Actions
                     </div>
-
-                    {/* Delivery Column */}
-                    <div className="table-cell delivery-cell">
-                      <div className="delivery-info">
-                        {order.trackingNumber && (
-                          <div className="tracking-info">
-                            <span className="tracking-label">Tracking:</span>
-                            <span className="tracking-number">
-                              {order.trackingNumber}
-                            </span>
-                          </div>
-                        )}
-                        {order.estimatedDelivery && (
-                          <div className="delivery-date">
-                            <span className="delivery-label">
-                              {order.status === 'delivered'
-                                ? 'Delivered:'
-                                : 'Expected:'}
-                            </span>
-                            <span className="delivery-date-value">
-                              {formatDate(
-                                order.actualDelivery || order.estimatedDelivery
-                              )}
-                            </span>
-                          </div>
-                        )}
-                        {order.assignedTo && (
-                          <div className="assigned-agent">
-                            {order.assignedTo}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Actions Column */}
-                    <div className="table-cell actions-cell">
-                      <div className="action-buttons">
-                        <Link
-                          to={`/admin/orders/${order.id}`}
-                          className="action-btn view-btn"
-                          title="View Order Details"
-                        >
-                          <FiEye />
-                        </Link>
-                        {order.status === 'pending' && (
-                          <button
-                            className="action-btn confirm-btn"
-                            title="Confirm Order"
-                          >
-                            ✓
-                          </button>
-                        )}
-                        {(order.status === 'confirmed' ||
-                          order.status === 'processing') && (
-                          <button
-                            className="action-btn ship-btn"
-                            title="Mark as Shipped"
-                          >
-                            📦
-                          </button>
-                        )}
-                        {order.trackingNumber && (
-                          <button
-                            className="action-btn track-btn"
-                            title="Track Package"
-                          >
-                            📍
-                          </button>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Notes Row (if exists) */}
-                    {order.notes && (
-                      <div className="table-notes-row">
-                        <div className="notes-content">
-                          <strong>Note:</strong> {order.notes}
-                        </div>
-                      </div>
-                    )}
                   </div>
-                ))}
-              </div>
+
+                  {/* Table Body */}
+                  <div className="orders-table-body">
+                    {recentOrders.map((order: Order, index: number) => (
+                      <div
+                        key={order.id}
+                        className={`table-row admin-animate-fade-in-up admin-stagger-${index + 1}`}
+                        data-order-index={index}
+                      >
+                        {/* Order Column */}
+                        <div className="table-cell order-cell">
+                          <div className="order-id-wrapper">
+                            <div className="order-id">
+                              #{order.id.slice(0, 8)}
+                            </div>
+                            <div className="order-date">
+                              {formatDate(order.orderDate)}
+                            </div>
+                          </div>
+                          <Badge
+                            variant={getStatusVariant(order.status)}
+                            size="sm"
+                          >
+                            {order.status}
+                          </Badge>
+                        </div>
+
+                        {/* Customer Column */}
+                        <div className="table-cell customer-cell">
+                          <div className="customer-main">
+                            <div className="customer-name">
+                              {order.customerInfo.name}
+                            </div>
+                            <div className="customer-contact">
+                              {order.customerInfo.phone}
+                            </div>
+                          </div>
+                          <div className="customer-location">
+                            {order.customerInfo.city},{' '}
+                            {order.customerInfo.pincode}
+                          </div>
+                        </div>
+
+                        {/* Items Column */}
+                        <div className="table-cell items-cell">
+                          <div className="items-summary">
+                            <Badge variant="default" size="sm">
+                              {order.items.reduce(
+                                (total, item) => total + item.quantity,
+                                0
+                              )}{' '}
+                              item
+                              {order.items.reduce(
+                                (total, item) => total + item.quantity,
+                                0
+                              ) !== 1
+                                ? 's'
+                                : ''}
+                            </Badge>
+                            <div className="items-details">
+                              {order.items.slice(0, 2).map((item, idx) => (
+                                <div key={idx} className="item-line">
+                                  {item.quantity}× {item.productName}
+                                </div>
+                              ))}
+                              {order.items.length > 2 && (
+                                <div className="items-more">
+                                  +{order.items.length - 2} more
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Payment Column */}
+                        <div className="table-cell payment-cell">
+                          <div className="payment-info">
+                            <div className="payment-method">
+                              <span className="payment-icon">
+                                {getPaymentMethodIcon(order.paymentMethod)}
+                              </span>
+                              <span className="payment-type">
+                                {order.paymentMethod.toUpperCase()}
+                              </span>
+                            </div>
+                            <Badge
+                              variant={
+                                order.paymentStatus === 'paid'
+                                  ? 'success'
+                                  : 'warning'
+                              }
+                              size="sm"
+                            >
+                              {order.paymentStatus}
+                            </Badge>
+                            <div className="order-amount">
+                              {formatCurrency(order.total)}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Delivery Column */}
+                        <div className="table-cell delivery-cell">
+                          <div className="delivery-info">
+                            {order.trackingNumber && (
+                              <div className="tracking-info">
+                                <span className="tracking-label">
+                                  Tracking:
+                                </span>
+                                <span className="tracking-number">
+                                  {order.trackingNumber}
+                                </span>
+                              </div>
+                            )}
+                            {order.estimatedDelivery && (
+                              <div className="delivery-date">
+                                <span className="delivery-label">
+                                  {order.status === 'delivered'
+                                    ? 'Delivered:'
+                                    : 'Expected:'}
+                                </span>
+                                <span className="delivery-date-value">
+                                  {formatDate(
+                                    order.actualDelivery ||
+                                      order.estimatedDelivery
+                                  )}
+                                </span>
+                              </div>
+                            )}
+                            {order.assignedTo && (
+                              <div className="assigned-agent">
+                                {order.assignedTo}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Actions Column */}
+                        <div className="table-cell actions-cell">
+                          <div className="action-buttons">
+                            <Link
+                              to={`/admin/orders/${order.id}`}
+                              className="action-btn view-btn"
+                              title="View Order Details"
+                            >
+                              <FiEye />
+                            </Link>
+                            {order.status === 'pending' && (
+                              <button
+                                className="action-btn confirm-btn"
+                                title="Confirm Order"
+                              >
+                                ✓
+                              </button>
+                            )}
+                            {(order.status === 'confirmed' ||
+                              order.status === 'processing') && (
+                              <button
+                                className="action-btn ship-btn"
+                                title="Mark as Shipped"
+                              >
+                                📦
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Notes Row */}
+                        {order.notes && (
+                          <div className="table-notes-row">
+                            <div className="notes-content">
+                              <Badge variant="info" size="sm">
+                                Note
+                              </Badge>
+                              <span>{order.notes}</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
-        </div>
+          </CardBody>
+        </Card>
 
         {/* Revenue and Low Stock - Side by side */}
         <div className="dashboard-bottom-section">
           {/* Revenue Chart */}
-          <div className="dashboard-card">
-            <div className="card-header">
+          <Card className="admin-animate-fade-in-up">
+            <CardHeader>
               <h2 className="card-title">Revenue Overview</h2>
               <Link to="/admin/analytics" className="card-action">
                 View Analytics <FiArrowRight />
               </Link>
-            </div>
-            <div className="chart-container">
-              <div>
-                Revenue chart will be displayed here (implement with chart
-                library)
+            </CardHeader>
+            <CardBody>
+              <div className="chart-container">
+                {revenueData?.monthlyData ? (
+                  <div className="revenue-chart-placeholder">
+                    <div className="revenue-summary">
+                      <div className="revenue-total">
+                        <span className="revenue-label">Total Revenue</span>
+                        <span className="revenue-value">
+                          {formatCurrency(revenueData.totalRevenue)}
+                        </span>
+                      </div>
+                      <div className="revenue-orders">
+                        <span className="revenue-label">Total Orders</span>
+                        <span className="revenue-value">
+                          {revenueData.totalOrders}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="monthly-bars">
+                      {revenueData.monthlyData.map((month, idx) => (
+                        <div key={idx} className="month-bar-wrapper">
+                          <div
+                            className="month-bar"
+                            style={{
+                              height: `${Math.max(20, (month.revenue / (Math.max(...revenueData.monthlyData.map(m => m.revenue)) || 1)) * 100)}%`,
+                            }}
+                            title={`${month.month}: ${formatCurrency(month.revenue)}`}
+                          />
+                          <span className="month-label">{month.month}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <EmptyState
+                    title="No revenue data"
+                    description="Revenue data will appear here once you have orders"
+                    icon={<FiTrendingUp />}
+                    size="sm"
+                  />
+                )}
               </div>
-            </div>
-          </div>
+            </CardBody>
+          </Card>
 
           {/* Low Stock Alert */}
-          <div className="dashboard-card">
-            <div className="card-header">
+          <Card className="admin-animate-fade-in-up">
+            <CardHeader>
               <h2 className="card-title">Low Stock Alert</h2>
               <Link
                 to="/admin/products?filter=low-stock"
@@ -718,35 +692,66 @@ const AdminDashboard: React.FC = () => {
               >
                 View All <FiArrowRight />
               </Link>
-            </div>
-            <div className="low-stock-items">
-              <div className="stock-item">
-                <div className="stock-info">
-                  <div className="stock-name">Alphonso Mangoes (2 dozen)</div>
-                  <div className="stock-sku">SKU: MAN-ALF-2DOZ</div>
-                </div>
-                <div className="stock-quantity">8 left</div>
-              </div>
-              <div className="stock-item">
-                <div className="stock-info">
-                  <div className="stock-name">
-                    Cold Pressed Sunflower Oil (1L)
+            </CardHeader>
+            <CardBody>
+              <div className="low-stock-items">
+                {lowStockLoading ? (
+                  <div className="low-stock-loading">
+                    {[1, 2, 3].map(i => (
+                      <div key={i} className="stock-item">
+                        <div className="stock-info">
+                          <Skeleton width="80%" height="16px" />
+                          <Skeleton width="50%" height="12px" />
+                        </div>
+                        <Skeleton width="40px" height="24px" />
+                      </div>
+                    ))}
                   </div>
-                  <div className="stock-sku">SKU: OIL-SUN-1L</div>
-                </div>
-                <div className="stock-quantity">5 left</div>
+                ) : lowStockError ? (
+                  <ErrorState
+                    message="Failed to load low stock items"
+                    onRetry={() => refetchLowStock()}
+                  />
+                ) : !lowStockProducts || lowStockProducts.length === 0 ? (
+                  <EmptyState
+                    title="All stocked up!"
+                    description="All products are well-stocked."
+                    icon={<FiPackage />}
+                    size="sm"
+                  />
+                ) : (
+                  lowStockProducts.map((product, idx) => {
+                    const variant = product.variants[0];
+                    const isCritical = (variant?.stockQuantity || 0) <= 3;
+                    return (
+                      <div
+                        key={product.id}
+                        className={`stock-item admin-animate-fade-in-up admin-stagger-${idx + 1}`}
+                      >
+                        <div className="stock-info">
+                          <div className="stock-name">
+                            {product.name}
+                            {variant?.size && ` (${variant.size})`}
+                          </div>
+                          <div className="stock-sku">
+                            {variant?.sku
+                              ? `SKU: ${variant.sku}`
+                              : `ID: ${product.id.slice(0, 8)}`}
+                          </div>
+                        </div>
+                        <Badge
+                          variant={isCritical ? 'error' : 'warning'}
+                          size="sm"
+                        >
+                          {variant?.stockQuantity || 0} left
+                        </Badge>
+                      </div>
+                    );
+                  })
+                )}
               </div>
-              <div className="stock-item">
-                <div className="stock-info">
-                  <div className="stock-name">
-                    Organic Jaggery Powder (500g)
-                  </div>
-                  <div className="stock-sku">SKU: JAG-POW-500G</div>
-                </div>
-                <div className="stock-quantity">3 left</div>
-              </div>
-            </div>
-          </div>
+            </CardBody>
+          </Card>
         </div>
       </div>
     </div>

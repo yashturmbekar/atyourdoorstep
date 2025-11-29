@@ -1,0 +1,302 @@
+/**
+ * Admin Panel - Modern Light Theme CSS Variables
+ * Professional design system with blue brand colors
+ * Import this file at the top of admin component CSS files
+ */
+
+:root {
+  /* ============================================
+     PRIMARY COLORS - Blue Brand
+     ============================================ */
+  --admin-primary: #3b82f6;
+  --admin-primary-light: #60a5fa;
+  --admin-primary-dark: #2563eb;
+  --admin-primary-bg: rgba(59, 130, 246, 0.08);
+  --admin-primary-hover: rgba(59, 130, 246, 0.12);
+  --admin-primary-50: #eff6ff;
+  --admin-primary-100: #dbeafe;
+  --admin-primary-200: #bfdbfe;
+  --admin-primary-300: #93c5fd;
+  --admin-primary-400: #60a5fa;
+  --admin-primary-500: #3b82f6;
+  --admin-primary-600: #2563eb;
+  --admin-primary-700: #1d4ed8;
+  --admin-primary-800: #1e40af;
+  --admin-primary-900: #1e3a8a;
+
+  /* ============================================
+     SECONDARY COLORS - Slate
+     ============================================ */
+  --admin-secondary: #475569;
+  --admin-secondary-light: #64748b;
+  --admin-secondary-dark: #334155;
+
+  /* ============================================
+     ACCENT COLORS - Complementary Palette
+     ============================================ */
+  --admin-accent-purple: #8b5cf6;
+  --admin-accent-purple-bg: rgba(139, 92, 246, 0.08);
+  --admin-accent-teal: #14b8a6;
+  --admin-accent-teal-bg: rgba(20, 184, 166, 0.08);
+  --admin-accent-pink: #ec4899;
+  --admin-accent-pink-bg: rgba(236, 72, 153, 0.08);
+  --admin-accent-indigo: #6366f1;
+  --admin-accent-indigo-bg: rgba(99, 102, 241, 0.08);
+
+  /* ============================================
+     STATUS COLORS
+     ============================================ */
+  --admin-success: #22c55e;
+  --admin-success-light: #4ade80;
+  --admin-success-dark: #16a34a;
+  --admin-success-bg: rgba(34, 197, 94, 0.1);
+
+  --admin-warning: #f59e0b;
+  --admin-warning-light: #fbbf24;
+  --admin-warning-dark: #d97706;
+  --admin-warning-bg: rgba(245, 158, 11, 0.1);
+
+  --admin-error: #ef4444;
+  --admin-error-light: #f87171;
+  --admin-error-dark: #dc2626;
+  --admin-error-bg: rgba(239, 68, 68, 0.08);
+
+  --admin-info: #0ea5e9;
+  --admin-info-light: #38bdf8;
+  --admin-info-dark: #0284c7;
+  --admin-info-bg: rgba(14, 165, 233, 0.08);
+
+  /* ============================================
+     BACKGROUND COLORS - Light Theme
+     ============================================ */
+  --admin-bg-primary: #f8fafc;
+  --admin-bg-secondary: #ffffff;
+  --admin-bg-tertiary: #f1f5f9;
+  --admin-bg-card: #ffffff;
+  --admin-bg-hover: rgba(59, 130, 246, 0.04);
+  --admin-bg-overlay: rgba(15, 23, 42, 0.6);
+  --admin-bg-elevated: #ffffff;
+  --admin-bg-sunken: #e2e8f0;
+
+  /* ============================================
+     GLASSMORPHISM EFFECTS
+     ============================================ */
+  --admin-glass-bg: rgba(255, 255, 255, 0.7);
+  --admin-glass-bg-strong: rgba(255, 255, 255, 0.85);
+  --admin-glass-border: rgba(255, 255, 255, 0.5);
+  --admin-glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  --admin-glass-blur: blur(12px);
+  --admin-glass-blur-strong: blur(20px);
+
+  /* ============================================
+     TEXT COLORS
+     ============================================ */
+  --admin-text-primary: #111827;
+  --admin-text-secondary: #374151;
+  --admin-text-muted: #6b7280;
+  --admin-text-light: #9ca3af;
+  --admin-text-inverse: #ffffff;
+  --admin-text-heading: #111827;
+
+  /* ============================================
+     BORDER COLORS
+     ============================================ */
+  --admin-border: #e5e7eb;
+  --admin-border-light: #f3f4f6;
+  --admin-border-hover: #d1d5db;
+  --admin-border-focus: #3b82f6;
+
+  /* ============================================
+     SHADOWS - Light Theme
+     ============================================ */
+  --admin-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --admin-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --admin-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  --admin-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --admin-shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  --admin-shadow-glow: 0 0 20px rgba(59, 130, 246, 0.15);
+  --admin-shadow-glow-strong: 0 0 40px rgba(59, 130, 246, 0.25);
+  --admin-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --admin-shadow-card-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --admin-shadow-float: 0 20px 40px -8px rgba(0, 0, 0, 0.12);
+  --admin-shadow-inset: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  --admin-shadow-colored: 0 10px 30px -5px rgba(59, 130, 246, 0.2);
+
+  /* ============================================
+     SPACING
+     ============================================ */
+  --admin-space-xs: 0.25rem;
+  --admin-space-sm: 0.5rem;
+  --admin-space-md: 1rem;
+  --admin-space-lg: 1.5rem;
+  --admin-space-xl: 2rem;
+  --admin-space-2xl: 3rem;
+  --admin-space-3xl: 4rem;
+  --admin-space-4xl: 6rem;
+
+  /* ============================================
+     BORDER RADIUS
+     ============================================ */
+  --admin-radius-sm: 6px;
+  --admin-radius-md: 8px;
+  --admin-radius-lg: 10px;
+  --admin-radius-xl: 12px;
+  --admin-radius-2xl: 16px;
+  --admin-radius-3xl: 20px;
+  --admin-radius-full: 9999px;
+
+  /* ============================================
+     TYPOGRAPHY
+     ============================================ */
+  --admin-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --admin-font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+
+  --admin-font-xs: 0.75rem;
+  --admin-font-sm: 0.875rem;
+  --admin-font-base: 1rem;
+  --admin-font-lg: 1.125rem;
+  --admin-font-xl: 1.25rem;
+  --admin-font-2xl: 1.5rem;
+  --admin-font-3xl: 1.875rem;
+  --admin-font-4xl: 2.25rem;
+
+  /* ============================================
+     TRANSITIONS
+     ============================================ */
+  --admin-transition-fast: 150ms ease;
+  --admin-transition-normal: 200ms ease;
+  --admin-transition-slow: 300ms ease;
+  --admin-transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ============================================
+     Z-INDEX SCALE
+     ============================================ */
+  --admin-z-base: 0;
+  --admin-z-dropdown: 100;
+  --admin-z-sticky: 200;
+  --admin-z-fixed: 300;
+  --admin-z-modal-backdrop: 400;
+  --admin-z-modal: 500;
+  --admin-z-popover: 600;
+  --admin-z-tooltip: 700;
+  --admin-z-toast: 800;
+
+  /* ============================================
+     LAYOUT
+     ============================================ */
+  --admin-sidebar-width: 260px;
+  --admin-sidebar-collapsed-width: 72px;
+  --admin-header-height: 64px;
+  --admin-content-max-width: 1600px;
+
+  /* ============================================
+     GRADIENTS - Blue Theme
+     ============================================ */
+  --admin-gradient-primary: linear-gradient(135deg, #3b82f6, #2563eb);
+  --admin-gradient-secondary: linear-gradient(135deg, #475569, #334155);
+  --admin-gradient-success: linear-gradient(135deg, #22c55e, #16a34a);
+  --admin-gradient-warning: linear-gradient(135deg, #f59e0b, #d97706);
+  --admin-gradient-error: linear-gradient(135deg, #ef4444, #dc2626);
+  --admin-gradient-info: linear-gradient(135deg, #0ea5e9, #0284c7);
+
+  /* ============================================
+     STATUS BADGE STYLES
+     ============================================ */
+  --admin-badge-pending-bg: #fef3c7;
+  --admin-badge-pending-color: #92400e;
+  --admin-badge-pending-border: #f59e0b;
+
+  --admin-badge-confirmed-bg: #dbeafe;
+  --admin-badge-confirmed-color: #1e40af;
+  --admin-badge-confirmed-border: #3b82f6;
+
+  --admin-badge-processing-bg: #e0e7ff;
+  --admin-badge-processing-color: #4338ca;
+  --admin-badge-processing-border: #6366f1;
+
+  --admin-badge-shipped-bg: #dbeafe;
+  --admin-badge-shipped-color: #1d4ed8;
+  --admin-badge-shipped-border: #3b82f6;
+
+  --admin-badge-delivered-bg: #dcfce7;
+  --admin-badge-delivered-color: #166534;
+  --admin-badge-delivered-border: #22c55e;
+
+  --admin-badge-cancelled-bg: #fee2e2;
+  --admin-badge-cancelled-color: #991b1b;
+  --admin-badge-cancelled-border: #ef4444;
+
+  /* ============================================
+     INTERACTIVE STATES
+     ============================================ */
+  --admin-focus-ring: 0 0 0 3px rgba(59, 130, 246, 0.25);
+  --admin-focus-ring-offset: 0 0 0 2px #ffffff, 0 0 0 4px rgba(59, 130, 246, 0.5);
+  --admin-focus-visible: 0 0 0 2px var(--admin-primary);
+
+  /* ============================================
+     INPUT STYLES
+     ============================================ */
+  --admin-input-bg: #ffffff;
+  --admin-input-border: #e5e7eb;
+  --admin-input-border-focus: #3b82f6;
+  --admin-input-placeholder: #9ca3af;
+  --admin-input-disabled-bg: #f3f4f6;
+
+  /* ============================================
+     TABLE STYLES
+     ============================================ */
+  --admin-table-header-bg: #f9fafb;
+  --admin-table-row-hover: rgba(59, 130, 246, 0.04);
+  --admin-table-stripe: #fafafa;
+  --admin-table-border: #e5e7eb;
+}
+
+/* ============================================
+   KEYFRAME ANIMATIONS
+   ============================================ */
+@keyframes admin-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes admin-fade-in-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes admin-scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes admin-slide-in-right {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes admin-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes admin-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Animation utility classes */
+.admin-animate-fade-in {
+  animation: admin-fade-in 300ms ease forwards;
+}
+
+.admin-animate-fade-in-up {
+  animation: admin-fade-in-up 300ms ease forwards;
+}
+
+.admin-animate-scale-in {
+  animation: admin-scale-in 200ms ease forwards;
+}
+
+.admin-animate-spin {
+  animation: admin-spin 1s linear infinite;
+}

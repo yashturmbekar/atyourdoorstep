@@ -72,6 +72,7 @@ export { useThemeContext } from './useThemeContext';
 
 // Admin hooks
 export * from './useAdminAuth';
+export * from './admin';
 
 // Content hooks (CMS)
 export * from './useContent';

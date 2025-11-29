@@ -25,6 +25,14 @@ import type {
   CreateCategoryRequestDto,
   UpdateCategoryRequestDto,
 } from '../../../types/content.types';
+import {
+  TableSkeleton,
+  ToastProvider,
+  useToast,
+  Breadcrumb,
+  EmptyState,
+  Button,
+} from '../ui';
 import './ContentManagement.css';
 
 interface CategoryFormData {
@@ -49,7 +57,16 @@ const initialFormData: CategoryFormData = {
   parentId: '',
 };
 
-const CategoryManagement: React.FC = () => {
+// Breadcrumb items for navigation
+const breadcrumbItems = [
+  { label: 'Dashboard', href: '/admin' },
+  { label: 'Content', href: '/admin/content' },
+  { label: 'Categories', href: '/admin/content/categories' },
+];
+
+// Inner component that uses toast hook
+const CategoryManagementContent: React.FC = () => {
+  const toast = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingCategory, setEditingCategory] =
@@ -106,6 +123,15 @@ const CategoryManagement: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Validate required image
+    if (!formData.imageUrl || formData.imageUrl.trim() === '') {
+      toast.error(
+        'Image Required',
+        'Category image is required. Please provide an image URL.'
+      );
+      return;
+    }
+
     try {
       if (editingCategory) {
         const updateData: UpdateCategoryRequestDto = {
@@ -113,7 +139,7 @@ const CategoryManagement: React.FC = () => {
           slug: formData.slug,
           description: formData.description || undefined,
           icon: formData.icon || undefined,
-          imageUrl: formData.imageUrl || undefined,
+          imageUrl: formData.imageUrl,
           displayOrder: formData.displayOrder,
           isActive: formData.isActive,
           parentId: formData.parentId || undefined,
@@ -122,18 +148,26 @@ const CategoryManagement: React.FC = () => {
           id: editingCategory.id,
           data: updateData,
         });
+        toast.success(
+          'Category Updated',
+          `Category "${formData.name}" updated successfully`
+        );
       } else {
         const createData: CreateCategoryRequestDto = {
           name: formData.name,
           slug: formData.slug,
           description: formData.description || undefined,
           icon: formData.icon || undefined,
-          imageUrl: formData.imageUrl || undefined,
+          imageUrl: formData.imageUrl,
           displayOrder: formData.displayOrder,
           isActive: formData.isActive,
           parentId: formData.parentId || undefined,
         };
         await createCategory.mutateAsync(createData);
+        toast.success(
+          'Category Created',
+          `Category "${formData.name}" created successfully`
+        );
       }
 
       setShowForm(false);
@@ -141,6 +175,7 @@ const CategoryManagement: React.FC = () => {
       setFormData(initialFormData);
     } catch (err) {
       console.error('Error saving category:', err);
+      toast.error('Error', 'Error saving category. Please try again.');
     }
   };
 
@@ -160,11 +195,17 @@ const CategoryManagement: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
+    const categoryToDelete = categories.find(c => c.id === id);
     try {
       await deleteCategory.mutateAsync(id);
+      toast.success(
+        'Category Deleted',
+        `Category "${categoryToDelete?.name || ''}" deleted successfully`
+      );
       setDeleteConfirm(null);
     } catch (err) {
       console.error('Error deleting category:', err);
+      toast.error('Error', 'Error deleting category. Please try again.');
     }
   };
 
@@ -177,9 +218,13 @@ const CategoryManagement: React.FC = () => {
   if (isLoading) {
     return (
       <div className="content-management">
-        <div className="loading-container">
-          <div className="loading-spinner" />
-          <div className="loading-text">Loading categories...</div>
+        <div className="page-header">
+          <Breadcrumb items={breadcrumbItems} />
+          <h1 className="page-title">Category Management</h1>
+          <p className="page-subtitle">Loading categories...</p>
+        </div>
+        <div className="data-table-container">
+          <TableSkeleton rows={6} columns={6} />
         </div>
       </div>
     );
@@ -189,18 +234,20 @@ const CategoryManagement: React.FC = () => {
     return (
       <div className="content-management">
         <div className="page-header">
-          <Link to="/admin/content" className="btn btn-ghost">
-            <FiArrowLeft />
-            Back to Content
-          </Link>
+          <Breadcrumb items={breadcrumbItems} />
           <h1 className="page-title">Category Management</h1>
         </div>
-        <div className="empty-state">
-          <div className="empty-state-title">Error loading categories</div>
-          <p className="empty-state-description">
-            There was an error loading the categories. Please try again later.
-          </p>
-        </div>
+        <EmptyState
+          icon={<FiGrid />}
+          title="Error loading categories"
+          description="There was an error loading the categories. Please try again later."
+          action={
+            <Link to="/admin/content" className="btn btn-ghost">
+              <FiArrowLeft />
+              Back to Content
+            </Link>
+          }
+        />
       </div>
     );
   }
@@ -208,10 +255,13 @@ const CategoryManagement: React.FC = () => {
   return (
     <div className="content-management">
       <div className="page-header">
-        <Link to="/admin/content" className="btn btn-ghost">
-          <FiArrowLeft />
-          Back to Content
-        </Link>
+        <Breadcrumb items={breadcrumbItems} />
+        <div className="page-header-row">
+          <Link to="/admin/content" className="btn btn-ghost">
+            <FiArrowLeft />
+            Back to Content
+          </Link>
+        </div>
         <h1 className="page-title">Category Management</h1>
         <p className="page-subtitle">
           Manage product categories and subcategories
@@ -308,7 +358,7 @@ const CategoryManagement: React.FC = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="imageUrl" className="form-label">
+                <label htmlFor="imageUrl" className="form-label required">
                   Image URL
                 </label>
                 <input
@@ -319,7 +369,25 @@ const CategoryManagement: React.FC = () => {
                   value={formData.imageUrl}
                   onChange={handleInputChange}
                   placeholder="https://example.com/image.jpg"
+                  required
                 />
+                <p className="form-hint">
+                  Category image is required. Use a high-quality image for
+                  better presentation.
+                </p>
+                {formData.imageUrl && (
+                  <div className="image-preview-container">
+                    <img
+                      src={formData.imageUrl}
+                      alt="Category preview"
+                      className="image-preview large"
+                      onError={e => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                      }}
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="form-group">
@@ -380,24 +448,26 @@ const CategoryManagement: React.FC = () => {
             </div>
 
             {filteredCategories.length === 0 ? (
-              <div className="empty-state">
-                <FiGrid className="empty-state-icon" />
-                <h3 className="empty-state-title">No categories found</h3>
-                <p className="empty-state-description">
-                  {searchTerm
+              <EmptyState
+                icon={<FiGrid />}
+                title="No categories found"
+                description={
+                  searchTerm
                     ? 'No categories match your search. Try a different search term.'
-                    : 'Get started by creating your first category.'}
-                </p>
-                {!searchTerm && (
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => setShowForm(true)}
-                  >
-                    <FiPlus />
-                    Add Your First Category
-                  </button>
-                )}
-              </div>
+                    : 'Get started by creating your first category.'
+                }
+                action={
+                  !searchTerm ? (
+                    <Button
+                      variant="primary"
+                      onClick={() => setShowForm(true)}
+                      icon={<FiPlus />}
+                    >
+                      Add Your First Category
+                    </Button>
+                  ) : undefined
+                }
+              />
             ) : (
               <table className="data-table">
                 <thead>
@@ -531,5 +601,14 @@ const CategoryManagement: React.FC = () => {
     </div>
   );
 };
+
+// Wrapper component with ToastProvider
+function CategoryManagement() {
+  return (
+    <ToastProvider>
+      <CategoryManagementContent />
+    </ToastProvider>
+  );
+}
 
 export default CategoryManagement;

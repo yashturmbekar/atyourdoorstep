@@ -1,0 +1,9 @@
+/**
+ * Admin Styles Index
+ * Central import file for all admin-related CSS
+ * Import this single file in components that need admin styling
+ */
+
+@import './admin-variables.css';
+@import './admin-animations.css';
+@import './admin-common.css';

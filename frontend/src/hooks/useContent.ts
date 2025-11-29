@@ -173,6 +173,19 @@ export const useDeleteCategory = () => {
   });
 };
 
+// Combined Category Mutations Hook
+export const useCategoryMutations = () => {
+  const createCategory = useCreateCategory();
+  const updateCategory = useUpdateCategory();
+  const deleteCategory = useDeleteCategory();
+
+  return {
+    createCategory,
+    updateCategory,
+    deleteCategory,
+  };
+};
+
 // ============================================
 // Product Hooks (CMS)
 // ============================================

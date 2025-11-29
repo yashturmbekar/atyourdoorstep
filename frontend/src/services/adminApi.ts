@@ -37,32 +37,55 @@ import type {
 
 /**
  * Map ProductResponseDto to legacy Product type
+ * Maps from backend ContentService ProductDto structure
  */
 function mapProductResponse(dto: ProductResponseDto): Product {
-  return {
+  // Get stock from first variant or default to 0
+  const firstVariant = dto.variants?.[0];
+  const stock = firstVariant?.stockQuantity ?? 0;
+  const price = dto.basePrice ?? 0;
+  const discountPrice = dto.discountedPrice;
+
+  const mapped = {
     id: dto.id,
     name: dto.name,
-    description: dto.description,
-    category: dto.category,
-    image: dto.imageUrl || '/images/placeholder.png',
+    description: dto.shortDescription || dto.fullDescription || '',
+    category: dto.categoryName || dto.categoryId || '',
+    image:
+      dto.primaryImageUrl || dto.images?.[0]?.url || '/images/placeholder.png',
     isActive: dto.isAvailable,
-    tags: [],
-    createdAt: new Date(dto.createdAt),
-    updatedAt: new Date(dto.updatedAt),
-    variants: [
-      {
-        id: `${dto.id}-default`,
-        size: 'Standard',
-        price: dto.price,
-        unit: 'unit',
-        inStock: dto.stock > 0,
-        stockQuantity: dto.stock,
-        sku: dto.sku,
-        costPrice: dto.price * 0.7,
-        discountPrice: dto.discountPrice,
-      },
-    ],
+    tags: dto.features || [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    variants:
+      dto.variants?.length > 0
+        ? dto.variants.map(v => ({
+            id: v.id,
+            size: v.size,
+            price: v.price,
+            unit: v.unit,
+            inStock: v.isAvailable && v.stockQuantity > 0,
+            stockQuantity: v.stockQuantity,
+            sku: v.sku || `SKU-${v.id.substring(0, 8)}`,
+            costPrice: v.price * 0.7,
+            discountPrice: v.discountedPrice,
+          }))
+        : [
+            {
+              id: `${dto.id}-default`,
+              size: 'Standard',
+              price: price,
+              unit: 'unit',
+              inStock: stock > 0,
+              stockQuantity: stock,
+              sku: `SKU-${dto.id.substring(0, 8)}`,
+              costPrice: price * 0.7,
+              discountPrice: discountPrice,
+            },
+          ],
   };
+
+  return mapped;
 }
 
 /**
@@ -230,21 +253,31 @@ export const productApi = {
   ): Promise<LegacyApiResponse<Product>> {
     try {
       const mainVariant = productData.variants[0];
+
+      // Build request matching backend CreateProductRequest
       const requestData = {
         name: productData.name,
-        description: productData.description,
-        category: productData.category,
-        price: mainVariant?.price || 0,
-        stock: mainVariant?.stockQuantity || 0,
-        imageUrl: productData.image,
+        shortDescription: productData.description,
+        fullDescription: productData.description,
+        categoryId: productData.category, // This should be a GUID - may need category lookup
+        basePrice: mainVariant?.price || 0,
+        discountedPrice: mainVariant?.discountPrice,
+        isFeatured: false,
         isAvailable: productData.isActive,
-        sku: mainVariant?.sku,
-        discountPrice: mainVariant?.discountPrice,
-        discountPercentage: mainVariant?.discountPrice
-          ? Math.round(
-              (1 - mainVariant.discountPrice / mainVariant.price) * 100
-            )
-          : undefined,
+        features: productData.tags || [],
+        variants:
+          productData.variants?.map(v => ({
+            size: v.size,
+            unit: v.unit || 'unit',
+            price: v.price,
+            discountedPrice: v.discountPrice,
+            stockQuantity: v.stockQuantity || 0,
+            sku: v.sku,
+            isAvailable: v.inStock !== false,
+          })) || [],
+        images: productData.image
+          ? [{ url: productData.image, altText: productData.name }]
+          : [],
       };
 
       const response = await apiClient.post<ApiResponse<ProductResponseDto>>(
@@ -272,24 +305,24 @@ export const productApi = {
     productData: Partial<ProductFormData>
   ): Promise<LegacyApiResponse<Product>> {
     try {
-      const requestData: UpdateProductRequestDto = {};
+      // Build request matching backend UpdateProductRequest
+      const requestData: Record<string, unknown> = {};
 
       if (productData.name) requestData.name = productData.name;
-      if (productData.description)
-        requestData.description = productData.description;
-      if (productData.category) requestData.category = productData.category;
-      if (productData.image) requestData.imageUrl = productData.image;
+      if (productData.description) {
+        requestData.shortDescription = productData.description;
+        requestData.fullDescription = productData.description;
+      }
+      if (productData.category) requestData.categoryId = productData.category;
       if (productData.isActive !== undefined)
         requestData.isAvailable = productData.isActive;
+      if (productData.tags) requestData.features = productData.tags;
 
       if (productData.variants && productData.variants.length > 0) {
         const variant = productData.variants[0];
-        if (variant.price) requestData.price = variant.price;
-        if (variant.stockQuantity !== undefined)
-          requestData.stock = variant.stockQuantity;
-        if (variant.sku) requestData.sku = variant.sku;
+        if (variant.price) requestData.basePrice = variant.price;
         if (variant.discountPrice)
-          requestData.discountPrice = variant.discountPrice;
+          requestData.discountedPrice = variant.discountPrice;
       }
 
       const response = await apiClient.put<ApiResponse<ProductResponseDto>>(
@@ -714,37 +747,77 @@ export const analyticsApi = {
   async getDashboardStats(): Promise<LegacyApiResponse<AdminStats>> {
     try {
       // Fetch data from multiple endpoints to build stats
-      const [productsRes, pendingOrdersRes, confirmedOrdersRes] =
-        await Promise.all([
-          apiClient.get<PaginatedResponse<ProductResponseDto>>(
-            `${API_ENDPOINTS.products.list}?page=1&pageSize=1`
-          ),
-          apiClient.get<PaginatedResponse<OrderResponseDto>>(
-            `${API_ENDPOINTS.orders.byStatus(0)}?page=1&pageSize=1`
-          ),
-          apiClient.get<PaginatedResponse<OrderResponseDto>>(
-            `${API_ENDPOINTS.orders.byStatus(1)}?page=1&pageSize=1`
-          ),
-        ]);
+      const [
+        productsRes,
+        pendingOrdersRes,
+        confirmedOrdersRes,
+        processingOrdersRes,
+        shippedOrdersRes,
+        deliveredOrdersRes,
+        cancelledOrdersRes,
+      ] = await Promise.allSettled([
+        apiClient.get<PaginatedResponse<ProductResponseDto>>(
+          `${API_ENDPOINTS.products.list}?page=1&pageSize=1`
+        ),
+        apiClient.get<PaginatedResponse<OrderResponseDto>>(
+          `${API_ENDPOINTS.orders.byStatus(0)}?page=1&pageSize=1`
+        ),
+        apiClient.get<PaginatedResponse<OrderResponseDto>>(
+          `${API_ENDPOINTS.orders.byStatus(1)}?page=1&pageSize=1`
+        ),
+        apiClient.get<PaginatedResponse<OrderResponseDto>>(
+          `${API_ENDPOINTS.orders.byStatus(2)}?page=1&pageSize=1`
+        ),
+        apiClient.get<PaginatedResponse<OrderResponseDto>>(
+          `${API_ENDPOINTS.orders.byStatus(3)}?page=1&pageSize=1`
+        ),
+        apiClient.get<PaginatedResponse<OrderResponseDto>>(
+          `${API_ENDPOINTS.orders.byStatus(4)}?page=1&pageSize=1`
+        ),
+        apiClient.get<PaginatedResponse<OrderResponseDto>>(
+          `${API_ENDPOINTS.orders.byStatus(5)}?page=1&pageSize=1`
+        ),
+      ]);
+
+      // Helper to safely extract count from settled promise
+      const getCount = (result: PromiseSettledResult<any>): number => {
+        if (result.status === 'fulfilled') {
+          return result.value?.data?.meta?.total || 0;
+        }
+        return 0;
+      };
+
+      const pendingCount = getCount(pendingOrdersRes);
+      const confirmedCount = getCount(confirmedOrdersRes);
+      const processingCount = getCount(processingOrdersRes);
+      const shippedCount = getCount(shippedOrdersRes);
+      const deliveredCount = getCount(deliveredOrdersRes);
+      const cancelledCount = getCount(cancelledOrdersRes);
+
+      const totalOrders =
+        pendingCount +
+        confirmedCount +
+        processingCount +
+        shippedCount +
+        deliveredCount +
+        cancelledCount;
 
       const stats: AdminStats = {
-        totalProducts: productsRes.data.meta?.total || 0,
-        totalOrders:
-          (pendingOrdersRes.data.meta?.total || 0) +
-          (confirmedOrdersRes.data.meta?.total || 0),
+        totalProducts: getCount(productsRes),
+        totalOrders: totalOrders,
         totalCustomers: 0, // Would need separate endpoint
         totalRevenue: 0, // Would need separate endpoint
-        pendingOrders: pendingOrdersRes.data.meta?.total || 0,
+        pendingOrders: pendingCount,
         lowStockProducts: 0, // Would need backend support
         ordersToday: 0, // Would need backend support
         monthlyRevenue: [0, 0, 0, 0, 0, 0],
         ordersByStatus: {
-          pending: pendingOrdersRes.data.meta?.total || 0,
-          confirmed: confirmedOrdersRes.data.meta?.total || 0,
-          processing: 0,
-          shipped: 0,
-          delivered: 0,
-          cancelled: 0,
+          pending: pendingCount,
+          confirmed: confirmedCount,
+          processing: processingCount,
+          shipped: shippedCount,
+          delivered: deliveredCount,
+          cancelled: cancelledCount,
         },
       };
 

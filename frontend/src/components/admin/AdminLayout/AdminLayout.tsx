@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link, useLocation, Outlet } from 'react-router-dom';
 import type { IconType } from 'react-icons';
 import {
@@ -30,6 +30,7 @@ import {
   FiChevronUp,
 } from 'react-icons/fi';
 import { useAdminAuth } from '../../../hooks/useAdminAuth';
+import { useAdminBadgeCounts } from '../../../hooks/admin';
 import './AdminLayout.css';
 
 interface AdminLayoutProps {
@@ -54,9 +55,14 @@ interface NavigationSection {
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [collapsedSections, setCollapsedSections] = useState<Set<string>>(new Set());
+  const [collapsedSections, setCollapsedSections] = useState<Set<string>>(
+    new Set()
+  );
   const location = useLocation();
   const { adminUser, logout } = useAdminAuth();
+
+  // Fetch dynamic badge counts from API
+  const { data: badgeCounts } = useAdminBadgeCounts();
 
   const toggleSection = (section: string) => {
     setCollapsedSections(prev => {
@@ -70,172 +76,176 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     });
   };
 
-  const navigation: NavigationSection[] = [
-    {
-      section: 'Main',
-      items: [
-        {
-          name: 'Dashboard',
-          href: '/admin',
-          icon: FiHome,
-          exact: true,
-        },
-      ],
-    },
-    {
-      section: 'Products & Inventory',
-      icon: FiPackage,
-      collapsible: true,
-      items: [
-        {
-          name: 'All Products',
-          href: '/admin/products',
-          icon: FiPackage,
-          badge: 3,
-        },
-        {
-          name: 'Add New Product',
-          href: '/admin/products/new',
-          icon: FiPackage,
-        },
-        {
-          name: 'Categories',
-          href: '/admin/content/categories',
-          icon: FiGrid,
-        },
-      ],
-    },
-    {
-      section: 'Orders & Customers',
-      icon: FiShoppingCart,
-      collapsible: true,
-      items: [
-        {
-          name: 'Orders',
-          href: '/admin/orders',
-          icon: FiShoppingCart,
-          badge: 5,
-        },
-        {
-          name: 'Customers',
-          href: '/admin/customers',
-          icon: FiUsers,
-        },
-        {
-          name: 'Contact Inquiries',
-          href: '/admin/content/contacts',
-          icon: FiMail,
-        },
-      ],
-    },
-    {
-      section: 'Site Content',
-      icon: FiFileText,
-      collapsible: true,
-      items: [
-        {
-          name: 'Content Dashboard',
-          href: '/admin/content',
-          icon: FiLayers,
-        },
-        {
-          name: 'Hero Slides',
-          href: '/admin/content/hero-slides',
-          icon: FiImage,
-        },
-        {
-          name: 'Testimonials',
-          href: '/admin/content/testimonials',
-          icon: FiMessageSquare,
-        },
-        {
-          name: 'Statistics',
-          href: '/admin/content/statistics',
-          icon: FiTrendingUp,
-        },
-        {
-          name: 'USP Items',
-          href: '/admin/content/usp-items',
-          icon: FiStar,
-        },
-        {
-          name: 'Company Story',
-          href: '/admin/content/company-story',
-          icon: FiInfo,
-        },
-      ],
-    },
-    {
-      section: 'Settings & Config',
-      icon: FiSettings,
-      collapsible: true,
-      items: [
-        {
-          name: 'Site Settings',
-          href: '/admin/content/site-settings',
-          icon: FiGlobe,
-        },
-        {
-          name: 'Delivery Settings',
-          href: '/admin/content/delivery',
-          icon: FiTruck,
-        },
-        {
-          name: 'Payment Settings',
-          href: '/admin/settings/payments',
-          icon: FiCreditCard,
-        },
-        {
-          name: 'Notifications',
-          href: '/admin/settings/notifications',
-          icon: FiBell,
-        },
-        {
-          name: 'SEO & Social',
-          href: '/admin/settings/seo',
-          icon: FiGlobe,
-        },
-        {
-          name: 'Security',
-          href: '/admin/settings/security',
-          icon: FiShield,
-        },
-        {
-          name: 'General Settings',
-          href: '/admin/settings',
-          icon: FiSettings,
-        },
-      ],
-    },
-    {
-      section: 'Analytics & Reports',
-      icon: FiBarChart,
-      collapsible: true,
-      items: [
-        {
-          name: 'Dashboard Analytics',
-          href: '/admin/analytics',
-          icon: FiBarChart,
-        },
-        {
-          name: 'Sales Reports',
-          href: '/admin/analytics/sales',
-          icon: FiTrendingUp,
-        },
-        {
-          name: 'Inventory Reports',
-          href: '/admin/analytics/inventory',
-          icon: FiPackage,
-        },
-      ],
-    },
-  ];
+  // Navigation with dynamic badge counts
+  const navigation: NavigationSection[] = useMemo(
+    () => [
+      {
+        section: 'Main',
+        items: [
+          {
+            name: 'Dashboard',
+            href: '/admin',
+            icon: FiHome,
+            exact: true,
+          },
+        ],
+      },
+      {
+        section: 'Products & Inventory',
+        icon: FiPackage,
+        collapsible: true,
+        items: [
+          {
+            name: 'Products',
+            href: '/admin/products',
+            icon: FiPackage,
+            badge: badgeCounts?.lowStockProducts || undefined,
+          },
+          {
+            name: 'Categories',
+            href: '/admin/content/categories',
+            icon: FiGrid,
+          },
+        ],
+      },
+      {
+        section: 'Orders & Customers',
+        icon: FiShoppingCart,
+        collapsible: true,
+        items: [
+          {
+            name: 'Orders',
+            href: '/admin/orders',
+            icon: FiShoppingCart,
+            badge: badgeCounts?.pendingOrders || undefined,
+          },
+          {
+            name: 'Customers',
+            href: '/admin/customers',
+            icon: FiUsers,
+          },
+          {
+            name: 'Contact Inquiries',
+            href: '/admin/content/contacts',
+            icon: FiMail,
+            badge: badgeCounts?.unreadContacts || undefined,
+          },
+        ],
+      },
+      {
+        section: 'Site Content',
+        icon: FiFileText,
+        collapsible: true,
+        items: [
+          {
+            name: 'Content Dashboard',
+            href: '/admin/content',
+            icon: FiLayers,
+          },
+          {
+            name: 'Hero Slides',
+            href: '/admin/content/hero-slides',
+            icon: FiImage,
+          },
+          {
+            name: 'Testimonials',
+            href: '/admin/content/testimonials',
+            icon: FiMessageSquare,
+          },
+          {
+            name: 'Statistics',
+            href: '/admin/content/statistics',
+            icon: FiTrendingUp,
+          },
+          {
+            name: 'USP Items',
+            href: '/admin/content/usp-items',
+            icon: FiStar,
+          },
+          {
+            name: 'Company Story',
+            href: '/admin/content/company-story',
+            icon: FiInfo,
+          },
+        ],
+      },
+      {
+        section: 'Settings & Config',
+        icon: FiSettings,
+        collapsible: true,
+        items: [
+          {
+            name: 'Site Settings',
+            href: '/admin/content/site-settings',
+            icon: FiGlobe,
+          },
+          {
+            name: 'Delivery Settings',
+            href: '/admin/content/delivery',
+            icon: FiTruck,
+          },
+          {
+            name: 'Payment Settings',
+            href: '/admin/settings/payments',
+            icon: FiCreditCard,
+          },
+          {
+            name: 'Notifications',
+            href: '/admin/settings/notifications',
+            icon: FiBell,
+          },
+          {
+            name: 'SEO & Social',
+            href: '/admin/settings/seo',
+            icon: FiGlobe,
+          },
+          {
+            name: 'Security',
+            href: '/admin/settings/security',
+            icon: FiShield,
+          },
+          {
+            name: 'General Settings',
+            href: '/admin/settings',
+            icon: FiSettings,
+          },
+        ],
+      },
+      {
+        section: 'Analytics & Reports',
+        icon: FiBarChart,
+        collapsible: true,
+        items: [
+          {
+            name: 'Dashboard Analytics',
+            href: '/admin/analytics',
+            icon: FiBarChart,
+          },
+          {
+            name: 'Sales Reports',
+            href: '/admin/analytics/sales',
+            icon: FiTrendingUp,
+          },
+          {
+            name: 'Inventory Reports',
+            href: '/admin/analytics/inventory',
+            icon: FiPackage,
+          },
+        ],
+      },
+    ],
+    [badgeCounts]
+  );
 
   const isActiveLink = (href: string, exact?: boolean) => {
     if (exact) {
       return location.pathname === href;
     }
     return location.pathname.startsWith(href);
+  };
+
+  const isSectionActive = (items: NavigationItem[]) => {
+    return items.some(item => isActiveLink(item.href, item.exact));
   };
 
   const getBreadcrumbs = () => {
@@ -246,7 +256,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     for (let i = 1; i < pathSegments.length; i++) {
       currentPath += `/${pathSegments[i]}`;
       const segment = pathSegments[i];
-      const name = segment.charAt(0).toUpperCase() + segment.slice(1);
+      const name =
+        segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' ');
       breadcrumbs.push({ name, href: currentPath });
     }
 
@@ -297,30 +308,57 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         </div>
 
         <nav className="admin-nav">
-          {navigation.map(section => (
-            <div key={section.section} className="nav-section">
-              <div className="nav-section-title">{section.section}</div>
-              {section.items.map(item => {
-                const isActive = isActiveLink(item.href, item.exact);
+          {navigation.map(section => {
+            const isCollapsed = collapsedSections.has(section.section);
+            const hasActiveItem = isSectionActive(section.items);
 
-                return (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    className={`nav-item ${isActive ? 'active' : ''}`}
-                    onClick={() => setMobileMenuOpen(false)}
-                    title={item.name}
+            return (
+              <div key={section.section} className="nav-section">
+                {section.collapsible ? (
+                  <button
+                    className={`nav-section-header ${hasActiveItem ? 'active' : ''}`}
+                    onClick={() => toggleSection(section.section)}
+                    title={section.section}
                   >
-                    <item.icon className="nav-item-icon" />
-                    <span className="nav-item-text">{item.name}</span>
-                    {item.badge && (
-                      <span className="notification-badge">{item.badge}</span>
+                    {section.icon && (
+                      <section.icon className="nav-section-icon" />
                     )}
-                  </Link>
-                );
-              })}
-            </div>
-          ))}
+                    <span className="nav-section-title">{section.section}</span>
+                    <span className="nav-section-toggle">
+                      {isCollapsed ? <FiChevronDown /> : <FiChevronUp />}
+                    </span>
+                  </button>
+                ) : (
+                  <div className="nav-section-title">{section.section}</div>
+                )}
+                {(!section.collapsible || !isCollapsed) && (
+                  <div className="nav-section-items">
+                    {section.items.map(item => {
+                      const isActive = isActiveLink(item.href, item.exact);
+
+                      return (
+                        <Link
+                          key={item.name}
+                          to={item.href}
+                          className={`nav-item ${isActive ? 'active' : ''}`}
+                          onClick={() => setMobileMenuOpen(false)}
+                          title={item.name}
+                        >
+                          <item.icon className="nav-item-icon" />
+                          <span className="nav-item-text">{item.name}</span>
+                          {item.badge && (
+                            <span className="notification-badge">
+                              {item.badge}
+                            </span>
+                          )}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </nav>
 
         <div className="admin-sidebar-footer">
@@ -362,7 +400,6 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                 </div>
                 <div className="header-brand-text">
                   <span className="header-brand-name">AtYourDoorStep</span>
-                  <span className="header-admin-label">Admin Panel</span>
                 </div>
               </div>
             </div>

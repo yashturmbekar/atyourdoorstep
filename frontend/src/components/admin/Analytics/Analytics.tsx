@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   FiTrendingUp,
   FiUsers,
@@ -10,109 +10,53 @@ import {
   FiPieChart,
   FiDownload,
   FiRefreshCw,
+  FiAlertCircle,
 } from 'react-icons/fi';
-import { adminApi } from '../../../services/adminApi';
+import { useAnalyticsData } from '../../../hooks/admin';
 import type { AdminStats } from '../../../types';
 import './Analytics.css';
 
-interface AnalyticsData {
-  revenueChart: {
-    labels: string[];
-    data: number[];
-  };
-  topProducts: {
-    name: string;
-    sales: number;
-    revenue: number;
-  }[];
-  customerGrowth: {
-    month: string;
-    newCustomers: number;
-    totalCustomers: number;
-  }[];
-  orderTrends: {
-    day: string;
-    orders: number;
-    revenue: number;
-  }[];
-}
-
 const Analytics: React.FC = () => {
-  const [stats, setStats] = useState<AdminStats | null>(null);
-  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(
-    null
-  );
-  const [isLoading, setIsLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState<
     'week' | 'month' | 'quarter' | 'year'
   >('month');
   const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    fetchAnalyticsData();
-  }, [selectedPeriod]);
-
-  const fetchAnalyticsData = async () => {
-    setIsLoading(true);
-    try {
-      const [statsResponse] = await Promise.all([
-        adminApi.analytics.getDashboardStats(),
-      ]);
-
-      setStats(statsResponse.data);
-
-      // Mock analytics data - in real app, this would come from API
-      setAnalyticsData({
-        revenueChart: {
-          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-          data: [15000, 18000, 22000, 19000, 25000, 30000],
-        },
-        topProducts: [
-          { name: 'Premium Alphonso Mangoes', sales: 145, revenue: 232000 },
-          { name: 'Organic Jaggery Powder', sales: 98, revenue: 147000 },
-          { name: 'Cold Pressed Coconut Oil', sales: 76, revenue: 114000 },
-          { name: 'Pure Honey', sales: 65, revenue: 97500 },
-          { name: 'Organic Turmeric', sales: 54, revenue: 81000 },
-        ],
-        customerGrowth: [
-          { month: 'Jan', newCustomers: 45, totalCustomers: 145 },
-          { month: 'Feb', newCustomers: 62, totalCustomers: 207 },
-          { month: 'Mar', newCustomers: 78, totalCustomers: 285 },
-          { month: 'Apr', newCustomers: 54, totalCustomers: 339 },
-          { month: 'May', newCustomers: 89, totalCustomers: 428 },
-          { month: 'Jun', newCustomers: 112, totalCustomers: 540 },
-        ],
-        orderTrends: [
-          { day: 'Mon', orders: 23, revenue: 34500 },
-          { day: 'Tue', orders: 18, revenue: 27000 },
-          { day: 'Wed', orders: 31, revenue: 46500 },
-          { day: 'Thu', orders: 28, revenue: 42000 },
-          { day: 'Fri', orders: 35, revenue: 52500 },
-          { day: 'Sat', orders: 42, revenue: 63000 },
-          { day: 'Sun', orders: 38, revenue: 57000 },
-        ],
-      });
-    } catch (error) {
-      console.error('Failed to fetch analytics data:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Use React Query hooks for data fetching
+  const {
+    stats,
+    topProducts,
+    orderTrends,
+    revenueTrend,
+    customerGrowth,
+    isLoading,
+    isError,
+    refetchAll,
+    queries,
+  } = useAnalyticsData(selectedPeriod);
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    await fetchAnalyticsData();
-    setRefreshing(false);
+    await refetchAll();
+    setTimeout(() => setRefreshing(false), 500);
   };
 
   const exportReport = () => {
-    if (!stats || !analyticsData) return;
+    if (!stats) return;
 
     const reportData = {
       generatedAt: new Date().toISOString(),
       period: selectedPeriod,
       summary: stats,
-      analytics: analyticsData,
+      analytics: {
+        revenueChart: {
+          labels: revenueTrend.map(d => d.label),
+          data: revenueTrend.map(d => d.value),
+        },
+        topProducts,
+        customerGrowth,
+        orderTrends,
+      },
     };
 
     const blob = new Blob([JSON.stringify(reportData, null, 2)], {
@@ -143,16 +87,29 @@ const Analytics: React.FC = () => {
     );
   }
 
-  if (!stats || !analyticsData) {
+  if (isError || !stats) {
     return (
       <div className="analytics-error">
+        <FiAlertCircle className="error-icon" />
         <p>Failed to load analytics data</p>
-        <button className="btn btn-primary" onClick={fetchAnalyticsData}>
+        <button className="btn btn-primary" onClick={handleRefresh}>
           Retry
         </button>
       </div>
     );
   }
+
+  // Safely get max values for charts
+  const maxRevenue =
+    revenueTrend.length > 0 ? Math.max(...revenueTrend.map(d => d.value)) : 1;
+  const maxProductRevenue =
+    topProducts.length > 0 ? Math.max(...topProducts.map(p => p.revenue)) : 1;
+  const maxNewCustomers =
+    customerGrowth.length > 0
+      ? Math.max(...customerGrowth.map(g => g.newCustomers))
+      : 1;
+  const maxOrders =
+    orderTrends.length > 0 ? Math.max(...orderTrends.map(t => t.orders)) : 1;
 
   return (
     <div className="analytics">
@@ -263,18 +220,18 @@ const Analytics: React.FC = () => {
           <div className="chart-content">
             <div className="chart-placeholder">
               <div className="chart-bars">
-                {analyticsData.revenueChart.data.map((value, index) => (
+                {revenueTrend.map(item => (
                   <div
-                    key={analyticsData.revenueChart.labels[index]}
+                    key={item.label}
                     className="chart-bar"
                     style={{
-                      height: `${(value / Math.max(...analyticsData.revenueChart.data)) * 100}%`,
+                      height: `${(item.value / maxRevenue) * 100}%`,
                     }}
                   >
-                    <div className="bar-label">
-                      {analyticsData.revenueChart.labels[index]}
+                    <div className="bar-label">{item.label}</div>
+                    <div className="bar-value">
+                      {formatCurrency(item.value)}
                     </div>
-                    <div className="bar-value">{formatCurrency(value)}</div>
                   </div>
                 ))}
               </div>
@@ -290,8 +247,8 @@ const Analytics: React.FC = () => {
           </div>
           <div className="chart-content">
             <div className="products-list">
-              {analyticsData.topProducts.map((product, index) => (
-                <div key={product.name} className="product-item">
+              {topProducts.map((product, index) => (
+                <div key={product.id || product.name} className="product-item">
                   <div className="product-rank">#{index + 1}</div>
                   <div className="product-info">
                     <div className="product-name">{product.name}</div>
@@ -303,7 +260,7 @@ const Analytics: React.FC = () => {
                     <div
                       className="bar-fill"
                       style={{
-                        width: `${(product.revenue / Math.max(...analyticsData.topProducts.map(p => p.revenue))) * 100}%`,
+                        width: `${(product.revenue / maxProductRevenue) * 100}%`,
                       }}
                     ></div>
                   </div>
@@ -321,7 +278,7 @@ const Analytics: React.FC = () => {
           </div>
           <div className="chart-content">
             <div className="growth-chart">
-              {analyticsData.customerGrowth.map(item => (
+              {customerGrowth.map(item => (
                 <div key={item.month} className="growth-item">
                   <div className="growth-month">{item.month}</div>
                   <div className="growth-bars">
@@ -329,7 +286,7 @@ const Analytics: React.FC = () => {
                       <div
                         className="bar-fill"
                         style={{
-                          height: `${(item.newCustomers / Math.max(...analyticsData.customerGrowth.map(g => g.newCustomers))) * 100}%`,
+                          height: `${(item.newCustomers / maxNewCustomers) * 100}%`,
                         }}
                       ></div>
                     </div>
@@ -349,14 +306,14 @@ const Analytics: React.FC = () => {
           </div>
           <div className="chart-content">
             <div className="trends-chart">
-              {analyticsData.orderTrends.map(trend => (
+              {orderTrends.map(trend => (
                 <div key={trend.day} className="trend-item">
                   <div className="trend-day">{trend.day}</div>
                   <div className="trend-bar">
                     <div
                       className="bar-fill"
                       style={{
-                        height: `${(trend.orders / Math.max(...analyticsData.orderTrends.map(t => t.orders))) * 100}%`,
+                        height: `${(trend.orders / maxOrders) * 100}%`,
                       }}
                     ></div>
                   </div>

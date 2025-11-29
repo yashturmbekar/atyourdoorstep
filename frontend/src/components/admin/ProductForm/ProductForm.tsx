@@ -7,8 +7,10 @@ import {
   FiPlus,
   FiX,
   FiImage,
+  FiAlertCircle,
 } from 'react-icons/fi';
 import { productApi } from '../../../services/adminApi';
+import { useCategories } from '../../../hooks/useContent';
 import type { ProductFormData, ProductVariantFormData } from '../../../types';
 import './ProductForm.css';
 
@@ -22,6 +24,11 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Fetch categories from database
+  const { data: categoriesData, isLoading: categoriesLoading } =
+    useCategories();
+  const categories = categoriesData?.data || [];
 
   const [formData, setFormData] = useState<ProductFormData>({
     name: '',
@@ -368,11 +375,18 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
                       onChange={e =>
                         handleInputChange('category', e.target.value)
                       }
+                      disabled={categoriesLoading}
                     >
-                      <option value="">Select Category</option>
-                      <option value="alphonso">Alphonso Mangoes</option>
-                      <option value="jaggery">Jaggery Products</option>
-                      <option value="oil">Cold Pressed Oils</option>
+                      <option value="">
+                        {categoriesLoading
+                          ? 'Loading categories...'
+                          : 'Select Category'}
+                      </option>
+                      {categories.map(cat => (
+                        <option key={cat.id} value={cat.slug}>
+                          {cat.name}
+                        </option>
+                      ))}
                     </select>
                     {errors.category && (
                       <div className="input-error">{errors.category}</div>
