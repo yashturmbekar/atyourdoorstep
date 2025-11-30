@@ -6,22 +6,22 @@ using Shared.Infrastructure.Persistence;
 
 namespace ContentService.Infrastructure.Repositories;
 
-#region Category Repository
+#region ProductCategory Repository
 
-public class CategoryRepository : RepositoryBase<Category>, ICategoryRepository
+public class ProductCategoryRepository : RepositoryBase<ProductCategory>, IProductCategoryRepository
 {
-    public CategoryRepository(ContentDbContext context) : base(context)
+    public ProductCategoryRepository(ContentDbContext context) : base(context)
     {
     }
 
-    public async Task<Category?> GetBySlugAsync(string slug, CancellationToken cancellationToken = default)
+    public async Task<ProductCategory?> GetBySlugAsync(string slug, CancellationToken cancellationToken = default)
     {
         return await _dbSet
             .Include(c => c.Products)
             .FirstOrDefaultAsync(c => c.Slug == slug, cancellationToken);
     }
 
-    public async Task<IEnumerable<Category>> GetActiveAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<ProductCategory>> GetActiveAsync(CancellationToken cancellationToken = default)
     {
         return await _dbSet
             .Where(c => c.IsActive)
@@ -29,7 +29,7 @@ public class CategoryRepository : RepositoryBase<Category>, ICategoryRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Category>> GetWithProductCountAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<ProductCategory>> GetWithProductCountAsync(CancellationToken cancellationToken = default)
     {
         return await _dbSet
             .Include(c => c.Products.Where(p => !p.IsDeleted && p.IsAvailable))
@@ -51,6 +51,14 @@ public class CategoryRepository : RepositoryBase<Category>, ICategoryRepository
     }
 }
 
+// Legacy alias for backward compatibility
+public class CategoryRepository : ProductCategoryRepository, ICategoryRepository
+{
+    public CategoryRepository(ContentDbContext context) : base(context)
+    {
+    }
+}
+
 #endregion
 
 #region Product Repository
@@ -64,7 +72,7 @@ public class ProductRepository : RepositoryBase<Product>, IProductRepository
     public async Task<Product?> GetBySlugAsync(string slug, CancellationToken cancellationToken = default)
     {
         return await _dbSet
-            .Include(p => p.Category)
+            .Include(p => p.ProductCategory)
             .Include(p => p.Variants.OrderBy(v => v.DisplayOrder))
             .Include(p => p.Features.OrderBy(f => f.DisplayOrder))
             .Include(p => p.Images.OrderBy(i => i.DisplayOrder))
@@ -74,7 +82,7 @@ public class ProductRepository : RepositoryBase<Product>, IProductRepository
     public async Task<Product?> GetWithDetailsAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await _dbSet
-            .Include(p => p.Category)
+            .Include(p => p.ProductCategory)
             .Include(p => p.Variants.OrderBy(v => v.DisplayOrder))
             .Include(p => p.Features.OrderBy(f => f.DisplayOrder))
             .Include(p => p.Images.OrderBy(i => i.DisplayOrder))
@@ -94,7 +102,7 @@ public class ProductRepository : RepositoryBase<Product>, IProductRepository
         CancellationToken cancellationToken = default)
     {
         var query = _dbSet
-            .Include(p => p.Category)
+            .Include(p => p.ProductCategory)
             .Include(p => p.Variants.OrderBy(v => v.DisplayOrder))
             .Include(p => p.Features.OrderBy(f => f.DisplayOrder))
             .Include(p => p.Images.OrderBy(i => i.DisplayOrder))
@@ -102,7 +110,7 @@ public class ProductRepository : RepositoryBase<Product>, IProductRepository
             .AsQueryable();
 
         if (!string.IsNullOrEmpty(categorySlug))
-            query = query.Where(p => p.Category.Slug == categorySlug);
+            query = query.Where(p => p.ProductCategory.Slug == categorySlug);
 
         if (isFeatured.HasValue)
             query = query.Where(p => p.IsFeatured == isFeatured.Value);
@@ -120,7 +128,7 @@ public class ProductRepository : RepositoryBase<Product>, IProductRepository
     public async Task<IEnumerable<Product>> GetFeaturedProductsAsync(CancellationToken cancellationToken = default)
     {
         return await _dbSet
-            .Include(p => p.Category)
+            .Include(p => p.ProductCategory)
             .Include(p => p.Variants.OrderBy(v => v.DisplayOrder))
             .Include(p => p.Images.OrderBy(i => i.DisplayOrder))
             .Where(p => p.IsFeatured && p.IsAvailable && !p.IsDeleted)
@@ -128,24 +136,24 @@ public class ProductRepository : RepositoryBase<Product>, IProductRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Product>> GetByCategoryAsync(Guid categoryId, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Product>> GetByProductCategoryAsync(Guid productCategoryId, CancellationToken cancellationToken = default)
     {
         return await _dbSet
-            .Include(p => p.Category)
+            .Include(p => p.ProductCategory)
             .Include(p => p.Variants.OrderBy(v => v.DisplayOrder))
             .Include(p => p.Features.OrderBy(f => f.DisplayOrder))
-            .Where(p => p.CategoryId == categoryId && !p.IsDeleted)
+            .Where(p => p.ProductCategoryId == productCategoryId && !p.IsDeleted)
             .OrderBy(p => p.DisplayOrder)
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Product>> GetByCategorySlugAsync(string categorySlug, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Product>> GetByProductCategorySlugAsync(string productCategorySlug, CancellationToken cancellationToken = default)
     {
         return await _dbSet
-            .Include(p => p.Category)
+            .Include(p => p.ProductCategory)
             .Include(p => p.Variants.OrderBy(v => v.DisplayOrder))
             .Include(p => p.Features.OrderBy(f => f.DisplayOrder))
-            .Where(p => p.Category.Slug == categorySlug && !p.IsDeleted)
+            .Where(p => p.ProductCategory.Slug == productCategorySlug && !p.IsDeleted)
             .OrderBy(p => p.DisplayOrder)
             .ToListAsync(cancellationToken);
     }
@@ -158,7 +166,7 @@ public class ProductRepository : RepositoryBase<Product>, IProductRepository
     public async Task<IEnumerable<Product>> GetAvailableAsync(CancellationToken cancellationToken = default)
     {
         return await _dbSet
-            .Include(p => p.Category)
+            .Include(p => p.ProductCategory)
             .Include(p => p.Variants.OrderBy(v => v.DisplayOrder))
             .Include(p => p.Features.OrderBy(f => f.DisplayOrder))
             .Where(p => p.IsAvailable && !p.IsDeleted)

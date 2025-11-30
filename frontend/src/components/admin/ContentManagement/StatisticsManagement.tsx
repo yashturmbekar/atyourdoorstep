@@ -4,13 +4,11 @@
  */
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import {
   FiPlus,
   FiEdit3,
   FiTrash2,
   FiTrendingUp,
-  FiArrowLeft,
   FiCheck,
   FiMove,
 } from 'react-icons/fi';
@@ -25,7 +23,15 @@ import type {
   CreateStatisticRequestDto,
   UpdateStatisticRequestDto,
 } from '../../../types/content.types';
+import { Breadcrumb, EmptyState } from '../ui';
 import './ContentManagement.css';
+
+// Breadcrumb items for navigation
+const breadcrumbItems = [
+  { label: 'Dashboard', href: '/admin' },
+  { label: 'Content', href: '/admin/content' },
+  { label: 'Statistics', href: '/admin/content/statistics' },
+];
 
 interface StatisticFormData {
   label: string;
@@ -153,18 +159,14 @@ const StatisticsManagement: React.FC = () => {
     return (
       <div className="content-management">
         <div className="page-header">
-          <Link to="/admin/content" className="btn btn-ghost">
-            <FiArrowLeft />
-            Back to Content
-          </Link>
+          <Breadcrumb items={breadcrumbItems} />
           <h1 className="page-title">Statistics Management</h1>
         </div>
-        <div className="empty-state">
-          <div className="empty-state-title">Error loading statistics</div>
-          <p className="empty-state-description">
-            There was an error loading the statistics. Please try again later.
-          </p>
-        </div>
+        <EmptyState
+          icon={<FiTrendingUp />}
+          title="Error loading statistics"
+          description="There was an error loading the statistics. Please try again later."
+        />
       </div>
     );
   }
@@ -172,10 +174,7 @@ const StatisticsManagement: React.FC = () => {
   return (
     <div className="content-management">
       <div className="page-header">
-        <Link to="/admin/content" className="btn btn-ghost">
-          <FiArrowLeft />
-          Back to Content
-        </Link>
+        <Breadcrumb items={breadcrumbItems} />
         <h1 className="page-title">Statistics Management</h1>
         <p className="page-subtitle">Configure homepage statistics display</p>
       </div>

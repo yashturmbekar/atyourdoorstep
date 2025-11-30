@@ -17,6 +17,7 @@ import {
 import { productApi } from '../../../services/adminApi';
 import { useCategories } from '../../../hooks/useContent';
 import type { Product, PaginatedResponse } from '../../../types';
+import { getImageSrc } from '../../../utils';
 import {
   TableSkeleton,
   ToastProvider,
@@ -674,11 +675,24 @@ const ProductManagementContent: React.FC = () => {
                   );
                   const categoryName =
                     categoryObj?.name || categorySlug || 'Uncategorized';
-                  const categoryImage = categoryObj?.imageUrl || '';
+
+                  // Use getImageSrc helper to handle base64 images
+                  const categoryImage = getImageSrc(
+                    categoryObj?.imageBase64,
+                    categoryObj?.imageContentType
+                  );
+
+                  // Get product image from base64 or fall back to category image
                   const productImage =
-                    product.image && product.image !== '/images/placeholder.png'
+                    getImageSrc(
+                      product.primaryImageBase64,
+                      product.primaryImageContentType
+                    ) ||
+                    (product.image &&
+                    product.image !== '/images/placeholder.png'
                       ? product.image
-                      : categoryImage || '/images/products/default.jpg';
+                      : categoryImage || '/images/products/default.jpg');
+
                   const variants = product.variants || [];
                   const tags = product.tags || [];
 
@@ -833,8 +847,8 @@ const ProductManagementContent: React.FC = () => {
             ? `Are you sure you want to delete ${selectedProducts.size} selected product(s)? This action cannot be undone.`
             : `Are you sure you want to delete "${deleteConfirm?.productName}"? This action cannot be undone.`
         }
-        confirmLabel="Delete"
-        variant="danger"
+        confirmText="Delete"
+        type="danger"
       />
     </div>
   );

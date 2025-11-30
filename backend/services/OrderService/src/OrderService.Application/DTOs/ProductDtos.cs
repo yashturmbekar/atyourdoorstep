@@ -7,7 +7,8 @@ public class CreateProductRequestDto
     public decimal Price { get; set; }
     public string Category { get; set; } = string.Empty;
     public int Stock { get; set; }
-    public string? ImageUrl { get; set; }
+    public string? ImageBase64 { get; set; }
+    public string? ImageContentType { get; set; }
     public bool IsAvailable { get; set; } = true;
     public string? Sku { get; set; }
     public decimal? DiscountPrice { get; set; }
@@ -21,7 +22,8 @@ public class UpdateProductRequestDto
     public decimal? Price { get; set; }
     public string? Category { get; set; }
     public int? Stock { get; set; }
-    public string? ImageUrl { get; set; }
+    public string? ImageBase64 { get; set; }
+    public string? ImageContentType { get; set; }
     public bool? IsAvailable { get; set; }
     public string? Sku { get; set; }
     public decimal? DiscountPrice { get; set; }
@@ -36,7 +38,8 @@ public class ProductResponseDto
     public decimal Price { get; set; }
     public string Category { get; set; } = string.Empty;
     public int Stock { get; set; }
-    public string? ImageUrl { get; set; }
+    public string? ImageBase64 { get; set; }
+    public string? ImageContentType { get; set; }
     public bool IsAvailable { get; set; }
     public string? Sku { get; set; }
     public decimal? DiscountPrice { get; set; }

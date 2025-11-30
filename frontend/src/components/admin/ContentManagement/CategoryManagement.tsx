@@ -13,6 +13,7 @@ import {
   FiGrid,
   FiArrowLeft,
   FiCheck,
+  FiUpload,
 } from 'react-icons/fi';
 import {
   useCategories,
@@ -33,6 +34,7 @@ import {
   EmptyState,
   Button,
 } from '../ui';
+import { getImageSrc, processImageForUpload } from '../../../utils';
 import './ContentManagement.css';
 
 interface CategoryFormData {
@@ -40,7 +42,8 @@ interface CategoryFormData {
   slug: string;
   description: string;
   icon: string;
-  imageUrl: string;
+  imageBase64: string;
+  imageContentType: string;
   displayOrder: number;
   isActive: boolean;
   parentId: string;
@@ -51,7 +54,8 @@ const initialFormData: CategoryFormData = {
   slug: '',
   description: '',
   icon: '',
-  imageUrl: '',
+  imageBase64: '',
+  imageContentType: '',
   displayOrder: 0,
   isActive: true,
   parentId: '',
@@ -123,11 +127,11 @@ const CategoryManagementContent: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate required image
-    if (!formData.imageUrl || formData.imageUrl.trim() === '') {
+    // Validate required image (base64 only - upload only)
+    if (!formData.imageBase64 || formData.imageBase64.trim() === '') {
       toast.error(
         'Image Required',
-        'Category image is required. Please provide an image URL.'
+        'Category image is required. Please upload an image.'
       );
       return;
     }
@@ -139,7 +143,8 @@ const CategoryManagementContent: React.FC = () => {
           slug: formData.slug,
           description: formData.description || undefined,
           icon: formData.icon || undefined,
-          imageUrl: formData.imageUrl,
+          imageBase64: formData.imageBase64 || undefined,
+          imageContentType: formData.imageContentType || undefined,
           displayOrder: formData.displayOrder,
           isActive: formData.isActive,
           parentId: formData.parentId || undefined,
@@ -158,7 +163,8 @@ const CategoryManagementContent: React.FC = () => {
           slug: formData.slug,
           description: formData.description || undefined,
           icon: formData.icon || undefined,
-          imageUrl: formData.imageUrl,
+          imageBase64: formData.imageBase64 || undefined,
+          imageContentType: formData.imageContentType || undefined,
           displayOrder: formData.displayOrder,
           isActive: formData.isActive,
           parentId: formData.parentId || undefined,
@@ -186,12 +192,41 @@ const CategoryManagementContent: React.FC = () => {
       slug: category.slug,
       description: category.description || '',
       icon: category.icon || '',
-      imageUrl: category.imageUrl || '',
+      imageBase64: category.imageBase64 || '',
+      imageContentType: category.imageContentType || '',
       displayOrder: category.displayOrder,
       isActive: category.isActive,
       parentId: '', // Note: parentId not in response, may need to add
     });
     setShowForm(true);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const { base64, contentType } = await processImageForUpload(file);
+      setFormData(prev => ({
+        ...prev,
+        imageBase64: base64,
+        imageContentType: contentType,
+      }));
+      toast.success('Image Uploaded', 'Image uploaded successfully');
+    } catch (error) {
+      toast.error(
+        'Upload Error',
+        error instanceof Error ? error.message : 'Failed to upload image'
+      );
+    }
+  };
+
+  const clearImage = () => {
+    setFormData(prev => ({
+      ...prev,
+      imageBase64: '',
+      imageContentType: '',
+    }));
   };
 
   const handleDelete = async (id: string) => {
@@ -256,12 +291,6 @@ const CategoryManagementContent: React.FC = () => {
     <div className="content-management">
       <div className="page-header">
         <Breadcrumb items={breadcrumbItems} />
-        <div className="page-header-row">
-          <Link to="/admin/content" className="btn btn-ghost">
-            <FiArrowLeft />
-            Back to Content
-          </Link>
-        </div>
         <h1 className="page-title">Category Management</h1>
         <p className="page-subtitle">
           Manage product categories and subcategories
@@ -358,36 +387,53 @@ const CategoryManagementContent: React.FC = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="imageUrl" className="form-label required">
-                  Image URL
+                <label htmlFor="imageUpload" className="form-label required">
+                  Category Image
                 </label>
-                <input
-                  type="url"
-                  id="imageUrl"
-                  name="imageUrl"
-                  className="form-input"
-                  value={formData.imageUrl}
-                  onChange={handleInputChange}
-                  placeholder="https://example.com/image.jpg"
-                  required
-                />
-                <p className="form-hint">
-                  Category image is required. Use a high-quality image for
-                  better presentation.
-                </p>
-                {formData.imageUrl && (
-                  <div className="image-preview-container">
-                    <img
-                      src={formData.imageUrl}
-                      alt="Category preview"
-                      className="image-preview large"
-                      onError={e => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                      }}
+                <div className="image-upload-section">
+                  <div className="image-upload-input">
+                    <input
+                      type="file"
+                      id="imageUpload"
+                      accept="image/jpeg,image/png,image/gif,image/webp"
+                      onChange={handleImageUpload}
+                      style={{ display: 'none' }}
                     />
+                    <label htmlFor="imageUpload" className="btn btn-secondary">
+                      <FiUpload />
+                      Upload Image
+                    </label>
                   </div>
-                )}
+                  <p className="form-hint">
+                    Upload an image file (JPEG, PNG, GIF, WebP, max 5MB).
+                    Category image is required for better presentation.
+                  </p>
+                  {formData.imageBase64 && (
+                    <div className="image-preview-container">
+                      <img
+                        src={getImageSrc(
+                          formData.imageBase64,
+                          formData.imageContentType
+                        )}
+                        alt="Category preview"
+                        className="image-preview large"
+                        onError={e => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                        }}
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-sm"
+                        onClick={clearImage}
+                        style={{ marginTop: '0.5rem' }}
+                      >
+                        <FiTrash2 />
+                        Remove Image
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="form-group">
@@ -491,9 +537,12 @@ const CategoryManagementContent: React.FC = () => {
                             gap: '0.75rem',
                           }}
                         >
-                          {category.imageUrl && (
+                          {category.imageBase64 && (
                             <img
-                              src={category.imageUrl}
+                              src={getImageSrc(
+                                category.imageBase64,
+                                category.imageContentType
+                              )}
                               alt={category.name}
                               className="image-preview"
                             />

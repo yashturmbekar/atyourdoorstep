@@ -14,16 +14,16 @@ namespace ContentService.API.Controllers;
 public class ProductsController : ControllerBase
 {
     private readonly IProductRepository _productRepository;
-    private readonly ICategoryRepository _categoryRepository;
+    private readonly IProductCategoryRepository _productCategoryRepository;
     private readonly ILogger<ProductsController> _logger;
 
     public ProductsController(
         IProductRepository productRepository,
-        ICategoryRepository categoryRepository,
+        IProductCategoryRepository productCategoryRepository,
         ILogger<ProductsController> logger)
     {
         _productRepository = productRepository;
-        _categoryRepository = categoryRepository;
+        _productCategoryRepository = productCategoryRepository;
         _logger = logger;
     }
 
@@ -75,7 +75,7 @@ public class ProductsController : ControllerBase
     [HttpGet("category/{categorySlug}")]
     public async Task<ActionResult<ApiResponse<IEnumerable<ProductDto>>>> GetProductsByCategory(string categorySlug, CancellationToken cancellationToken)
     {
-        var products = await _productRepository.GetByCategorySlugAsync(categorySlug, cancellationToken);
+        var products = await _productRepository.GetByProductCategorySlugAsync(categorySlug, cancellationToken);
         var dtos = products.Select(MapToDto);
         return Ok(ApiResponse<IEnumerable<ProductDto>>.Ok(dtos));
     }
@@ -103,7 +103,7 @@ public class ProductsController : ControllerBase
             Slug = request.Slug,
             ShortDescription = request.ShortDescription,
             FullDescription = request.FullDescription,
-            CategoryId = request.CategoryId,
+            ProductCategoryId = request.ProductCategoryId,
             BasePrice = request.BasePrice,
             DiscountedPrice = request.DiscountedPrice,
             IsFeatured = request.IsFeatured,
@@ -129,7 +129,8 @@ public class ProductsController : ControllerBase
             }).ToList() ?? new List<ProductFeature>(),
             Images = request.Images?.Select((img, i) => new ProductImage
             {
-                Url = img.Url,
+                ImageData = !string.IsNullOrEmpty(img.ImageBase64) ? Convert.FromBase64String(img.ImageBase64) : null,
+                ImageContentType = img.ImageContentType,
                 AltText = img.AltText,
                 IsPrimary = i == 0,
                 DisplayOrder = i
@@ -159,7 +160,7 @@ public class ProductsController : ControllerBase
         product.Slug = request.Slug;
         product.ShortDescription = request.ShortDescription;
         product.FullDescription = request.FullDescription;
-        product.CategoryId = request.CategoryId;
+        product.ProductCategoryId = request.ProductCategoryId;
         product.BasePrice = request.BasePrice;
         product.DiscountedPrice = request.DiscountedPrice;
         product.IsFeatured = request.IsFeatured;
@@ -280,6 +281,7 @@ public class ProductsController : ControllerBase
 
     private static ProductDto MapToDto(Product product)
     {
+        var primaryImage = product.Images?.FirstOrDefault(i => i.IsPrimary) ?? product.Images?.FirstOrDefault();
         return new ProductDto
         {
             Id = product.Id,
@@ -287,8 +289,8 @@ public class ProductsController : ControllerBase
             Slug = product.Slug,
             ShortDescription = product.ShortDescription,
             FullDescription = product.FullDescription,
-            CategoryId = product.CategoryId,
-            CategoryName = product.Category?.Name,
+            ProductCategoryId = product.ProductCategoryId,
+            ProductCategoryName = product.ProductCategory?.Name,
             BasePrice = product.BasePrice,
             DiscountedPrice = product.DiscountedPrice,
             IsFeatured = product.IsFeatured,
@@ -302,11 +304,13 @@ public class ProductsController : ControllerBase
             Images = product.Images?.OrderBy(i => i.DisplayOrder).Select(i => new ProductImageDto
             {
                 Id = i.Id,
-                Url = i.Url,
+                ImageBase64 = i.ImageData != null ? Convert.ToBase64String(i.ImageData) : null,
+                ImageContentType = i.ImageContentType,
                 AltText = i.AltText,
                 IsPrimary = i.IsPrimary
             }).ToList() ?? new List<ProductImageDto>(),
-            PrimaryImageUrl = product.Images?.FirstOrDefault(i => i.IsPrimary)?.Url ?? product.Images?.FirstOrDefault()?.Url
+            PrimaryImageBase64 = primaryImage?.ImageData != null ? Convert.ToBase64String(primaryImage.ImageData) : null,
+            PrimaryImageContentType = primaryImage?.ImageContentType
         };
     }
 

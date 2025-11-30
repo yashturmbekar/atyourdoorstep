@@ -59,7 +59,7 @@ public class OrderDbContext : DbContext
             entity.Property(p => p.DiscountPrice).HasPrecision(18, 2);
             entity.Property(p => p.Category).IsRequired().HasMaxLength(100);
             entity.Property(p => p.Sku).HasMaxLength(50);
-            entity.Property(p => p.ImageUrl).HasMaxLength(500);
+            entity.Property(p => p.ImageContentType).HasMaxLength(100);
 
             entity.HasMany(p => p.OrderItems)
                 .WithOne(oi => oi.Product)

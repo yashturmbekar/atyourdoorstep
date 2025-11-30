@@ -4,16 +4,15 @@
  */
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import {
   FiPlus,
   FiSearch,
   FiEdit3,
   FiTrash2,
   FiMessageSquare,
-  FiArrowLeft,
   FiCheck,
   FiStar,
+  FiUpload,
 } from 'react-icons/fi';
 import {
   useTestimonials,
@@ -26,13 +25,23 @@ import type {
   CreateTestimonialRequestDto,
   UpdateTestimonialRequestDto,
 } from '../../../types/content.types';
+import { getImageSrc, processImageForUpload } from '../../../utils';
+import { ToastProvider, useToast, Breadcrumb, EmptyState } from '../ui';
+
+// Breadcrumb items for navigation
+const breadcrumbItems = [
+  { label: 'Dashboard', href: '/admin' },
+  { label: 'Content', href: '/admin/content' },
+  { label: 'Testimonials', href: '/admin/content/testimonials' },
+];
 import './ContentManagement.css';
 
 interface TestimonialFormData {
   customerName: string;
   customerTitle: string;
   customerLocation: string;
-  customerImageUrl: string;
+  customerImageBase64: string;
+  customerImageContentType: string;
   content: string;
   rating: number;
   productPurchased: string;
@@ -45,7 +54,8 @@ const initialFormData: TestimonialFormData = {
   customerName: '',
   customerTitle: '',
   customerLocation: '',
-  customerImageUrl: '',
+  customerImageBase64: '',
+  customerImageContentType: '',
   content: '',
   rating: 5,
   productPurchased: '',
@@ -54,7 +64,8 @@ const initialFormData: TestimonialFormData = {
   displayOrder: 0,
 };
 
-const TestimonialManagement: React.FC = () => {
+const TestimonialManagementContent: React.FC = () => {
+  const toast = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingTestimonial, setEditingTestimonial] =
@@ -102,7 +113,9 @@ const TestimonialManagement: React.FC = () => {
           customerName: formData.customerName,
           customerTitle: formData.customerTitle || undefined,
           customerLocation: formData.customerLocation || undefined,
-          customerImageUrl: formData.customerImageUrl || undefined,
+          customerImageBase64: formData.customerImageBase64 || undefined,
+          customerImageContentType:
+            formData.customerImageContentType || undefined,
           content: formData.content,
           rating: formData.rating,
           productPurchased: formData.productPurchased || undefined,
@@ -114,12 +127,18 @@ const TestimonialManagement: React.FC = () => {
           id: editingTestimonial.id,
           data: updateData,
         });
+        toast.success(
+          'Testimonial Updated',
+          `Testimonial updated successfully`
+        );
       } else {
         const createData: CreateTestimonialRequestDto = {
           customerName: formData.customerName,
           customerTitle: formData.customerTitle || undefined,
           customerLocation: formData.customerLocation || undefined,
-          customerImageUrl: formData.customerImageUrl || undefined,
+          customerImageBase64: formData.customerImageBase64 || undefined,
+          customerImageContentType:
+            formData.customerImageContentType || undefined,
           content: formData.content,
           rating: formData.rating,
           productPurchased: formData.productPurchased || undefined,
@@ -128,6 +147,10 @@ const TestimonialManagement: React.FC = () => {
           displayOrder: formData.displayOrder,
         };
         await createTestimonial.mutateAsync(createData);
+        toast.success(
+          'Testimonial Created',
+          `Testimonial created successfully`
+        );
       }
 
       setShowForm(false);
@@ -135,6 +158,7 @@ const TestimonialManagement: React.FC = () => {
       setFormData(initialFormData);
     } catch (err) {
       console.error('Error saving testimonial:', err);
+      toast.error('Error', 'Error saving testimonial. Please try again.');
     }
   };
 
@@ -144,7 +168,8 @@ const TestimonialManagement: React.FC = () => {
       customerName: testimonial.customerName,
       customerTitle: testimonial.customerTitle || '',
       customerLocation: testimonial.customerLocation || '',
-      customerImageUrl: testimonial.customerImageUrl || '',
+      customerImageBase64: testimonial.customerImageBase64 || '',
+      customerImageContentType: testimonial.customerImageContentType || '',
       content: testimonial.content,
       rating: testimonial.rating,
       productPurchased: testimonial.productPurchased || '',
@@ -158,10 +183,40 @@ const TestimonialManagement: React.FC = () => {
   const handleDelete = async (id: string) => {
     try {
       await deleteTestimonial.mutateAsync(id);
+      toast.success('Testimonial Deleted', 'Testimonial deleted successfully');
       setDeleteConfirm(null);
     } catch (err) {
       console.error('Error deleting testimonial:', err);
+      toast.error('Error', 'Error deleting testimonial. Please try again.');
     }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const { base64, contentType } = await processImageForUpload(file);
+      setFormData(prev => ({
+        ...prev,
+        customerImageBase64: base64,
+        customerImageContentType: contentType,
+      }));
+      toast.success('Image Uploaded', 'Image uploaded successfully');
+    } catch (error) {
+      toast.error(
+        'Upload Error',
+        error instanceof Error ? error.message : 'Failed to upload image'
+      );
+    }
+  };
+
+  const clearImage = () => {
+    setFormData(prev => ({
+      ...prev,
+      customerImageBase64: '',
+      customerImageContentType: '',
+    }));
   };
 
   const handleCancel = () => {
@@ -201,18 +256,14 @@ const TestimonialManagement: React.FC = () => {
     return (
       <div className="content-management">
         <div className="page-header">
-          <Link to="/admin/content" className="btn btn-ghost">
-            <FiArrowLeft />
-            Back to Content
-          </Link>
+          <Breadcrumb items={breadcrumbItems} />
           <h1 className="page-title">Testimonial Management</h1>
         </div>
-        <div className="empty-state">
-          <div className="empty-state-title">Error loading testimonials</div>
-          <p className="empty-state-description">
-            There was an error loading the testimonials. Please try again later.
-          </p>
-        </div>
+        <EmptyState
+          icon={<FiMessageSquare />}
+          title="Error loading testimonials"
+          description="There was an error loading the testimonials. Please try again later."
+        />
       </div>
     );
   }
@@ -220,10 +271,7 @@ const TestimonialManagement: React.FC = () => {
   return (
     <div className="content-management">
       <div className="page-header">
-        <Link to="/admin/content" className="btn btn-ghost">
-          <FiArrowLeft />
-          Back to Content
-        </Link>
+        <Breadcrumb items={breadcrumbItems} />
         <h1 className="page-title">Testimonial Management</h1>
         <p className="page-subtitle">
           Manage customer testimonials and reviews
@@ -305,18 +353,61 @@ const TestimonialManagement: React.FC = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="customerImageUrl" className="form-label">
-                  Customer Photo URL
+                <label htmlFor="customerImageUpload" className="form-label">
+                  Customer Photo
                 </label>
-                <input
-                  type="url"
-                  id="customerImageUrl"
-                  name="customerImageUrl"
-                  className="form-input"
-                  value={formData.customerImageUrl}
-                  onChange={handleInputChange}
-                  placeholder="https://example.com/photo.jpg"
-                />
+                <div className="image-upload-section">
+                  <div className="image-upload-input">
+                    <input
+                      type="file"
+                      id="customerImageUpload"
+                      accept="image/jpeg,image/png,image/gif,image/webp"
+                      onChange={handleImageUpload}
+                      style={{ display: 'none' }}
+                    />
+                    <label
+                      htmlFor="customerImageUpload"
+                      className="btn btn-secondary"
+                    >
+                      <FiUpload />
+                      Upload Photo
+                    </label>
+                  </div>
+                  <p className="form-hint">
+                    Upload a photo (JPEG, PNG, GIF, WebP, max 5MB). Optional
+                    customer photo for the testimonial.
+                  </p>
+                  {formData.customerImageBase64 && (
+                    <div className="image-preview-container">
+                      <img
+                        src={getImageSrc(
+                          formData.customerImageBase64,
+                          formData.customerImageContentType
+                        )}
+                        alt="Customer preview"
+                        style={{
+                          width: '80px',
+                          height: '80px',
+                          borderRadius: '50%',
+                          objectFit: 'cover',
+                        }}
+                        onError={e => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                        }}
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-sm"
+                        onClick={clearImage}
+                        style={{ marginTop: '0.5rem' }}
+                      >
+                        <FiTrash2 />
+                        Remove Photo
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="form-group">
@@ -504,9 +595,12 @@ const TestimonialManagement: React.FC = () => {
                             gap: '0.75rem',
                           }}
                         >
-                          {testimonial.customerImageUrl ? (
+                          {testimonial.customerImageBase64 ? (
                             <img
-                              src={testimonial.customerImageUrl}
+                              src={getImageSrc(
+                                testimonial.customerImageBase64,
+                                testimonial.customerImageContentType
+                              )}
                               alt={testimonial.customerName}
                               style={{
                                 width: '40px',
@@ -660,6 +754,15 @@ const TestimonialManagement: React.FC = () => {
         </div>
       )}
     </div>
+  );
+};
+
+// Wrapper component with ToastProvider
+const TestimonialManagement: React.FC = () => {
+  return (
+    <ToastProvider>
+      <TestimonialManagementContent />
+    </ToastProvider>
   );
 };
 

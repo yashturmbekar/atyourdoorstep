@@ -104,7 +104,7 @@ export interface Customer extends User {
 
 // Admin Types
 export interface AdminUser extends User {
-  role: 'admin' | 'super_admin';
+  role: 'admin' | 'super_admin' | 'manager' | 'user';
   permissions: AdminPermission[];
   lastLogin?: Date;
   isActive: boolean;
@@ -114,7 +114,13 @@ export interface AdminPermission {
   id: string;
   name: string;
   description: string;
-  module: 'products' | 'orders' | 'users' | 'analytics' | 'settings';
+  module:
+    | 'products'
+    | 'orders'
+    | 'users'
+    | 'analytics'
+    | 'settings'
+    | 'content';
 }
 
 export interface AdminStats {
@@ -154,6 +160,9 @@ export interface Product {
   category: string; // Changed from union type to string for more flexibility
   description: string;
   image: string;
+  // Base64 image data support
+  primaryImageBase64?: string;
+  primaryImageContentType?: string;
   variants: ProductVariant[];
   features?: string[];
   isActive?: boolean;

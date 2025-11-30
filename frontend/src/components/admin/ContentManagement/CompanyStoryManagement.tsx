@@ -5,16 +5,27 @@
  */
 
 import React, { useState } from 'react';
+import { FiInfo } from 'react-icons/fi';
 import { useCompanyStory } from '../../../hooks/useContent';
 import type { CompanyStorySectionResponseDto } from '../../../types/content.types';
+import { getImageSrc, processImageForUpload } from '../../../utils';
+import { Breadcrumb, EmptyState } from '../ui';
 import './ContentManagement.css';
+
+// Breadcrumb items for navigation
+const breadcrumbItems = [
+  { label: 'Dashboard', href: '/admin' },
+  { label: 'Content', href: '/admin/content' },
+  { label: 'Company Story', href: '/admin/content/company-story' },
+];
 
 interface StorySectionFormData {
   sectionType: string;
   title: string;
   subtitle: string;
   content: string;
-  imageUrl: string;
+  imageBase64: string;
+  imageContentType: string;
   displayOrder: number;
   isActive: boolean;
 }
@@ -24,7 +35,8 @@ const initialFormData: StorySectionFormData = {
   title: '',
   subtitle: '',
   content: '',
-  imageUrl: '',
+  imageBase64: '',
+  imageContentType: '',
   displayOrder: 0,
   isActive: true,
 };
@@ -59,7 +71,8 @@ const CompanyStoryManagement: React.FC = () => {
         title: section.title,
         subtitle: section.subtitle || '',
         content: section.content,
-        imageUrl: section.imageUrl || '',
+        imageBase64: section.imageBase64 || '',
+        imageContentType: section.imageContentType || '',
         displayOrder: section.displayOrder,
         isActive: section.isActive,
       });
@@ -99,6 +112,30 @@ const CompanyStoryManagement: React.FC = () => {
     }));
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const { base64, contentType } = await processImageForUpload(file);
+      setFormData(prev => ({
+        ...prev,
+        imageBase64: base64,
+        imageContentType: contentType,
+      }));
+    } catch (error) {
+      console.error('Image upload error:', error);
+    }
+  };
+
+  const clearImage = () => {
+    setFormData(prev => ({
+      ...prev,
+      imageBase64: '',
+      imageContentType: '',
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Note: Create/Update mutations would be added when backend endpoints are available
@@ -115,6 +152,11 @@ const CompanyStoryManagement: React.FC = () => {
   if (isLoading) {
     return (
       <div className="content-management">
+        <div className="page-header">
+          <Breadcrumb items={breadcrumbItems} />
+          <h1 className="page-title">Company Story Management</h1>
+          <p className="page-subtitle">Loading company story sections...</p>
+        </div>
         <div className="loading-state">Loading company story sections...</div>
       </div>
     );
@@ -123,20 +165,30 @@ const CompanyStoryManagement: React.FC = () => {
   if (error) {
     return (
       <div className="content-management">
-        <div className="error-state">
-          Failed to load company story. Please try again.
+        <div className="page-header">
+          <Breadcrumb items={breadcrumbItems} />
+          <h1 className="page-title">Company Story Management</h1>
         </div>
+        <EmptyState
+          icon={<FiInfo />}
+          title="Failed to load company story"
+          description="There was an error loading the company story. Please try again later."
+        />
       </div>
     );
   }
 
   return (
     <div className="content-management">
+      <div className="page-header">
+        <Breadcrumb items={breadcrumbItems} />
+        <h1 className="page-title">Company Story Management</h1>
+        <p className="page-subtitle">
+          Manage your company's about/story sections
+        </p>
+      </div>
       <div className="content-header">
-        <div>
-          <h1>Company Story Management</h1>
-          <p>Manage your company's about/story sections</p>
-        </div>
+        <div></div>
         <button className="btn-primary" onClick={() => handleOpenModal()}>
           Add Section
         </button>
@@ -167,9 +219,15 @@ const CompanyStoryManagement: React.FC = () => {
                   {section.isActive ? 'Active' : 'Inactive'}
                 </span>
               </div>
-              {section.imageUrl && (
+              {section.imageBase64 && (
                 <div className="card-image">
-                  <img src={section.imageUrl} alt={section.title} />
+                  <img
+                    src={getImageSrc(
+                      section.imageBase64,
+                      section.imageContentType
+                    )}
+                    alt={section.title}
+                  />
                 </div>
               )}
               <div className="card-body">
@@ -289,15 +347,53 @@ const CompanyStoryManagement: React.FC = () => {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="imageUrl">Image URL (optional)</label>
-                <input
-                  type="url"
-                  id="imageUrl"
-                  name="imageUrl"
-                  value={formData.imageUrl}
-                  onChange={handleInputChange}
-                  placeholder="https://example.com/image.jpg"
-                />
+                <label htmlFor="imageUpload">Image (optional)</label>
+                <div className="image-upload-section">
+                  <input
+                    type="file"
+                    id="imageUpload"
+                    accept="image/jpeg,image/png,image/gif,image/webp"
+                    onChange={handleImageUpload}
+                    style={{ display: 'none' }}
+                  />
+                  <label
+                    htmlFor="imageUpload"
+                    className="btn-secondary"
+                    style={{
+                      cursor: 'pointer',
+                      display: 'inline-block',
+                      padding: '0.5rem 1rem',
+                    }}
+                  >
+                    Upload Image
+                  </label>
+                  {formData.imageBase64 && (
+                    <div style={{ marginTop: '0.5rem' }}>
+                      <img
+                        src={getImageSrc(
+                          formData.imageBase64,
+                          formData.imageContentType
+                        )}
+                        alt="Preview"
+                        style={{
+                          maxWidth: '200px',
+                          maxHeight: '150px',
+                          objectFit: 'cover',
+                          borderRadius: '4px',
+                        }}
+                      />
+                      <button
+                        type="button"
+                        className="btn-icon btn-danger"
+                        onClick={clearImage}
+                        style={{ marginLeft: '0.5rem' }}
+                        title="Remove image"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
               <div className="form-group checkbox-group">
                 <label>

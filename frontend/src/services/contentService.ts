@@ -161,7 +161,10 @@ export const contentProductService = {
     if (params?.pageSize)
       queryParams.append('pageSize', params.pageSize.toString());
     if (params?.search) queryParams.append('search', params.search);
-    if (params?.categoryId) queryParams.append('categoryId', params.categoryId);
+    if (params?.productCategoryId)
+      queryParams.append('categoryId', params.productCategoryId);
+    if (params?.productCategorySlug)
+      queryParams.append('categorySlug', params.productCategorySlug);
     if (params?.isFeatured !== undefined)
       queryParams.append('isFeatured', params.isFeatured.toString());
     if (params?.isAvailable !== undefined)

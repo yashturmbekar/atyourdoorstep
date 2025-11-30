@@ -18,7 +18,6 @@ import {
   FiUsers,
   FiCalendar,
   FiRefreshCw,
-  FiHome,
   FiSettings,
 } from 'react-icons/fi';
 import {
@@ -29,7 +28,6 @@ import {
   useRevenueStats,
 } from '../../../hooks/admin';
 import {
-  Breadcrumb,
   Card,
   CardHeader,
   CardBody,
@@ -67,12 +65,6 @@ const ErrorState: React.FC<{ message: string; onRetry?: () => void }> = ({
     )}
   </div>
 );
-
-// Breadcrumb items
-const breadcrumbItems = [
-  { label: 'Home', href: '/admin', icon: <FiHome /> },
-  { label: 'Dashboard' },
-];
 
 // ============================================
 // MAIN COMPONENT
@@ -143,17 +135,17 @@ const AdminDashboard: React.FC = () => {
 
   const getStatusVariant = (
     status: string
-  ): 'success' | 'warning' | 'error' | 'info' | 'default' => {
+  ): 'success' | 'warning' | 'danger' | 'info' | 'default' => {
     const variants: Record<
       string,
-      'success' | 'warning' | 'error' | 'info' | 'default'
+      'success' | 'warning' | 'danger' | 'info' | 'default'
     > = {
       pending: 'warning',
       confirmed: 'info',
       processing: 'info',
       shipped: 'default',
       delivered: 'success',
-      cancelled: 'error',
+      cancelled: 'danger',
     };
     return variants[status] || 'default';
   };
@@ -176,9 +168,6 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <div className="admin-dashboard">
-      {/* Breadcrumb Navigation */}
-      <Breadcrumb items={breadcrumbItems} className="admin-animate-fade-in" />
-
       <div className="page-header">
         <div className="page-header-content">
           <h1 className="page-title">Dashboard</h1>
@@ -740,7 +729,7 @@ const AdminDashboard: React.FC = () => {
                           </div>
                         </div>
                         <Badge
-                          variant={isCritical ? 'error' : 'warning'}
+                          variant={isCritical ? 'danger' : 'warning'}
                           size="sm"
                         >
                           {variant?.stockQuantity || 0} left

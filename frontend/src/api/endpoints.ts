@@ -74,15 +74,26 @@ export const API_ENDPOINTS = {
   // Content Endpoints (ContentService)
   // ============================================
   content: {
-    // Categories
+    // Product Categories (renamed from categories)
     categories: {
-      list: '/api/categories',
-      byId: (id: string) => `/api/categories/${id}`,
-      bySlug: (slug: string) => `/api/categories/slug/${slug}`,
-      active: '/api/categories/active',
-      create: '/api/categories',
-      update: (id: string) => `/api/categories/${id}`,
-      delete: (id: string) => `/api/categories/${id}`,
+      list: '/api/productcategories',
+      byId: (id: string) => `/api/productcategories/${id}`,
+      bySlug: (slug: string) => `/api/productcategories/slug/${slug}`,
+      active: '/api/productcategories/active',
+      create: '/api/productcategories',
+      update: (id: string) => `/api/productcategories/${id}`,
+      delete: (id: string) => `/api/productcategories/${id}`,
+    },
+
+    // Alias for productCategories (new name)
+    productCategories: {
+      list: '/api/productcategories',
+      byId: (id: string) => `/api/productcategories/${id}`,
+      bySlug: (slug: string) => `/api/productcategories/slug/${slug}`,
+      active: '/api/productcategories/active',
+      create: '/api/productcategories',
+      update: (id: string) => `/api/productcategories/${id}`,
+      delete: (id: string) => `/api/productcategories/${id}`,
     },
 
     // Products (CMS)

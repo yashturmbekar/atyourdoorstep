@@ -34,7 +34,8 @@ public class CompanyStoryController : ControllerBase
             Id = s.Id,
             Title = s.Title,
             Subtitle = s.Subtitle,
-            ImageUrl = s.ImageUrl,
+            ImageBase64 = s.ImageData != null ? Convert.ToBase64String(s.ImageData) : null,
+            ImageContentType = s.ImageContentType,
             DisplayOrder = s.DisplayOrder,
             IsActive = s.IsActive,
             Items = s.Items?.OrderBy(i => i.DisplayOrder).Select(i => new CompanyStoryItemDto
@@ -61,7 +62,8 @@ public class CompanyStoryController : ControllerBase
             Id = s.Id,
             Title = s.Title,
             Subtitle = s.Subtitle,
-            ImageUrl = s.ImageUrl,
+            ImageBase64 = s.ImageData != null ? Convert.ToBase64String(s.ImageData) : null,
+            ImageContentType = s.ImageContentType,
             DisplayOrder = s.DisplayOrder,
             IsActive = s.IsActive,
             Items = s.Items?.OrderBy(i => i.DisplayOrder).Select(i => new CompanyStoryItemDto
@@ -86,7 +88,6 @@ public class CompanyStoryController : ControllerBase
         {
             Title = request.Title,
             Subtitle = request.Subtitle,
-            ImageUrl = request.ImageUrl,
             DisplayOrder = request.DisplayOrder,
             IsActive = request.IsActive,
             Items = request.Items?.Select((item, i) => new CompanyStoryItem
@@ -98,6 +99,13 @@ public class CompanyStoryController : ControllerBase
             }).ToList() ?? new List<CompanyStoryItem>()
         };
 
+        // Handle image byte data
+        if (!string.IsNullOrEmpty(request.ImageBase64))
+        {
+            section.ImageData = Convert.FromBase64String(request.ImageBase64);
+            section.ImageContentType = request.ImageContentType;
+        }
+
         await _companyStoryRepository.AddAsync(section, cancellationToken);
         await _companyStoryRepository.SaveChangesAsync(cancellationToken);
 
@@ -108,7 +116,8 @@ public class CompanyStoryController : ControllerBase
             Id = section.Id,
             Title = section.Title,
             Subtitle = section.Subtitle,
-            ImageUrl = section.ImageUrl,
+            ImageBase64 = section.ImageData != null ? Convert.ToBase64String(section.ImageData) : null,
+            ImageContentType = section.ImageContentType,
             DisplayOrder = section.DisplayOrder,
             IsActive = section.IsActive,
             Items = section.Items?.Select(i => new CompanyStoryItemDto
@@ -134,10 +143,22 @@ public class CompanyStoryController : ControllerBase
 
         section.Title = request.Title;
         section.Subtitle = request.Subtitle;
-        section.ImageUrl = request.ImageUrl;
         section.DisplayOrder = request.DisplayOrder;
         section.IsActive = request.IsActive;
         section.UpdatedAt = DateTime.UtcNow;
+
+        // Handle image byte data
+        if (!string.IsNullOrEmpty(request.ImageBase64))
+        {
+            section.ImageData = Convert.FromBase64String(request.ImageBase64);
+            section.ImageContentType = request.ImageContentType;
+        }
+        else if (request.ImageBase64 == string.Empty)
+        {
+            // Clear image if empty string is explicitly sent
+            section.ImageData = null;
+            section.ImageContentType = null;
+        }
 
         await _companyStoryRepository.UpdateAsync(section, cancellationToken);
         await _companyStoryRepository.SaveChangesAsync(cancellationToken);
@@ -149,7 +170,8 @@ public class CompanyStoryController : ControllerBase
             Id = section.Id,
             Title = section.Title,
             Subtitle = section.Subtitle,
-            ImageUrl = section.ImageUrl,
+            ImageBase64 = section.ImageData != null ? Convert.ToBase64String(section.ImageData) : null,
+            ImageContentType = section.ImageContentType,
             DisplayOrder = section.DisplayOrder,
             IsActive = section.IsActive
         }, "Section updated successfully"));

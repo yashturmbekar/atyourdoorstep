@@ -11,7 +11,8 @@ public class CompanyStorySection : BaseEntity
     public string Title { get; set; } = string.Empty;
     public string? Subtitle { get; set; }
     public string? Icon { get; set; }
-    public string? ImageUrl { get; set; }
+    public byte[]? ImageData { get; set; }
+    public string? ImageContentType { get; set; }
     public int DisplayOrder { get; set; } = 0;
     public bool IsActive { get; set; } = true;
 

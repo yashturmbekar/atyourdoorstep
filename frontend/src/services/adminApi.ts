@@ -10,7 +10,6 @@ import type {
   ApiResponse,
   PaginatedResponse,
   ProductResponseDto,
-  UpdateProductRequestDto,
   OrderResponseDto,
   UpdateOrderStatusRequestDto,
   CustomerResponseDto,
@@ -46,13 +45,27 @@ function mapProductResponse(dto: ProductResponseDto): Product {
   const price = dto.basePrice ?? 0;
   const discountPrice = dto.discountedPrice;
 
+  // Build image from base64 data
+  let imageUrl = '/images/placeholder.png';
+  if (dto.primaryImageBase64 && dto.primaryImageContentType) {
+    imageUrl = `data:${dto.primaryImageContentType};base64,${dto.primaryImageBase64}`;
+  } else if (dto.images?.[0]?.imageBase64 && dto.images[0].imageContentType) {
+    imageUrl = `data:${dto.images[0].imageContentType};base64,${dto.images[0].imageBase64}`;
+  }
+
   const mapped = {
     id: dto.id,
     name: dto.name,
     description: dto.shortDescription || dto.fullDescription || '',
-    category: dto.categoryName || dto.categoryId || '',
-    image:
-      dto.primaryImageUrl || dto.images?.[0]?.url || '/images/placeholder.png',
+    // Use productCategoryId for form editing, fallback to display name for views
+    category:
+      dto.productCategoryId ||
+      dto.categoryId ||
+      dto.productCategoryName ||
+      dto.categoryName ||
+      '',
+    categoryName: dto.productCategoryName || dto.categoryName || '',
+    image: imageUrl,
     isActive: dto.isAvailable,
     tags: dto.features || [],
     createdAt: new Date(),
@@ -90,15 +103,16 @@ function mapProductResponse(dto: ProductResponseDto): Product {
 
 /**
  * Map OrderResponseDto to legacy Order type
+ * Backend OrderStatus: Pending=1, Confirmed=2, Processing=3, Shipped=4, Delivered=5, Cancelled=6, Refunded=7
  */
 function mapOrderResponse(dto: OrderResponseDto): Order {
   const statusMap: Record<number, Order['status']> = {
-    0: 'pending',
-    1: 'confirmed',
-    2: 'processing',
-    3: 'shipped',
-    4: 'delivered',
-    5: 'cancelled',
+    1: 'pending',
+    2: 'confirmed',
+    3: 'processing',
+    4: 'shipped',
+    5: 'delivered',
+    6: 'cancelled',
   };
 
   return {
@@ -165,15 +179,16 @@ function mapCustomerResponse(dto: CustomerResponseDto): Customer {
 
 /**
  * Map legacy OrderStatus string to backend enum
+ * Backend OrderStatus: Pending=1, Confirmed=2, Processing=3, Shipped=4, Delivered=5, Cancelled=6, Refunded=7
  */
 function mapOrderStatusToEnum(status: Order['status']): OrderStatus {
   const statusMap: Record<Order['status'], OrderStatus> = {
-    pending: 0,
-    confirmed: 1,
-    processing: 2,
-    shipped: 3,
-    delivered: 4,
-    cancelled: 5,
+    pending: 1,
+    confirmed: 2,
+    processing: 3,
+    shipped: 4,
+    delivered: 5,
+    cancelled: 6,
   };
   return statusMap[status];
 }
@@ -254,17 +269,39 @@ export const productApi = {
     try {
       const mainVariant = productData.variants[0];
 
+      // Build images array from data URL if present
+      const images: {
+        imageBase64: string;
+        imageContentType: string;
+        altText?: string;
+      }[] = [];
+      if (productData.image && productData.image.startsWith('data:')) {
+        const matches = productData.image.match(/^data:([^;]+);base64,(.+)$/);
+        if (matches) {
+          images.push({
+            imageBase64: matches[2],
+            imageContentType: matches[1],
+            altText: productData.name,
+          });
+        }
+      }
+
       // Build request matching backend CreateProductRequest
       const requestData = {
         name: productData.name,
+        slug: productData.name
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)/g, ''),
         shortDescription: productData.description,
         fullDescription: productData.description,
-        categoryId: productData.category, // This should be a GUID - may need category lookup
+        productCategoryId: productData.category,
         basePrice: mainVariant?.price || 0,
         discountedPrice: mainVariant?.discountPrice,
         isFeatured: false,
         isAvailable: productData.isActive,
         features: productData.tags || [],
+        images: images.length > 0 ? images : undefined,
         variants:
           productData.variants?.map(v => ({
             size: v.size,
@@ -275,9 +312,6 @@ export const productApi = {
             sku: v.sku,
             isAvailable: v.inStock !== false,
           })) || [],
-        images: productData.image
-          ? [{ url: productData.image, altText: productData.name }]
-          : [],
       };
 
       const response = await apiClient.post<ApiResponse<ProductResponseDto>>(
@@ -313,10 +347,20 @@ export const productApi = {
         requestData.shortDescription = productData.description;
         requestData.fullDescription = productData.description;
       }
-      if (productData.category) requestData.categoryId = productData.category;
+      if (productData.category)
+        requestData.productCategoryId = productData.category;
       if (productData.isActive !== undefined)
         requestData.isAvailable = productData.isActive;
       if (productData.tags) requestData.features = productData.tags;
+
+      // Handle image - extract base64 and content type from data URL
+      if (productData.image && productData.image.startsWith('data:')) {
+        const matches = productData.image.match(/^data:([^;]+);base64,(.+)$/);
+        if (matches) {
+          requestData.imageContentType = matches[1];
+          requestData.imageBase64 = matches[2];
+        }
+      }
 
       if (productData.variants && productData.variants.length > 0) {
         const variant = productData.variants[0];
@@ -449,13 +493,13 @@ export const orderApi = {
         };
       }
 
-      // Default: fetch pending orders
+      // Default: fetch pending orders (status=1 in backend)
       const queryParams = new URLSearchParams();
       queryParams.append('page', page.toString());
       queryParams.append('pageSize', limit.toString());
 
       const response = await apiClient.get<PaginatedResponse<OrderResponseDto>>(
-        `${API_ENDPOINTS.orders.byStatus(0)}?${queryParams.toString()}`
+        `${API_ENDPOINTS.orders.byStatus(1)}?${queryParams.toString()}`
       );
 
       const orders = (response.data.data || []).map(mapOrderResponse);
@@ -759,9 +803,7 @@ export const analyticsApi = {
         apiClient.get<PaginatedResponse<ProductResponseDto>>(
           `${API_ENDPOINTS.products.list}?page=1&pageSize=1`
         ),
-        apiClient.get<PaginatedResponse<OrderResponseDto>>(
-          `${API_ENDPOINTS.orders.byStatus(0)}?page=1&pageSize=1`
-        ),
+        // Backend OrderStatus: Pending=1, Confirmed=2, Processing=3, Shipped=4, Delivered=5, Cancelled=6
         apiClient.get<PaginatedResponse<OrderResponseDto>>(
           `${API_ENDPOINTS.orders.byStatus(1)}?page=1&pageSize=1`
         ),
@@ -776,6 +818,9 @@ export const analyticsApi = {
         ),
         apiClient.get<PaginatedResponse<OrderResponseDto>>(
           `${API_ENDPOINTS.orders.byStatus(5)}?page=1&pageSize=1`
+        ),
+        apiClient.get<PaginatedResponse<OrderResponseDto>>(
+          `${API_ENDPOINTS.orders.byStatus(6)}?page=1&pageSize=1`
         ),
       ]);
 

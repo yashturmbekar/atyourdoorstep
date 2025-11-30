@@ -11,7 +11,8 @@ public class HeroSlide : BaseEntity
     public string? Subtitle { get; set; }
     public string? Description { get; set; }
     public string? HighlightText { get; set; }
-    public string? ImageUrl { get; set; }
+    public byte[]? ImageData { get; set; }
+    public string? ImageContentType { get; set; }
     public string? GradientStart { get; set; }
     public string? GradientMiddle { get; set; }
     public string? GradientEnd { get; set; }

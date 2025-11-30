@@ -42,7 +42,7 @@ builder.Services.AddCors(options =>
 
 // Add FluentValidation
 builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddValidatorsFromAssemblyContaining<ContentService.Application.Validators.CreateCategoryRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<ContentService.Application.Validators.CreateProductCategoryRequestValidator>();
 
 // Configure Database
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -50,7 +50,7 @@ builder.Services.AddDbContext<ContentDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 // Register Repositories
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IProductCategoryRepository, ProductCategoryRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ITestimonialRepository, TestimonialRepository>();
 builder.Services.AddScoped<ISiteSettingRepository, SiteSettingRepository>();

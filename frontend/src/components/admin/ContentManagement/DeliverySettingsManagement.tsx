@@ -5,11 +5,20 @@
  */
 
 import React, { useState } from 'react';
+import { FiTruck } from 'react-icons/fi';
 import {
   useDeliverySettings,
   useDeliveryCharges,
 } from '../../../hooks/useContent';
+import { Breadcrumb, EmptyState } from '../ui';
 import './ContentManagement.css';
+
+// Breadcrumb items for navigation
+const breadcrumbItems = [
+  { label: 'Dashboard', href: '/admin' },
+  { label: 'Content', href: '/admin/content' },
+  { label: 'Delivery Settings', href: '/admin/content/delivery' },
+];
 
 interface SettingsFormData {
   defaultDeliveryCharge: number;
@@ -98,6 +107,11 @@ const DeliverySettingsManagement: React.FC = () => {
   if (isLoading) {
     return (
       <div className="content-management">
+        <div className="page-header">
+          <Breadcrumb items={breadcrumbItems} />
+          <h1 className="page-title">Delivery Settings</h1>
+          <p className="page-subtitle">Loading delivery settings...</p>
+        </div>
         <div className="loading-state">Loading delivery settings...</div>
       </div>
     );
@@ -106,20 +120,30 @@ const DeliverySettingsManagement: React.FC = () => {
   if (error) {
     return (
       <div className="content-management">
-        <div className="error-state">
-          Failed to load delivery settings. Please try again.
+        <div className="page-header">
+          <Breadcrumb items={breadcrumbItems} />
+          <h1 className="page-title">Delivery Settings</h1>
         </div>
+        <EmptyState
+          icon={<FiTruck />}
+          title="Failed to load delivery settings"
+          description="There was an error loading the delivery settings. Please try again later."
+        />
       </div>
     );
   }
 
   return (
     <div className="content-management">
+      <div className="page-header">
+        <Breadcrumb items={breadcrumbItems} />
+        <h1 className="page-title">Delivery Settings</h1>
+        <p className="page-subtitle">
+          Manage delivery charges and estimated delivery times
+        </p>
+      </div>
       <div className="content-header">
-        <div>
-          <h1>Delivery Settings</h1>
-          <p>Manage delivery charges and estimated delivery times</p>
-        </div>
+        <div></div>
         <button className="btn-primary" onClick={handleOpenEditModal}>
           Edit Settings
         </button>

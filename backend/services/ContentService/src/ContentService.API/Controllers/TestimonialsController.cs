@@ -79,7 +79,6 @@ public class TestimonialsController : ControllerBase
             CustomerName = request.CustomerName,
             CustomerTitle = request.CustomerTitle,
             CustomerLocation = request.CustomerLocation,
-            CustomerImageUrl = request.CustomerImageUrl,
             Content = request.Content,
             Rating = request.Rating,
             ProductPurchased = request.ProductPurchased,
@@ -87,6 +86,13 @@ public class TestimonialsController : ControllerBase
             IsActive = request.IsActive,
             DisplayOrder = request.DisplayOrder
         };
+
+        // Handle image byte data
+        if (!string.IsNullOrEmpty(request.CustomerImageBase64))
+        {
+            testimonial.CustomerImageData = Convert.FromBase64String(request.CustomerImageBase64);
+            testimonial.CustomerImageContentType = request.CustomerImageContentType;
+        }
 
         await _testimonialRepository.AddAsync(testimonial, cancellationToken);
         await _testimonialRepository.SaveChangesAsync(cancellationToken);
@@ -109,7 +115,6 @@ public class TestimonialsController : ControllerBase
         testimonial.CustomerName = request.CustomerName;
         testimonial.CustomerTitle = request.CustomerTitle;
         testimonial.CustomerLocation = request.CustomerLocation;
-        testimonial.CustomerImageUrl = request.CustomerImageUrl;
         testimonial.Content = request.Content;
         testimonial.Rating = request.Rating;
         testimonial.ProductPurchased = request.ProductPurchased;
@@ -117,6 +122,19 @@ public class TestimonialsController : ControllerBase
         testimonial.IsActive = request.IsActive;
         testimonial.DisplayOrder = request.DisplayOrder;
         testimonial.UpdatedAt = DateTime.UtcNow;
+
+        // Handle image byte data
+        if (!string.IsNullOrEmpty(request.CustomerImageBase64))
+        {
+            testimonial.CustomerImageData = Convert.FromBase64String(request.CustomerImageBase64);
+            testimonial.CustomerImageContentType = request.CustomerImageContentType;
+        }
+        else if (request.CustomerImageBase64 == string.Empty)
+        {
+            // Clear image if empty string is explicitly sent
+            testimonial.CustomerImageData = null;
+            testimonial.CustomerImageContentType = null;
+        }
 
         await _testimonialRepository.UpdateAsync(testimonial, cancellationToken);
         await _testimonialRepository.SaveChangesAsync(cancellationToken);
@@ -152,7 +170,8 @@ public class TestimonialsController : ControllerBase
             CustomerName = testimonial.CustomerName,
             CustomerTitle = testimonial.CustomerTitle,
             CustomerLocation = testimonial.CustomerLocation,
-            CustomerImageUrl = testimonial.CustomerImageUrl,
+            CustomerImageBase64 = testimonial.CustomerImageData != null ? Convert.ToBase64String(testimonial.CustomerImageData) : null,
+            CustomerImageContentType = testimonial.CustomerImageContentType,
             Content = testimonial.Content,
             Rating = testimonial.Rating,
             ProductPurchased = testimonial.ProductPurchased,

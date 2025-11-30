@@ -1,55 +1,86 @@
 namespace ContentService.Application.DTOs;
 
-#region Category DTOs
+#region ProductCategory DTOs
 
-public record CreateCategoryRequest(
+public record CreateProductCategoryRequest(
     string Name,
     string Slug,
     string? Description,
     string? Icon,
-    string? ImageUrl,
+    string? ImageBase64,
+    string? ImageContentType,
     int DisplayOrder = 0,
     bool IsActive = true,
     Guid? ParentId = null
 );
 
-public record UpdateCategoryRequest(
+public record UpdateProductCategoryRequest(
     string Name,
     string Slug,
     string? Description,
     string? Icon,
-    string? ImageUrl,
+    string? ImageBase64,
+    string? ImageContentType,
     int DisplayOrder,
     bool IsActive,
     Guid? ParentId
 );
 
-public class CategoryDto
+public class ProductCategoryDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Slug { get; set; } = string.Empty;
     public string? Description { get; set; }
     public string? Icon { get; set; }
-    public string? ImageUrl { get; set; }
+    public string? ImageBase64 { get; set; }
+    public string? ImageContentType { get; set; }
     public int DisplayOrder { get; set; }
     public bool IsActive { get; set; }
     public int ProductCount { get; set; }
 }
 
 // Response aliases for service interfaces
-public class CategoryResponse : CategoryDto { }
+public class ProductCategoryResponse : ProductCategoryDto { }
 
-public class PublicCategoryResponse
+public class PublicProductCategoryResponse
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Slug { get; set; } = string.Empty;
     public string? Description { get; set; }
     public string? Icon { get; set; }
-    public string? ImageUrl { get; set; }
+    public string? ImageBase64 { get; set; }
+    public string? ImageContentType { get; set; }
     public int ProductCount { get; set; }
 }
+
+// Legacy aliases for backward compatibility
+public class CategoryDto : ProductCategoryDto { }
+public class CategoryResponse : ProductCategoryDto { }
+public record CreateCategoryRequest(
+    string Name,
+    string Slug,
+    string? Description,
+    string? Icon,
+    string? ImageBase64,
+    string? ImageContentType,
+    int DisplayOrder = 0,
+    bool IsActive = true,
+    Guid? ParentId = null
+) : CreateProductCategoryRequest(Name, Slug, Description, Icon, ImageBase64, ImageContentType, DisplayOrder, IsActive, ParentId);
+public record UpdateCategoryRequest(
+    string Name,
+    string Slug,
+    string? Description,
+    string? Icon,
+    string? ImageBase64,
+    string? ImageContentType,
+    int DisplayOrder,
+    bool IsActive,
+    Guid? ParentId
+) : UpdateProductCategoryRequest(Name, Slug, Description, Icon, ImageBase64, ImageContentType, DisplayOrder, IsActive, ParentId);
+public class PublicCategoryResponse : PublicProductCategoryResponse { }
 
 #endregion
 
@@ -61,7 +92,7 @@ public class CreateProductRequest
     public string Slug { get; set; } = string.Empty;
     public string ShortDescription { get; set; } = string.Empty;
     public string? FullDescription { get; set; }
-    public Guid CategoryId { get; set; }
+    public Guid ProductCategoryId { get; set; }
     public decimal BasePrice { get; set; }
     public decimal? DiscountedPrice { get; set; }
     public bool IsFeatured { get; set; }
@@ -81,7 +112,7 @@ public class UpdateProductRequest
     public string Slug { get; set; } = string.Empty;
     public string ShortDescription { get; set; } = string.Empty;
     public string? FullDescription { get; set; }
-    public Guid CategoryId { get; set; }
+    public Guid ProductCategoryId { get; set; }
     public decimal BasePrice { get; set; }
     public decimal? DiscountedPrice { get; set; }
     public bool IsFeatured { get; set; }
@@ -116,7 +147,8 @@ public class UpdateVariantRequest
 
 public class CreateProductImageRequest
 {
-    public string Url { get; set; } = string.Empty;
+    public string? ImageBase64 { get; set; }
+    public string? ImageContentType { get; set; }
     public string? AltText { get; set; }
 }
 
@@ -127,8 +159,8 @@ public class ProductDto
     public string Slug { get; set; } = string.Empty;
     public string ShortDescription { get; set; } = string.Empty;
     public string? FullDescription { get; set; }
-    public Guid CategoryId { get; set; }
-    public string? CategoryName { get; set; }
+    public Guid ProductCategoryId { get; set; }
+    public string? ProductCategoryName { get; set; }
     public decimal BasePrice { get; set; }
     public decimal? DiscountedPrice { get; set; }
     public bool IsFeatured { get; set; }
@@ -137,7 +169,8 @@ public class ProductDto
     public string? SeasonEnd { get; set; }
     public string? MetaTitle { get; set; }
     public string? MetaDescription { get; set; }
-    public string? PrimaryImageUrl { get; set; }
+    public string? PrimaryImageBase64 { get; set; }
+    public string? PrimaryImageContentType { get; set; }
     public List<ProductVariantDto> Variants { get; set; } = new();
     public List<string> Features { get; set; } = new();
     public List<ProductImageDto> Images { get; set; } = new();
@@ -158,7 +191,8 @@ public class ProductVariantDto
 public class ProductImageDto
 {
     public Guid Id { get; set; }
-    public string Url { get; set; } = string.Empty;
+    public string? ImageBase64 { get; set; }
+    public string? ImageContentType { get; set; }
     public string? AltText { get; set; }
     public bool IsPrimary { get; set; }
 }
@@ -174,12 +208,13 @@ public class ProductListResponse
     public string Name { get; set; } = string.Empty;
     public string Slug { get; set; } = string.Empty;
     public string ShortDescription { get; set; } = string.Empty;
-    public string? CategoryName { get; set; }
+    public string? ProductCategoryName { get; set; }
     public decimal BasePrice { get; set; }
     public decimal? DiscountedPrice { get; set; }
     public bool IsFeatured { get; set; }
     public bool IsAvailable { get; set; }
-    public string? PrimaryImageUrl { get; set; }
+    public string? PrimaryImageBase64 { get; set; }
+    public string? PrimaryImageContentType { get; set; }
 }
 
 public class PublicProductResponse
@@ -189,13 +224,14 @@ public class PublicProductResponse
     public string Slug { get; set; } = string.Empty;
     public string ShortDescription { get; set; } = string.Empty;
     public string? FullDescription { get; set; }
-    public string? CategoryName { get; set; }
-    public string? CategorySlug { get; set; }
+    public string? ProductCategoryName { get; set; }
+    public string? ProductCategorySlug { get; set; }
     public decimal BasePrice { get; set; }
     public decimal? DiscountedPrice { get; set; }
     public string? SeasonStart { get; set; }
     public string? SeasonEnd { get; set; }
-    public string? PrimaryImageUrl { get; set; }
+    public string? PrimaryImageBase64 { get; set; }
+    public string? PrimaryImageContentType { get; set; }
     public List<ProductVariantDto> Variants { get; set; } = new();
     public List<string> Features { get; set; } = new();
     public List<ProductImageDto> Images { get; set; } = new();
@@ -210,7 +246,8 @@ public class CreateTestimonialRequest
     public string CustomerName { get; set; } = string.Empty;
     public string? CustomerTitle { get; set; }
     public string? CustomerLocation { get; set; }
-    public string? CustomerImageUrl { get; set; }
+    public string? CustomerImageBase64 { get; set; }
+    public string? CustomerImageContentType { get; set; }
     public string Content { get; set; } = string.Empty;
     public int Rating { get; set; } = 5;
     public string? ProductPurchased { get; set; }
@@ -224,7 +261,8 @@ public class UpdateTestimonialRequest
     public string CustomerName { get; set; } = string.Empty;
     public string? CustomerTitle { get; set; }
     public string? CustomerLocation { get; set; }
-    public string? CustomerImageUrl { get; set; }
+    public string? CustomerImageBase64 { get; set; }
+    public string? CustomerImageContentType { get; set; }
     public string Content { get; set; } = string.Empty;
     public int Rating { get; set; }
     public string? ProductPurchased { get; set; }
@@ -239,7 +277,8 @@ public class TestimonialDto
     public string CustomerName { get; set; } = string.Empty;
     public string? CustomerTitle { get; set; }
     public string? CustomerLocation { get; set; }
-    public string? CustomerImageUrl { get; set; }
+    public string? CustomerImageBase64 { get; set; }
+    public string? CustomerImageContentType { get; set; }
     public string Content { get; set; } = string.Empty;
     public int Rating { get; set; }
     public string? ProductPurchased { get; set; }
@@ -257,7 +296,8 @@ public class PublicTestimonialResponse
     public string CustomerName { get; set; } = string.Empty;
     public string? CustomerTitle { get; set; }
     public string? CustomerLocation { get; set; }
-    public string? CustomerImageUrl { get; set; }
+    public string? CustomerImageBase64 { get; set; }
+    public string? CustomerImageContentType { get; set; }
     public string Content { get; set; } = string.Empty;
     public int Rating { get; set; }
     public string? ProductPurchased { get; set; }
@@ -326,7 +366,8 @@ public class CreateContentBlockRequest
     public string? Title { get; set; }
     public string? Subtitle { get; set; }
     public string? Content { get; set; }
-    public string? ImageUrl { get; set; }
+    public string? ImageBase64 { get; set; }
+    public string? ImageContentType { get; set; }
     public string? LinkUrl { get; set; }
     public string? LinkText { get; set; }
     public int DisplayOrder { get; set; }
@@ -338,7 +379,8 @@ public class UpdateContentBlockRequest
     public string? Title { get; set; }
     public string? Subtitle { get; set; }
     public string? Content { get; set; }
-    public string? ImageUrl { get; set; }
+    public string? ImageBase64 { get; set; }
+    public string? ImageContentType { get; set; }
     public string? LinkUrl { get; set; }
     public string? LinkText { get; set; }
     public int DisplayOrder { get; set; }
@@ -354,7 +396,8 @@ public class ContentBlockDto
     public string? Title { get; set; }
     public string? Subtitle { get; set; }
     public string? Content { get; set; }
-    public string? ImageUrl { get; set; }
+    public string? ImageBase64 { get; set; }
+    public string? ImageContentType { get; set; }
     public string? LinkUrl { get; set; }
     public string? LinkText { get; set; }
     public int DisplayOrder { get; set; }
@@ -373,7 +416,8 @@ public class CreateHeroSlideRequest
     public string Title { get; set; } = string.Empty;
     public string? Subtitle { get; set; }
     public string? Description { get; set; }
-    public string? ImageUrl { get; set; }
+    public string? ImageBase64 { get; set; }
+    public string? ImageContentType { get; set; }
     public string? GradientStart { get; set; }
     public string? GradientEnd { get; set; }
     public string? CtaText { get; set; }
@@ -388,7 +432,8 @@ public class UpdateHeroSlideRequest
     public string Title { get; set; } = string.Empty;
     public string? Subtitle { get; set; }
     public string? Description { get; set; }
-    public string? ImageUrl { get; set; }
+    public string? ImageBase64 { get; set; }
+    public string? ImageContentType { get; set; }
     public string? GradientStart { get; set; }
     public string? GradientEnd { get; set; }
     public string? CtaText { get; set; }
@@ -403,7 +448,8 @@ public class HeroSlideDto
     public string Title { get; set; } = string.Empty;
     public string? Subtitle { get; set; }
     public string? Description { get; set; }
-    public string? ImageUrl { get; set; }
+    public string? ImageBase64 { get; set; }
+    public string? ImageContentType { get; set; }
     public string? GradientStart { get; set; }
     public string? GradientEnd { get; set; }
     public string? CtaText { get; set; }
@@ -422,7 +468,8 @@ public class PublicHeroSlideResponse
     public string Title { get; set; } = string.Empty;
     public string? Subtitle { get; set; }
     public string? Description { get; set; }
-    public string? ImageUrl { get; set; }
+    public string? ImageBase64 { get; set; }
+    public string? ImageContentType { get; set; }
     public string? GradientStart { get; set; }
     public string? GradientEnd { get; set; }
     public string? CtaText { get; set; }
@@ -511,7 +558,8 @@ public class CreateCompanyStorySectionRequest
 {
     public string Title { get; set; } = string.Empty;
     public string? Subtitle { get; set; }
-    public string? ImageUrl { get; set; }
+    public string? ImageBase64 { get; set; }
+    public string? ImageContentType { get; set; }
     public int DisplayOrder { get; set; }
     public bool IsActive { get; set; } = true;
     public List<CreateCompanyStoryItemRequest>? Items { get; set; }
@@ -521,7 +569,8 @@ public class UpdateCompanyStorySectionRequest
 {
     public string Title { get; set; } = string.Empty;
     public string? Subtitle { get; set; }
-    public string? ImageUrl { get; set; }
+    public string? ImageBase64 { get; set; }
+    public string? ImageContentType { get; set; }
     public int DisplayOrder { get; set; }
     public bool IsActive { get; set; }
 }
@@ -538,7 +587,8 @@ public class CompanyStorySectionDto
     public Guid Id { get; set; }
     public string Title { get; set; } = string.Empty;
     public string? Subtitle { get; set; }
-    public string? ImageUrl { get; set; }
+    public string? ImageBase64 { get; set; }
+    public string? ImageContentType { get; set; }
     public int DisplayOrder { get; set; }
     public bool IsActive { get; set; }
     public List<CompanyStoryItemDto> Items { get; set; } = new();

@@ -4,6 +4,7 @@
  */
 import { useState, useEffect, useMemo } from 'react';
 import { useActiveTestimonials } from '../../../hooks/useContent';
+import { getImageSrc } from '../../../utils';
 import './Testimonials.css';
 
 interface TestimonialData {
@@ -94,7 +95,10 @@ export const Testimonials = () => {
       role:
         testimonial.customerLocation || testimonial.customerTitle || 'Customer',
       image:
-        testimonial.customerImageUrl || getInitials(testimonial.customerName),
+        getImageSrc(
+          testimonial.customerImageBase64,
+          testimonial.customerImageContentType
+        ) || getInitials(testimonial.customerName),
       rating: testimonial.rating || 5,
       text: testimonial.content,
     }));

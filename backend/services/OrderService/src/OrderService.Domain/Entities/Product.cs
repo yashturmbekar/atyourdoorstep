@@ -9,7 +9,8 @@ public class Product : BaseEntity
     public decimal Price { get; set; }
     public string Category { get; set; } = string.Empty;
     public int Stock { get; set; }
-    public string? ImageUrl { get; set; }
+    public byte[]? ImageData { get; set; }
+    public string? ImageContentType { get; set; }
     public bool IsAvailable { get; set; } = true;
     public string? Sku { get; set; }
     public decimal? DiscountPrice { get; set; }

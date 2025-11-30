@@ -13,7 +13,6 @@ import {
   FiAlertCircle,
 } from 'react-icons/fi';
 import { useAnalyticsData } from '../../../hooks/admin';
-import type { AdminStats } from '../../../types';
 import './Analytics.css';
 
 const Analytics: React.FC = () => {
@@ -32,7 +31,6 @@ const Analytics: React.FC = () => {
     isLoading,
     isError,
     refetchAll,
-    queries,
   } = useAnalyticsData(selectedPeriod);
 
   const handleRefresh = async () => {

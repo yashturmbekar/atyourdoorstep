@@ -8,6 +8,7 @@ import {
   useActiveStatistics,
 } from '../../../hooks/useContent';
 import { generateProductStructuredData } from '../../../utils/seo';
+import { getImageSrc } from '../../../utils';
 import './Hero.css';
 
 interface SlideData {
@@ -162,7 +163,9 @@ export const Hero = () => {
       name: slide.title,
       description: slide.description || '',
       emoji: getEmojiFromTitle(slide.title),
-      image: slide.imageUrl || '/images/placeholder.png',
+      image:
+        getImageSrc(slide.imageBase64, slide.imageContentType) ||
+        '/images/placeholder.png',
       imageAlt: slide.subtitle || slide.title,
       highlight: slide.subtitle || '',
       features: slide.features || [],

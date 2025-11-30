@@ -4,15 +4,14 @@
  */
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import {
   FiPlus,
   FiEdit3,
   FiTrash2,
   FiImage,
-  FiArrowLeft,
   FiCheck,
   FiMove,
+  FiUpload,
 } from 'react-icons/fi';
 import {
   useHeroSlides,
@@ -25,13 +24,23 @@ import type {
   CreateHeroSlideRequestDto,
   UpdateHeroSlideRequestDto,
 } from '../../../types/content.types';
+import { getImageSrc, processImageForUpload } from '../../../utils';
+import { ToastProvider, useToast, Breadcrumb, EmptyState } from '../ui';
 import './ContentManagement.css';
+
+// Breadcrumb items for navigation
+const breadcrumbItems = [
+  { label: 'Dashboard', href: '/admin' },
+  { label: 'Content', href: '/admin/content' },
+  { label: 'Hero Slides', href: '/admin/content/hero-slides' },
+];
 
 interface HeroSlideFormData {
   title: string;
   subtitle: string;
   description: string;
-  imageUrl: string;
+  imageBase64: string;
+  imageContentType: string;
   gradientStart: string;
   gradientEnd: string;
   ctaText: string;
@@ -45,7 +54,8 @@ const initialFormData: HeroSlideFormData = {
   title: '',
   subtitle: '',
   description: '',
-  imageUrl: '',
+  imageBase64: '',
+  imageContentType: '',
   gradientStart: '#f97316',
   gradientEnd: '#ea580c',
   ctaText: 'Shop Now',
@@ -55,7 +65,8 @@ const initialFormData: HeroSlideFormData = {
   features: [],
 };
 
-const HeroSlideManagement: React.FC = () => {
+const HeroSlideManagementContent: React.FC = () => {
+  const toast = useToast();
   const [showForm, setShowForm] = useState(false);
   const [editingSlide, setEditingSlide] = useState<HeroSlideResponseDto | null>(
     null
@@ -111,7 +122,8 @@ const HeroSlideManagement: React.FC = () => {
           title: formData.title,
           subtitle: formData.subtitle || undefined,
           description: formData.description || undefined,
-          imageUrl: formData.imageUrl || undefined,
+          imageBase64: formData.imageBase64 || undefined,
+          imageContentType: formData.imageContentType || undefined,
           gradientStart: formData.gradientStart || undefined,
           gradientEnd: formData.gradientEnd || undefined,
           ctaText: formData.ctaText || undefined,
@@ -123,12 +135,17 @@ const HeroSlideManagement: React.FC = () => {
           id: editingSlide.id,
           data: updateData,
         });
+        toast.success(
+          'Slide Updated',
+          `Slide "${formData.title}" updated successfully`
+        );
       } else {
         const createData: CreateHeroSlideRequestDto = {
           title: formData.title,
           subtitle: formData.subtitle || undefined,
           description: formData.description || undefined,
-          imageUrl: formData.imageUrl || undefined,
+          imageBase64: formData.imageBase64 || undefined,
+          imageContentType: formData.imageContentType || undefined,
           gradientStart: formData.gradientStart || undefined,
           gradientEnd: formData.gradientEnd || undefined,
           ctaText: formData.ctaText || undefined,
@@ -139,6 +156,10 @@ const HeroSlideManagement: React.FC = () => {
             formData.features.length > 0 ? formData.features : undefined,
         };
         await createSlide.mutateAsync(createData);
+        toast.success(
+          'Slide Created',
+          `Slide "${formData.title}" created successfully`
+        );
       }
 
       setShowForm(false);
@@ -146,6 +167,7 @@ const HeroSlideManagement: React.FC = () => {
       setFormData(initialFormData);
     } catch (err) {
       console.error('Error saving hero slide:', err);
+      toast.error('Error', 'Error saving hero slide. Please try again.');
     }
   };
 
@@ -155,7 +177,8 @@ const HeroSlideManagement: React.FC = () => {
       title: slide.title,
       subtitle: slide.subtitle || '',
       description: slide.description || '',
-      imageUrl: slide.imageUrl || '',
+      imageBase64: slide.imageBase64 || '',
+      imageContentType: slide.imageContentType || '',
       gradientStart: slide.gradientStart || '#f97316',
       gradientEnd: slide.gradientEnd || '#ea580c',
       ctaText: slide.ctaText || 'Shop Now',
@@ -170,10 +193,40 @@ const HeroSlideManagement: React.FC = () => {
   const handleDelete = async (id: string) => {
     try {
       await deleteSlide.mutateAsync(id);
+      toast.success('Slide Deleted', 'Hero slide deleted successfully');
       setDeleteConfirm(null);
     } catch (err) {
       console.error('Error deleting hero slide:', err);
+      toast.error('Error', 'Error deleting hero slide. Please try again.');
     }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const { base64, contentType } = await processImageForUpload(file);
+      setFormData(prev => ({
+        ...prev,
+        imageBase64: base64,
+        imageContentType: contentType,
+      }));
+      toast.success('Image Uploaded', 'Image uploaded successfully');
+    } catch (error) {
+      toast.error(
+        'Upload Error',
+        error instanceof Error ? error.message : 'Failed to upload image'
+      );
+    }
+  };
+
+  const clearImage = () => {
+    setFormData(prev => ({
+      ...prev,
+      imageBase64: '',
+      imageContentType: '',
+    }));
   };
 
   const handleCancel = () => {
@@ -197,18 +250,14 @@ const HeroSlideManagement: React.FC = () => {
     return (
       <div className="content-management">
         <div className="page-header">
-          <Link to="/admin/content" className="btn btn-ghost">
-            <FiArrowLeft />
-            Back to Content
-          </Link>
+          <Breadcrumb items={breadcrumbItems} />
           <h1 className="page-title">Hero Slide Management</h1>
         </div>
-        <div className="empty-state">
-          <div className="empty-state-title">Error loading hero slides</div>
-          <p className="empty-state-description">
-            There was an error loading the hero slides. Please try again later.
-          </p>
-        </div>
+        <EmptyState
+          icon={<FiImage />}
+          title="Error loading hero slides"
+          description="There was an error loading the hero slides. Please try again later."
+        />
       </div>
     );
   }
@@ -216,10 +265,7 @@ const HeroSlideManagement: React.FC = () => {
   return (
     <div className="content-management">
       <div className="page-header">
-        <Link to="/admin/content" className="btn btn-ghost">
-          <FiArrowLeft />
-          Back to Content
-        </Link>
+        <Breadcrumb items={breadcrumbItems} />
         <h1 className="page-title">Hero Slide Management</h1>
         <p className="page-subtitle">Configure homepage hero carousel slides</p>
       </div>
@@ -278,18 +324,53 @@ const HeroSlideManagement: React.FC = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="imageUrl" className="form-label">
-                  Background Image URL
+                <label htmlFor="imageUpload" className="form-label">
+                  Background Image
                 </label>
-                <input
-                  type="url"
-                  id="imageUrl"
-                  name="imageUrl"
-                  className="form-input"
-                  value={formData.imageUrl}
-                  onChange={handleInputChange}
-                  placeholder="https://example.com/image.jpg"
-                />
+                <div className="image-upload-section">
+                  <div className="image-upload-input">
+                    <input
+                      type="file"
+                      id="imageUpload"
+                      accept="image/jpeg,image/png,image/gif,image/webp"
+                      onChange={handleImageUpload}
+                      style={{ display: 'none' }}
+                    />
+                    <label htmlFor="imageUpload" className="btn btn-secondary">
+                      <FiUpload />
+                      Upload Image
+                    </label>
+                  </div>
+                  <p className="form-hint">
+                    Upload an image file (JPEG, PNG, GIF, WebP, max 5MB).
+                    Optional background image for the slide.
+                  </p>
+                  {formData.imageBase64 && (
+                    <div className="image-preview-container">
+                      <img
+                        src={getImageSrc(
+                          formData.imageBase64,
+                          formData.imageContentType
+                        )}
+                        alt="Slide background preview"
+                        className="image-preview large"
+                        onError={e => {
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                        }}
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-sm"
+                        onClick={clearImage}
+                        style={{ marginTop: '0.5rem' }}
+                      >
+                        <FiTrash2 />
+                        Remove Image
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="form-row">
@@ -759,6 +840,15 @@ const HeroSlideManagement: React.FC = () => {
         </div>
       )}
     </div>
+  );
+};
+
+// Wrapper component with ToastProvider
+const HeroSlideManagement: React.FC = () => {
+  return (
+    <ToastProvider>
+      <HeroSlideManagementContent />
+    </ToastProvider>
   );
 };
 

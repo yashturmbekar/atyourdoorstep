@@ -241,7 +241,13 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     if (exact) {
       return location.pathname === href;
     }
-    return location.pathname.startsWith(href);
+    // For non-exact matches, check if path matches exactly or is a direct child
+    // This prevents /admin/content from matching /admin/content/categories
+    if (location.pathname === href) {
+      return true;
+    }
+    // Only match if it's a proper sub-path (has trailing slash context)
+    return location.pathname.startsWith(href + '/');
   };
 
   const isSectionActive = (items: NavigationItem[]) => {

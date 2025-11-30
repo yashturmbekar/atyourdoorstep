@@ -25,9 +25,9 @@ public class CreateProductRequestValidator : AbstractValidator<CreateProductRequ
         RuleFor(x => x.Stock)
             .GreaterThanOrEqualTo(0).WithMessage("Stock cannot be negative");
 
-        RuleFor(x => x.ImageUrl)
-            .MaximumLength(500).WithMessage("Image URL cannot exceed 500 characters")
-            .When(x => !string.IsNullOrEmpty(x.ImageUrl));
+        RuleFor(x => x.ImageContentType)
+            .MaximumLength(100).WithMessage("Image content type cannot exceed 100 characters")
+            .When(x => !string.IsNullOrEmpty(x.ImageContentType));
 
         RuleFor(x => x.Sku)
             .MaximumLength(50).WithMessage("SKU cannot exceed 50 characters")
@@ -68,9 +68,9 @@ public class UpdateProductRequestValidator : AbstractValidator<UpdateProductRequ
             .GreaterThanOrEqualTo(0).WithMessage("Stock cannot be negative")
             .When(x => x.Stock.HasValue);
 
-        RuleFor(x => x.ImageUrl)
-            .MaximumLength(500).WithMessage("Image URL cannot exceed 500 characters")
-            .When(x => !string.IsNullOrEmpty(x.ImageUrl));
+        RuleFor(x => x.ImageContentType)
+            .MaximumLength(100).WithMessage("Image content type cannot exceed 100 characters")
+            .When(x => !string.IsNullOrEmpty(x.ImageContentType));
 
         RuleFor(x => x.Sku)
             .MaximumLength(50).WithMessage("SKU cannot exceed 50 characters")

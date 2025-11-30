@@ -54,7 +54,8 @@ public class ProductsController : ControllerBase
                 Price = p.Price,
                 Category = p.Category,
                 Stock = p.Stock,
-                ImageUrl = p.ImageUrl,
+                ImageBase64 = p.ImageData != null ? Convert.ToBase64String(p.ImageData) : null,
+                ImageContentType = p.ImageContentType,
                 IsAvailable = p.IsAvailable,
                 Sku = p.Sku,
                 DiscountPrice = p.DiscountPrice,
@@ -100,7 +101,8 @@ public class ProductsController : ControllerBase
             Price = product.Price,
             Category = product.Category,
             Stock = product.Stock,
-            ImageUrl = product.ImageUrl,
+            ImageBase64 = product.ImageData != null ? Convert.ToBase64String(product.ImageData) : null,
+            ImageContentType = product.ImageContentType,
             IsAvailable = product.IsAvailable,
             Sku = product.Sku,
             DiscountPrice = product.DiscountPrice,
@@ -138,7 +140,8 @@ public class ProductsController : ControllerBase
             Price = request.Price,
             Category = request.Category,
             Stock = request.Stock,
-            ImageUrl = request.ImageUrl,
+            ImageData = !string.IsNullOrEmpty(request.ImageBase64) ? Convert.FromBase64String(request.ImageBase64) : null,
+            ImageContentType = request.ImageContentType,
             IsAvailable = request.IsAvailable,
             Sku = request.Sku,
             DiscountPrice = request.DiscountPrice,
@@ -155,7 +158,8 @@ public class ProductsController : ControllerBase
             Price = product.Price,
             Category = product.Category,
             Stock = product.Stock,
-            ImageUrl = product.ImageUrl,
+            ImageBase64 = product.ImageData != null ? Convert.ToBase64String(product.ImageData) : null,
+            ImageContentType = product.ImageContentType,
             IsAvailable = product.IsAvailable,
             Sku = product.Sku,
             DiscountPrice = product.DiscountPrice,
@@ -190,7 +194,11 @@ public class ProductsController : ControllerBase
         if (request.Price.HasValue) product.Price = request.Price.Value;
         if (!string.IsNullOrEmpty(request.Category)) product.Category = request.Category;
         if (request.Stock.HasValue) product.Stock = request.Stock.Value;
-        if (request.ImageUrl != null) product.ImageUrl = request.ImageUrl;
+        if (!string.IsNullOrEmpty(request.ImageBase64))
+        {
+            product.ImageData = Convert.FromBase64String(request.ImageBase64);
+            product.ImageContentType = request.ImageContentType;
+        }
         if (request.IsAvailable.HasValue) product.IsAvailable = request.IsAvailable.Value;
         if (request.Sku != null) product.Sku = request.Sku;
         if (request.DiscountPrice.HasValue) product.DiscountPrice = request.DiscountPrice;
@@ -206,7 +214,8 @@ public class ProductsController : ControllerBase
             Price = product.Price,
             Category = product.Category,
             Stock = product.Stock,
-            ImageUrl = product.ImageUrl,
+            ImageBase64 = product.ImageData != null ? Convert.ToBase64String(product.ImageData) : null,
+            ImageContentType = product.ImageContentType,
             IsAvailable = product.IsAvailable,
             Sku = product.Sku,
             DiscountPrice = product.DiscountPrice,

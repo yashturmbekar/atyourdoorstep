@@ -24,7 +24,7 @@ import {
   useActiveCategories,
   useProductsByCategory,
 } from '../hooks/useContent';
-import { generateId } from '../utils';
+import { generateId, getImageSrc } from '../utils';
 import { PRODUCTS } from '../constants';
 import './OrderPage.css';
 
@@ -98,7 +98,9 @@ export const OrderPage = () => {
             cat.description ||
             `Premium quality ${cat.name.toLowerCase()} products.`,
           season: 'Year-round',
-          image: cat.imageUrl || '/images/placeholder.png',
+          image:
+            getImageSrc(cat.imageBase64, cat.imageContentType) ||
+            '/images/placeholder.png',
         };
       });
       return { ...FALLBACK_CATEGORY_INFO, ...dynamicInfo };
@@ -118,8 +120,12 @@ export const OrderPage = () => {
       return productsResponse.data.map(apiProduct => ({
         id: apiProduct.id,
         name: apiProduct.name,
-        category: apiProduct.categorySlug || category || '',
-        image: apiProduct.primaryImageUrl || '/images/placeholder.png',
+        category: apiProduct.productCategorySlug || category || '',
+        image:
+          getImageSrc(
+            apiProduct.primaryImageBase64,
+            apiProduct.primaryImageContentType
+          ) || '/images/placeholder.png',
         description:
           apiProduct.shortDescription || apiProduct.fullDescription || '',
         features: apiProduct.features || [],

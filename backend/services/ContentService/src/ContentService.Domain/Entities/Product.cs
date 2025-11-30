@@ -14,8 +14,9 @@ public class Product : BaseEntity
     public string? Unit { get; set; }
     public decimal BasePrice { get; set; }
     public decimal? DiscountedPrice { get; set; }
-    public string? ImageUrl { get; set; }
-    public Guid CategoryId { get; set; }
+    public byte[]? ImageData { get; set; }
+    public string? ImageContentType { get; set; }
+    public Guid ProductCategoryId { get; set; }
     public bool IsAvailable { get; set; } = true;
     public bool IsFeatured { get; set; } = false;
     public bool IsDeleted { get; set; } = false;
@@ -27,7 +28,7 @@ public class Product : BaseEntity
     public string? MetaDescription { get; set; }
 
     // Navigation properties
-    public Category Category { get; set; } = null!;
+    public ProductCategory ProductCategory { get; set; } = null!;
     public ICollection<ProductVariant> Variants { get; set; } = new List<ProductVariant>();
     public ICollection<ProductFeature> Features { get; set; } = new List<ProductFeature>();
     public ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();

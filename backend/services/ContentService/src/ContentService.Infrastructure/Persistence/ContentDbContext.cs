@@ -13,7 +13,7 @@ public class ContentDbContext : DbContext
     }
 
     // Product related
-    public DbSet<Category> Categories => Set<Category>();
+    public DbSet<ProductCategory> ProductCategories => Set<ProductCategory>();
     public DbSet<Product> Products => Set<Product>();
     public DbSet<ProductVariant> ProductVariants => Set<ProductVariant>();
     public DbSet<ProductFeature> ProductFeatures => Set<ProductFeature>();
@@ -70,9 +70,10 @@ public class ContentDbContext : DbContext
             }
         }
 
-        // Category configuration
-        modelBuilder.Entity<Category>(entity =>
+        // ProductCategory configuration
+        modelBuilder.Entity<ProductCategory>(entity =>
         {
+            entity.ToTable("product_categories");
             entity.HasIndex(e => e.Slug).IsUnique();
             entity.Property(e => e.Name).HasMaxLength(100).IsRequired();
             entity.Property(e => e.Slug).HasMaxLength(100).IsRequired();
@@ -98,9 +99,9 @@ public class ContentDbContext : DbContext
             entity.Property(e => e.MetaTitle).HasMaxLength(100);
             entity.Property(e => e.MetaDescription).HasMaxLength(300);
 
-            entity.HasOne(e => e.Category)
+            entity.HasOne(e => e.ProductCategory)
                 .WithMany(e => e.Products)
-                .HasForeignKey(e => e.CategoryId)
+                .HasForeignKey(e => e.ProductCategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
 
@@ -134,7 +135,6 @@ public class ContentDbContext : DbContext
         // ProductImage configuration
         modelBuilder.Entity<ProductImage>(entity =>
         {
-            entity.Property(e => e.Url).HasMaxLength(500).IsRequired();
             entity.Property(e => e.AltText).HasMaxLength(200);
 
             entity.HasOne(e => e.Product)
@@ -268,7 +268,7 @@ public class ContentDbContext : DbContext
         });
 
         // Global query filter for soft delete
-        modelBuilder.Entity<Category>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<ProductCategory>().HasQueryFilter(e => !e.IsDeleted);
         modelBuilder.Entity<Product>().HasQueryFilter(e => !e.IsDeleted);
         modelBuilder.Entity<ProductVariant>().HasQueryFilter(e => !e.IsDeleted);
         modelBuilder.Entity<ProductFeature>().HasQueryFilter(e => !e.IsDeleted);

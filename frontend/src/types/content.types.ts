@@ -1,55 +1,73 @@
 /**
  * Content Service Types - Matching ContentService Backend DTOs
  * Following Clean Architecture standards
+ *
+ * UPDATED: 2025-11-30
+ * - Renamed Category → ProductCategory
+ * - Removed all imageUrl fields (upload only via imageBase64)
  */
 
 // ============================================
-// Category DTOs
+// Product Category DTOs (renamed from Category)
 // ============================================
 
-export interface CreateCategoryRequestDto {
+export interface CreateProductCategoryRequestDto {
   name: string;
   slug: string;
   description?: string;
   icon?: string;
-  imageUrl?: string;
+  imageBase64?: string;
+  imageContentType?: string;
   displayOrder?: number;
   isActive?: boolean;
   parentId?: string;
 }
 
-export interface UpdateCategoryRequestDto {
+export interface UpdateProductCategoryRequestDto {
   name: string;
   slug: string;
   description?: string;
   icon?: string;
-  imageUrl?: string;
+  imageBase64?: string;
+  imageContentType?: string;
   displayOrder: number;
   isActive: boolean;
   parentId?: string;
 }
 
-export interface CategoryResponseDto {
+export interface ProductCategoryResponseDto {
   id: string;
   name: string;
   slug: string;
   description?: string;
   icon?: string;
-  imageUrl?: string;
+  imageBase64?: string;
+  imageContentType?: string;
   displayOrder: number;
   isActive: boolean;
   productCount: number;
 }
 
-export interface PublicCategoryResponseDto {
+export interface PublicProductCategoryResponseDto {
   id: string;
   name: string;
   slug: string;
   description?: string;
   icon?: string;
-  imageUrl?: string;
+  imageBase64?: string;
+  imageContentType?: string;
   productCount: number;
 }
+
+// Legacy aliases for backward compatibility
+/** @deprecated Use ProductCategoryResponseDto instead */
+export type CategoryResponseDto = ProductCategoryResponseDto;
+/** @deprecated Use CreateProductCategoryRequestDto instead */
+export type CreateCategoryRequestDto = CreateProductCategoryRequestDto;
+/** @deprecated Use UpdateProductCategoryRequestDto instead */
+export type UpdateCategoryRequestDto = UpdateProductCategoryRequestDto;
+/** @deprecated Use PublicProductCategoryResponseDto instead */
+export type PublicCategoryResponseDto = PublicProductCategoryResponseDto;
 
 // ============================================
 // Content Product DTOs (ContentService - different from ProductService)
@@ -60,7 +78,7 @@ export interface CreateContentProductRequestDto {
   slug: string;
   shortDescription: string;
   fullDescription?: string;
-  categoryId: string;
+  productCategoryId: string;
   basePrice: number;
   discountedPrice?: number;
   isFeatured: boolean;
@@ -79,7 +97,7 @@ export interface UpdateContentProductRequestDto {
   slug: string;
   shortDescription: string;
   fullDescription?: string;
-  categoryId: string;
+  productCategoryId: string;
   basePrice: number;
   discountedPrice?: number;
   isFeatured: boolean;
@@ -111,7 +129,8 @@ export interface UpdateVariantRequestDto {
 }
 
 export interface CreateProductImageRequestDto {
-  url: string;
+  imageBase64?: string;
+  imageContentType?: string;
   altText?: string;
 }
 
@@ -128,7 +147,8 @@ export interface ProductVariantDto {
 
 export interface ProductImageDto {
   id: string;
-  url: string;
+  imageBase64?: string;
+  imageContentType?: string;
   altText?: string;
   isPrimary: boolean;
 }
@@ -139,8 +159,8 @@ export interface ContentProductResponseDto {
   slug: string;
   shortDescription: string;
   fullDescription?: string;
-  categoryId: string;
-  categoryName?: string;
+  productCategoryId: string;
+  productCategoryName?: string;
   basePrice: number;
   discountedPrice?: number;
   isFeatured: boolean;
@@ -149,7 +169,8 @@ export interface ContentProductResponseDto {
   seasonEnd?: string;
   metaTitle?: string;
   metaDescription?: string;
-  primaryImageUrl?: string;
+  primaryImageBase64?: string;
+  primaryImageContentType?: string;
   variants: ProductVariantDto[];
   features: string[];
   images: ProductImageDto[];
@@ -160,12 +181,13 @@ export interface ProductListResponseDto {
   name: string;
   slug: string;
   shortDescription: string;
-  categoryName?: string;
+  productCategoryName?: string;
   basePrice: number;
   discountedPrice?: number;
   isFeatured: boolean;
   isAvailable: boolean;
-  primaryImageUrl?: string;
+  primaryImageBase64?: string;
+  primaryImageContentType?: string;
 }
 
 export interface PublicProductResponseDto {
@@ -174,13 +196,14 @@ export interface PublicProductResponseDto {
   slug: string;
   shortDescription: string;
   fullDescription?: string;
-  categoryName?: string;
-  categorySlug?: string;
+  productCategoryName?: string;
+  productCategorySlug?: string;
   basePrice: number;
   discountedPrice?: number;
   seasonStart?: string;
   seasonEnd?: string;
-  primaryImageUrl?: string;
+  primaryImageBase64?: string;
+  primaryImageContentType?: string;
   variants: ProductVariantDto[];
   features: string[];
   images: ProductImageDto[];
@@ -194,7 +217,8 @@ export interface CreateTestimonialRequestDto {
   customerName: string;
   customerTitle?: string;
   customerLocation?: string;
-  customerImageUrl?: string;
+  customerImageBase64?: string;
+  customerImageContentType?: string;
   content: string;
   rating?: number;
   productPurchased?: string;
@@ -207,7 +231,8 @@ export interface UpdateTestimonialRequestDto {
   customerName: string;
   customerTitle?: string;
   customerLocation?: string;
-  customerImageUrl?: string;
+  customerImageBase64?: string;
+  customerImageContentType?: string;
   content: string;
   rating: number;
   productPurchased?: string;
@@ -221,7 +246,8 @@ export interface TestimonialResponseDto {
   customerName: string;
   customerTitle?: string;
   customerLocation?: string;
-  customerImageUrl?: string;
+  customerImageBase64?: string;
+  customerImageContentType?: string;
   content: string;
   rating: number;
   productPurchased?: string;
@@ -235,7 +261,8 @@ export interface PublicTestimonialResponseDto {
   customerName: string;
   customerTitle?: string;
   customerLocation?: string;
-  customerImageUrl?: string;
+  customerImageBase64?: string;
+  customerImageContentType?: string;
   content: string;
   rating: number;
   productPurchased?: string;
@@ -291,7 +318,8 @@ export interface CreateHeroSlideRequestDto {
   title: string;
   subtitle?: string;
   description?: string;
-  imageUrl?: string;
+  imageBase64?: string;
+  imageContentType?: string;
   gradientStart?: string;
   gradientEnd?: string;
   ctaText?: string;
@@ -305,7 +333,8 @@ export interface UpdateHeroSlideRequestDto {
   title: string;
   subtitle?: string;
   description?: string;
-  imageUrl?: string;
+  imageBase64?: string;
+  imageContentType?: string;
   gradientStart?: string;
   gradientEnd?: string;
   ctaText?: string;
@@ -319,7 +348,8 @@ export interface HeroSlideResponseDto {
   title: string;
   subtitle?: string;
   description?: string;
-  imageUrl?: string;
+  imageBase64?: string;
+  imageContentType?: string;
   gradientStart?: string;
   gradientEnd?: string;
   ctaText?: string;
@@ -334,7 +364,8 @@ export interface PublicHeroSlideResponseDto {
   title: string;
   subtitle?: string;
   description?: string;
-  imageUrl?: string;
+  imageBase64?: string;
+  imageContentType?: string;
   gradientStart?: string;
   gradientEnd?: string;
   ctaText?: string;
@@ -412,7 +443,8 @@ export interface CreateCompanyStorySectionRequestDto {
   title: string;
   subtitle?: string;
   content: string;
-  imageUrl?: string;
+  imageBase64?: string;
+  imageContentType?: string;
   displayOrder: number;
   isActive?: boolean;
   items?: CreateCompanyStoryItemRequestDto[];
@@ -423,7 +455,8 @@ export interface UpdateCompanyStorySectionRequestDto {
   title: string;
   subtitle?: string;
   content: string;
-  imageUrl?: string;
+  imageBase64?: string;
+  imageContentType?: string;
   displayOrder: number;
   isActive: boolean;
 }
@@ -444,9 +477,12 @@ export interface CompanyStoryItemDto {
 
 export interface CompanyStorySectionResponseDto {
   id: string;
+  sectionType: string;
   title: string;
   subtitle?: string;
-  imageUrl?: string;
+  content: string;
+  imageBase64?: string;
+  imageContentType?: string;
   displayOrder: number;
   isActive: boolean;
   items: CompanyStoryItemDto[];
@@ -571,7 +607,6 @@ export interface CreateContentBlockRequestDto {
   title?: string;
   subtitle?: string;
   content?: string;
-  imageUrl?: string;
   linkUrl?: string;
   linkText?: string;
   displayOrder: number;
@@ -582,7 +617,6 @@ export interface UpdateContentBlockRequestDto {
   title?: string;
   subtitle?: string;
   content?: string;
-  imageUrl?: string;
   linkUrl?: string;
   linkText?: string;
   displayOrder: number;
@@ -597,7 +631,6 @@ export interface ContentBlockResponseDto {
   title?: string;
   subtitle?: string;
   content?: string;
-  imageUrl?: string;
   linkUrl?: string;
   linkText?: string;
   displayOrder: number;
@@ -615,8 +648,8 @@ export interface ContentQueryParams {
 }
 
 export interface ProductContentQueryParams extends ContentQueryParams {
-  categoryId?: string;
-  categorySlug?: string;
+  productCategoryId?: string;
+  productCategorySlug?: string;
   isFeatured?: boolean;
   isAvailable?: boolean;
 }

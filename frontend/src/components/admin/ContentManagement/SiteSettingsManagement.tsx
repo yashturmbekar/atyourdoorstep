@@ -4,13 +4,11 @@
  */
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import {
   FiPlus,
   FiEdit3,
   FiTrash2,
   FiSettings,
-  FiArrowLeft,
   FiCheck,
   FiSearch,
 } from 'react-icons/fi';
@@ -21,7 +19,15 @@ import type {
   CreateSiteSettingRequestDto,
   UpdateSiteSettingRequestDto,
 } from '../../../types/content.types';
+import { Breadcrumb, EmptyState } from '../ui';
 import './ContentManagement.css';
+
+// Breadcrumb items for navigation
+const breadcrumbItems = [
+  { label: 'Dashboard', href: '/admin' },
+  { label: 'Content', href: '/admin/content' },
+  { label: 'Site Settings', href: '/admin/content/site-settings' },
+];
 
 interface SettingFormData {
   key: string;
@@ -179,19 +185,14 @@ const SiteSettingsManagement: React.FC = () => {
     return (
       <div className="content-management">
         <div className="page-header">
-          <Link to="/admin/content" className="btn btn-ghost">
-            <FiArrowLeft />
-            Back to Content
-          </Link>
+          <Breadcrumb items={breadcrumbItems} />
           <h1 className="page-title">Site Settings</h1>
         </div>
-        <div className="empty-state">
-          <div className="empty-state-title">Error loading settings</div>
-          <p className="empty-state-description">
-            There was an error loading the site settings. Please try again
-            later.
-          </p>
-        </div>
+        <EmptyState
+          icon={<FiSettings />}
+          title="Error loading settings"
+          description="There was an error loading the site settings. Please try again later."
+        />
       </div>
     );
   }
@@ -199,10 +200,7 @@ const SiteSettingsManagement: React.FC = () => {
   return (
     <div className="content-management">
       <div className="page-header">
-        <Link to="/admin/content" className="btn btn-ghost">
-          <FiArrowLeft />
-          Back to Content
-        </Link>
+        <Breadcrumb items={breadcrumbItems} />
         <h1 className="page-title">Site Settings</h1>
         <p className="page-subtitle">
           Configure general site settings and information

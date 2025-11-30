@@ -6,6 +6,369 @@
 
 ---
 
+## [2025-11-30] — Complete ImageUrl Removal (Upload Only)
+
+### Status: Completed ✅
+
+**Objective:** Remove all `imageUrl` related code from frontend and backend, keeping only the base64 image upload functionality.
+
+**Changes Made:**
+
+**Frontend:**
+
+| File                                                                    | Changes                                                                                                 |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `frontend/src/types/api.types.ts`                                       | Removed `primaryImageUrl` from `ProductResponseDto`, removed `url` from `ProductImageResponseDto`       |
+| `frontend/src/services/adminApi.ts`                                     | Removed `primaryImageUrl` and `url` fallbacks from `mapProductResponse`                                 |
+| `frontend/src/utils/index.ts`                                           | Updated `getImageSrc` to remove `imageUrl` parameter (now takes only base64, contentType, defaultImage) |
+| `frontend/src/components/admin/ProductManagement/ProductManagement.tsx` | Updated to use new 2-parameter `getImageSrc` signature                                                  |
+
+**Backend (OrderService):**
+
+| File                                                        | Changes                                                                       |
+| ----------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| `OrderService.Domain/Entities/Product.cs`                   | Replaced `ImageUrl` with `ImageData` (byte[]) and `ImageContentType` (string) |
+| `OrderService.Application/DTOs/ProductDtos.cs`              | Replaced `ImageUrl` with `ImageBase64` and `ImageContentType` in all DTOs     |
+| `OrderService.Api/Controllers/ProductsController.cs`        | Updated all mappings to use `ImageData`/`ImageBase64` instead of `ImageUrl`   |
+| `OrderService.Infrastructure/Persistence/OrderDbContext.cs` | Changed `ImageUrl` config to `ImageContentType`                               |
+| `OrderService.Application/Validators/ProductValidators.cs`  | Replaced `ImageUrl` validation with `ImageContentType` validation             |
+
+**API Changes:**
+
+Before:
+
+```json
+{
+  "imageUrl": "https://example.com/image.jpg"
+}
+```
+
+After:
+
+```json
+{
+  "imageBase64": "iVBORw0KGgo...",
+  "imageContentType": "image/png"
+}
+```
+
+**getImageSrc Utility Function:**
+
+Before (4 parameters):
+
+```typescript
+getImageSrc(imageBase64, imageContentType, imageUrl, defaultImage);
+```
+
+After (3 parameters):
+
+```typescript
+getImageSrc(imageBase64, imageContentType, defaultImage);
+```
+
+**Database Migration Required:**
+A new migration is needed for OrderService to:
+
+1. Add `image_data` (bytea) column
+2. Add `image_content_type` (varchar 100) column
+3. Drop `image_url` column
+
+**Commands:**
+
+```bash
+# Generate migration for OrderService
+cd backend/services/OrderService/src/OrderService.Infrastructure
+dotnet ef migrations add RemoveImageUrlAddImageData -c OrderDbContext -o Migrations
+
+# Apply migration
+dotnet ef database update -c OrderDbContext
+
+# Rebuild services
+docker-compose up -d --build orderservice
+```
+
+---
+
+## [2025-12-02] — API Fixes: Gateway Routing, Image Upload, OrderStatus Enum
+
+### Status: Completed ✅
+
+**Objective:** Fix broken UI after docker-compose rebuild - Categories 404, Products showing "Uncategorized", /api/orders/status/0 returning 400, and Product edit image upload broken.
+
+**Issues Fixed:**
+
+1. **Gateway routing for ProductCategories (404 error):**
+
+   - Changed route from `categories-route` to `productcategories-route`
+   - Updated path from `/api/categories/{**catch-all}` to `/api/productcategories/{**catch-all}`
+
+2. **Product Image Upload (broken preview):**
+
+   - Frontend was sending `imageBase64` at top level; backend expects `images` array
+   - Updated `createProduct` to send images array with `imageBase64`, `imageContentType`, `altText`
+   - Updated `mapProductResponse` to build data URLs from base64 images
+   - Fixed category dropdown to use `cat.id` instead of `cat.slug` for productCategoryId
+
+3. **Order Status Enum Mismatch (400 error):**
+   - Backend OrderStatus starts at 1 (Pending=1, Confirmed=2, etc.)
+   - Frontend was using 0-based (Pending=0, Confirmed=1, etc.)
+   - Updated all status mappings in frontend to match backend
+
+**Files Modified:**
+
+| File                                                        | Changes                                                                          |
+| ----------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `Gateway/src/appsettings.json`                              | Changed categories-route to productcategories-route                              |
+| `Gateway/src/appsettings.Production.json`                   | Same route change                                                                |
+| `frontend/src/services/adminApi.ts`                         | Fixed image upload (images array), status mappings (1-based), mapProductResponse |
+| `frontend/src/types/api.types.ts`                           | Updated OrderStatus enum to start at 1                                           |
+| `frontend/src/components/admin/ProductForm/ProductForm.tsx` | Changed category dropdown value from slug to id                                  |
+
+**Key Code Changes:**
+
+- `createProduct`: Now sends `images: [{ imageBase64, imageContentType, altText }]` instead of top-level imageBase64
+- `mapOrderStatusToEnum`: Changed to `{ pending: 1, confirmed: 2, processing: 3, shipped: 4, delivered: 5, cancelled: 6 }`
+- `mapOrderResponse`: Changed statusMap to 1-based values
+- `OrderStatus` const: Changed from 0-based to 1-based
+
+**Commands:**
+
+```bash
+# Rebuild Gateway after route change
+docker-compose up -d --build gateway
+
+# Rebuild frontend
+cd frontend && npm run build
+```
+
+**Notes:**
+
+- Backend OrderStatus enum is defined in `OrderService.Domain/Enums/OrderStatus.cs` with values starting at 1
+- ProductForm category dropdown now sends GUID (cat.id) which is required by backend `productCategoryId` field
+
+---
+
+## [2025-12-01] — Image Seeding Infrastructure
+
+### Status: Completed ✅
+
+**Objective:** Create infrastructure to seed images from frontend/public/images into the database during database seeding, replacing the previous ImageUrl approach with actual binary image data.
+
+**Implementation:**
+
+1. Created `ImageSeeder.cs` helper class with:
+
+   - Static dictionaries mapping entity slugs/keys to actual image filenames
+   - `GetSeedImagesPath()` to locate images from multiple possible locations
+   - `GetImage()` and `GetImageByName()` methods to load images as byte arrays
+   - Image caching for performance
+   - Support for Categories, Products, HeroSlides, and CompanyStorySections
+
+2. Updated `ContentDbSeeder.cs` to:
+   - Use ImageSeeder to load images during seeding
+   - Set ImageData and ImageContentType for all Categories (3 categories)
+   - Set ImageData and ImageContentType for all Products (10 products)
+   - Set ImageData and ImageContentType for all HeroSlides (3 slides)
+   - Set ImageData and ImageContentType for all CompanyStorySections (3 sections)
+
+**Files Created:**
+
+| File                                                       | Purpose                                          |
+| ---------------------------------------------------------- | ------------------------------------------------ |
+| `ContentService.Infrastructure/Persistence/ImageSeeder.cs` | Helper class to load seed images from filesystem |
+
+**Files Modified:**
+
+| File                                                           | Changes                                                   |
+| -------------------------------------------------------------- | --------------------------------------------------------- |
+| `ContentService.Infrastructure/Persistence/ContentDbSeeder.cs` | Added image loading and assignment to all seeded entities |
+
+**Image Mappings:**
+
+- **Categories:** alphonso→mangoes-carousel.png, jaggery→jaggery-carousel.png, oil→cold-pressed-oil-carousel.png
+- **Products:** Each product mapped to appropriate carousel/category image
+- **HeroSlides:** alphonso→mangoes-carousel.png, oil→cold-pressed-oil-carousel.png, jaggery→jaggery-carousel.png
+- **CompanyStory:** our_story→ourstory.png, our_spaces→Ourspace.png, our_products→Ourproduct.png
+
+**Build Verification:**
+
+- ✅ Backend (ContentService) builds successfully
+- ✅ Frontend builds successfully
+
+**Notes:**
+
+- Images are loaded from `frontend/public/images/` or `SeedImages/` folder
+- Migration still requires PostgreSQL to be running
+- Run `dotnet ef database update` when database is available
+
+---
+
+## [2025-12-01] — Fix Double Breadcrumbs in Admin Pages
+
+### Status: Completed ✅
+
+**Objective:** Remove redundant navigation (both Breadcrumb component AND "Back to Content" button) and add consistent breadcrumb navigation across all content management pages.
+
+**Problem Identified:**
+
+- CategoryManagement.tsx had both a Breadcrumb component AND a separate "Back to Content" button, causing redundant navigation options
+- Other content management pages had inconsistent navigation (some with "Back to Content" button only, some with no navigation)
+
+**Solution Applied:**
+
+- Removed redundant "Back to Content" buttons when Breadcrumb is present
+- Added consistent Breadcrumb navigation to ALL content management pages
+- Used EmptyState component for error states with appropriate icons
+
+**Files Modified:**
+
+| File                           | Changes                                                                                                                |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| CategoryManagement.tsx         | Removed redundant "Back to Content" button from main return (Breadcrumb already provides this)                         |
+| HeroSlideManagement.tsx        | Added Breadcrumb import, added breadcrumbItems, replaced "Back to Content" with Breadcrumb, used EmptyState for errors |
+| TestimonialManagement.tsx      | Added Breadcrumb import, added breadcrumbItems, replaced "Back to Content" with Breadcrumb, used EmptyState for errors |
+| StatisticsManagement.tsx       | Added Breadcrumb import, added breadcrumbItems, replaced "Back to Content" with Breadcrumb, used EmptyState for errors |
+| SiteSettingsManagement.tsx     | Added Breadcrumb import, added breadcrumbItems, replaced "Back to Content" with Breadcrumb, used EmptyState for errors |
+| UspItemsManagement.tsx         | Added Breadcrumb import, added breadcrumbItems, added page-header structure, used EmptyState for errors                |
+| DeliverySettingsManagement.tsx | Added Breadcrumb import, added breadcrumbItems, added page-header structure, used EmptyState for errors                |
+| ContactManagement.tsx          | Added Breadcrumb import, added breadcrumbItems, added page-header structure, used EmptyState for errors                |
+| CompanyStoryManagement.tsx     | Added Breadcrumb import, added breadcrumbItems, added page-header structure, used EmptyState for errors                |
+
+**Consistent Pattern Applied:**
+
+All content management pages now follow this structure:
+
+```tsx
+// Breadcrumb items for navigation
+const breadcrumbItems = [
+  { label: "Dashboard", href: "/admin" },
+  { label: "Content", href: "/admin/content" },
+  { label: "Page Name", href: "/admin/content/page-slug" },
+];
+
+// In component:
+return (
+  <div className="content-management">
+    <div className="page-header">
+      <Breadcrumb items={breadcrumbItems} />
+      <h1 className="page-title">Page Name</h1>
+      <p className="page-subtitle">Page description</p>
+    </div>
+    {/* ... content ... */}
+  </div>
+);
+```
+
+**Build Status:**
+
+- ✅ Frontend: Build succeeded
+
+---
+
+## [2025-12-XX] — Image Byte Data Storage Migration - Frontend Integration Complete
+
+### Status: Completed ✅
+
+**Summary:**
+Completed full frontend integration for image byte data storage. Updated all admin management components to support both file upload and URL input for images, with proper base64 handling and display using the `getImageSrc` utility.
+
+**Frontend Components Updated:**
+
+1. **ProductManagement.tsx** - Updated image display to use `getImageSrc` helper for product and category images
+2. **CategoryManagement.tsx** - Added file upload support with base64 conversion, image preview, and updated table display
+3. **HeroSlideManagement.tsx** - Added file upload support for background images, toast notifications, and wrapped with ToastProvider
+4. **TestimonialManagement.tsx** - Added file upload support for customer photos, toast notifications, and wrapped with ToastProvider
+5. **content.types.ts** - Fixed missing fields in `CompanyStorySectionResponseDto` (sectionType, content)
+
+**Frontend Type Fixes:**
+
+- `types/index.ts` - Added `primaryImageBase64` and `primaryImageContentType` to Product interface
+- `types/index.ts` - Extended AdminUser role to include 'manager' and 'user'
+- `types/index.ts` - Extended AdminPermission module to include 'content'
+
+**Additional TypeScript Fixes:**
+
+- `AdminDashboard.tsx` - Changed Badge variant from 'error' to 'danger' (matching BadgeVariant type)
+- `Analytics.tsx` - Removed unused imports (AdminStats, queries)
+- `ProductForm.tsx` - Removed unused import (FiAlertCircle)
+- `adminApi.ts` - Removed unused import (UpdateProductRequestDto)
+
+**CSS Updates:**
+
+- `ContentManagement.css` - Added image upload section styles (.image-upload-section, .image-upload-input, .image-preview-container, .btn-sm)
+
+**Build Status:**
+
+- ✅ Backend: Build succeeded with 0 warnings, 0 errors
+- ✅ Frontend: Build succeeded (TypeScript compilation + Vite build)
+
+---
+
+## [2025-11-XX] — Image Byte Data Storage Migration - Backend Complete
+
+### Status: Completed ✅
+
+**Summary:**
+Migrated image storage from physical file URLs to byte data stored directly in the database. Added ImageData (byte[]) and ImageContentType (string) columns to all entities that store images.
+
+**Entities Updated:**
+
+1. **Category** - Added ImageData, ImageContentType
+2. **Product** - Added ImageData, ImageContentType
+3. **ProductImage** - Added ImageData, ImageContentType
+4. **HeroSlide** - Added ImageData, ImageContentType
+5. **Testimonial** - Added CustomerImageData, CustomerImageContentType
+6. **CompanyStorySection** - Added ImageData, ImageContentType
+
+**Backend Changes:**
+
+- `ContentService.Domain/Entities/` - All 6 entity files updated with new nullable byte[] and string fields
+- `ContentService.Application/DTOs/ContentDtos.cs` - All DTOs updated with ImageBase64/ImageContentType fields
+- `ContentService.API/Controllers/`:
+  - `CategoriesController.cs` - Handle base64 conversion on create/update, return base64 in response
+  - `ProductsController.cs` - Handle product image base64 conversion
+  - `TestimonialsController.cs` - Handle customer image base64 conversion
+  - `HeroSlidesController.cs` - Handle hero slide image base64 conversion
+  - `CompanyStoryController.cs` - Handle company story image base64 conversion
+
+**Migration Created:**
+
+- `ContentService.Infrastructure/Persistence/Migrations/XXXXXXXX_AddImageByteData.cs`
+
+**Frontend Changes:**
+
+- `frontend/src/types/content.types.ts` - All TypeScript interfaces updated with imageBase64/imageContentType fields
+- `frontend/src/utils/index.ts` - Added image utility functions:
+  - `fileToBase64()` - Convert File to base64 string
+  - `getImageSrc()` - Get image source from base64 or URL (prioritizes base64)
+  - `isBase64Image()` - Check if source is base64 data URL
+  - `isValidImageType()` - Validate image MIME type
+  - `isValidImageSize()` - Validate image file size
+  - `processImageForUpload()` - Validate and convert image for upload
+
+**API Contract Changes:**
+
+- All image-related endpoints now accept `imageBase64` and `imageContentType` in request body
+- All image-related responses now include `imageBase64` and `imageContentType` fields
+- Frontend should use `getImageSrc()` utility to display images
+
+**Commands:**
+
+```bash
+# Apply migration
+cd backend/services/ContentService/src/ContentService.Infrastructure
+dotnet ef database update --startup-project ../ContentService.API --context ContentDbContext
+```
+
+**Notes:**
+
+- Legacy `imageUrl` fields are preserved for backward compatibility
+- API prioritizes base64 data when available
+- Frontend should use `getImageSrc(imageBase64, imageContentType, imageUrl)` for display
+- Image conversion to base64 should be done client-side before upload
+
+---
+
 ## [2025-11-29] — Admin Panel UI Bug Fixes
 
 ### Status: Completed
@@ -2205,6 +2568,220 @@ Response: ✅ 200 OK with JWT tokens
 - Removed unused imports
 
 **Build Status:** ✅ SUCCESS - No TypeScript errors
+
+---
+
+## [2025-11-30] — Category→ProductCategory Rename & ImageUrl Removal - COMPLETED ✅
+
+### Status: Completed
+
+**Objective:**
+
+1. Rename `Category` to `ProductCategory` throughout the entire codebase (backend + database)
+2. Remove all `ImageUrl` fields - use `ImageData`/`ImageBase64` only (upload only)
+
+**Backend Entity Renames:**
+
+| Old Name                       | New Name                              | File                                              |
+| ------------------------------ | ------------------------------------- | ------------------------------------------------- |
+| Category                       | ProductCategory                       | ContentService.Domain/Entities/ProductCategory.cs |
+| Categories (DbSet)             | ProductCategories                     | ContentDbContext.cs                               |
+| ICategoryRepository            | IProductCategoryRepository            | IContentRepositories.cs                           |
+| CategoryRepository             | ProductCategoryRepository             | ContentRepositories.cs                            |
+| CategoryDto                    | ProductCategoryDto                    | ContentDtos.cs                                    |
+| CreateCategoryRequest          | CreateProductCategoryRequest          | ContentDtos.cs                                    |
+| UpdateCategoryRequest          | UpdateProductCategoryRequest          | ContentDtos.cs                                    |
+| CategoryResponse               | ProductCategoryResponse               | ContentDtos.cs                                    |
+| CreateCategoryRequestValidator | CreateProductCategoryRequestValidator | ContentValidators.cs                              |
+
+**ImageUrl Fields Removed:**
+
+| Entity              | Field Removed    |
+| ------------------- | ---------------- |
+| ProductCategory     | ImageUrl         |
+| Product             | ImageUrl         |
+| ProductImage        | Url              |
+| HeroSlide           | ImageUrl         |
+| Testimonial         | CustomerImageUrl |
+| CompanyStorySection | ImageUrl         |
+
+**Controllers Updated:**
+
+1. **ProductCategoriesController.cs** - Already renamed, uses ImageBase64 only
+2. **ProductsController.cs** - Updated Category→ProductCategory, CategoryId→ProductCategoryId, removed Url from ProductImage mapping
+3. **HeroSlidesController.cs** - Removed ImageUrl from create/update/mapping
+4. **TestimonialsController.cs** - Removed CustomerImageUrl from create/update/mapping
+5. **CompanyStoryController.cs** - Removed ImageUrl from create/update/mapping (6 locations)
+
+**DTOs Updated (ContentDtos.cs):**
+
+- ProductCategoryDto - no ImageUrl, has ImageBase64/ImageContentType
+- ProductDto - has ProductCategoryId, ProductCategoryName (not CategoryId, CategoryName)
+- ProductImageDto - no Url, only ImageBase64/ImageContentType
+- CreateProductImageRequest - no Url, only ImageBase64/ImageContentType
+
+**Program.cs DI Updated:**
+
+```csharp
+// Old
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+// New
+builder.Services.AddScoped<IProductCategoryRepository, ProductCategoryRepository>();
+```
+
+**Database Migration Created:**
+
+`20251130043908_RenameToProductCategory.cs`
+
+**Migration Operations:**
+
+1. Rename table `categories` → `product_categories` (using RenameTable to preserve data)
+2. Rename column `category_id` → `product_category_id` in products
+3. Rename all indexes and foreign keys
+4. Drop `image_url` from `product_categories`
+5. Drop `customer_image_url` from `testimonials`
+6. Drop `image_url` from `products`
+7. Drop `url` from `product_images`
+8. Drop `image_url` from `hero_slides`
+9. Drop `image_url` from `company_story_sections`
+
+**Seeder Updated (ContentDbSeeder.cs):**
+
+```csharp
+// Old
+new Category { CategoryId = ..., ImageUrl = "..." }
+
+// New
+new ProductCategory { ProductCategoryId = ... } // No ImageUrl
+```
+
+**Build Status:** ✅ SUCCESS with 3 warnings (nullable reference)
+
+**Files Modified:**
+
+- ContentRepositories.cs
+- Program.cs
+- ContentValidators.cs
+- ProductsController.cs
+- ContentDtos.cs
+- Category.cs (DELETED - was duplicate)
+- ContentDbSeeder.cs
+- HeroSlidesController.cs
+- TestimonialsController.cs
+- CompanyStoryController.cs
+- 20251130043908_RenameToProductCategory.cs
+
+**Commands to Apply:**
+
+```powershell
+# Apply migration
+cd backend/services/ContentService/src/ContentService.Infrastructure
+dotnet ef database update --startup-project "../ContentService.API"
+```
+
+---
+
+## [2025-11-30] — Frontend ImageUrl Removal & Type Updates - COMPLETED ✅
+
+### Status: Completed
+
+**Objective:** Complete frontend updates to remove all `imageUrl` references and rename `Category` to `ProductCategory` types.
+
+**Frontend Type Updates (content.types.ts):**
+
+Already completed in previous session:
+
+- All `Category` types renamed to `ProductCategory`
+- Removed all `imageUrl` fields from interfaces
+- Using `imageBase64` + `imageContentType` only
+- Legacy aliases added for backward compatibility
+
+**Frontend Service Updates (contentService.ts):**
+
+- `categoryId` → `productCategoryId` in query params
+
+**Frontend Component Fixes (10 components):**
+
+| Component                  | Changes Made                                                                |
+| -------------------------- | --------------------------------------------------------------------------- |
+| CategoryManagement.tsx     | Removed `imageUrl` from form, requests, table. Upload only now.             |
+| HeroSlideManagement.tsx    | Removed `imageUrl` from form, requests, preview. Upload only now.           |
+| TestimonialManagement.tsx  | Removed `customerImageUrl` from form, requests, table. Upload only.         |
+| CompanyStoryManagement.tsx | Added `getImageSrc` import, `handleImageUpload`, `clearImage`. Upload only. |
+| ProductManagement.tsx      | Updated `getImageSrc` call to not use `imageUrl`.                           |
+| Services.tsx               | Added `getImageSrc` import, updated category/product image mapping.         |
+| Hero.tsx                   | Added `getImageSrc` import, updated slide image mapping.                    |
+| Testimonials.tsx           | Added `getImageSrc` import, updated customer image mapping.                 |
+| CategoryProductCatalog.tsx | Added `getImageSrc` import, updated product image mapping.                  |
+| OrderPage.tsx              | Added `getImageSrc` import, updated category/product image mapping.         |
+
+**Property Renames in Components:**
+
+| Old Property     | New Property        | Components Affected                                     |
+| ---------------- | ------------------- | ------------------------------------------------------- |
+| categorySlug     | productCategorySlug | Services.tsx, CategoryProductCatalog.tsx, OrderPage.tsx |
+| primaryImageUrl  | primaryImageBase64  | Services.tsx, CategoryProductCatalog.tsx, OrderPage.tsx |
+| imageUrl         | (removed)           | All 10 components                                       |
+| customerImageUrl | customerImageBase64 | TestimonialManagement.tsx, Testimonials.tsx             |
+
+**getImageSrc Helper Usage:**
+
+All components now use the `getImageSrc(base64, contentType)` utility from `utils/index.ts` which:
+
+- Returns base64 data URL if base64 data exists
+- Returns fallback placeholder if no image data
+- No longer accepts `imageUrl` parameter
+
+**Build Status:**
+
+- ✅ Backend: Build succeeded with 3 warnings (nullable reference)
+- ✅ Frontend: Build succeeded (TypeScript compilation + Vite build)
+
+**Files Modified:**
+
+```
+Frontend:
+├── src/components/admin/ContentManagement/
+│   ├── CategoryManagement.tsx      ✅ Fixed
+│   ├── HeroSlideManagement.tsx     ✅ Fixed
+│   ├── TestimonialManagement.tsx   ✅ Fixed
+│   └── CompanyStoryManagement.tsx  ✅ Fixed (added upload capability)
+├── src/components/admin/ProductManagement/
+│   └── ProductManagement.tsx       ✅ Fixed
+├── src/components/common/
+│   ├── Hero/Hero.tsx               ✅ Fixed
+│   ├── Services/Services.tsx       ✅ Fixed
+│   ├── Testimonials/Testimonials.tsx ✅ Fixed
+│   └── CategoryProductCatalog/CategoryProductCatalog.tsx ✅ Fixed
+└── src/pages/
+    └── OrderPage.tsx               ✅ Fixed
+```
+
+**Summary of Changes:**
+
+1. **Admin Management Components:**
+
+   - All now have upload-only image fields (no URL input)
+   - Forms use `imageBase64`/`imageContentType` instead of `imageUrl`
+   - Image preview shows from base64 data
+   - Clear image button removes base64 data
+
+2. **Public Display Components:**
+
+   - All use `getImageSrc()` utility for image display
+   - Fall back to placeholder images if no base64 data
+   - Property names aligned with backend DTOs
+
+3. **Type Safety:**
+   - All TypeScript errors resolved
+   - Builds successfully without imageUrl references
+
+**Next Steps:**
+
+- Apply database migration
+- Fix double breadcrumbs
+- Seed images from frontend/public to database
 
 ---
 

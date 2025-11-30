@@ -183,6 +183,50 @@
   margin-top: 0.25rem;
 }
 
+/* Image Upload Section */
+.image-upload-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.image-upload-input {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.image-upload-input .form-input {
+  flex: 1;
+  min-width: 200px;
+}
+
+.image-preview-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.image-preview {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid var(--admin-border, #e2e8f0);
+}
+
+.image-preview.large {
+  width: 120px;
+  height: 80px;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+
 .form-row {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

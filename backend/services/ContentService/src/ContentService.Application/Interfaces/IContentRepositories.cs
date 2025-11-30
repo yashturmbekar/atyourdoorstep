@@ -4,16 +4,19 @@ using Shared.Application.Interfaces;
 namespace ContentService.Application.Interfaces;
 
 /// <summary>
-/// Repository interface for Category entity
+/// Repository interface for ProductCategory entity
 /// </summary>
-public interface ICategoryRepository : IRepository<Category>
+public interface IProductCategoryRepository : IRepository<ProductCategory>
 {
-    Task<Category?> GetBySlugAsync(string slug, CancellationToken cancellationToken = default);
-    Task<IEnumerable<Category>> GetActiveAsync(CancellationToken cancellationToken = default);
-    Task<IEnumerable<Category>> GetWithProductCountAsync(CancellationToken cancellationToken = default);
+    Task<ProductCategory?> GetBySlugAsync(string slug, CancellationToken cancellationToken = default);
+    Task<IEnumerable<ProductCategory>> GetActiveAsync(CancellationToken cancellationToken = default);
+    Task<IEnumerable<ProductCategory>> GetWithProductCountAsync(CancellationToken cancellationToken = default);
     Task<bool> SlugExistsAsync(string slug, Guid? excludeId = null, CancellationToken cancellationToken = default);
     Task SaveChangesAsync(CancellationToken cancellationToken = default);
 }
+
+// Legacy alias for backward compatibility
+public interface ICategoryRepository : IProductCategoryRepository { }
 
 /// <summary>
 /// Repository interface for Product entity
@@ -24,8 +27,8 @@ public interface IProductRepository : IRepository<Product>
     Task<Product?> GetWithDetailsAsync(Guid id, CancellationToken cancellationToken = default);
     Task<Product?> GetByIdWithDetailsAsync(Guid id, CancellationToken cancellationToken = default);
     Task<(IEnumerable<Product> Products, int Total)> GetPagedWithDetailsAsync(int page, int pageSize, string? categorySlug = null, bool? isFeatured = null, CancellationToken cancellationToken = default);
-    Task<IEnumerable<Product>> GetByCategoryAsync(Guid categoryId, CancellationToken cancellationToken = default);
-    Task<IEnumerable<Product>> GetByCategorySlugAsync(string categorySlug, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Product>> GetByProductCategoryAsync(Guid productCategoryId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Product>> GetByProductCategorySlugAsync(string productCategorySlug, CancellationToken cancellationToken = default);
     Task<IEnumerable<Product>> GetFeaturedAsync(CancellationToken cancellationToken = default);
     Task<IEnumerable<Product>> GetFeaturedProductsAsync(CancellationToken cancellationToken = default);
     Task<IEnumerable<Product>> GetAvailableAsync(CancellationToken cancellationToken = default);

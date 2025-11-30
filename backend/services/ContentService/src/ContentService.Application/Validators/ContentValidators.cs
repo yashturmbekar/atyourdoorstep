@@ -3,19 +3,19 @@ using ContentService.Application.DTOs;
 
 namespace ContentService.Application.Validators;
 
-#region Category Validators
+#region ProductCategory Validators
 
-public class CreateCategoryRequestValidator : AbstractValidator<CreateCategoryRequest>
+public class CreateProductCategoryRequestValidator : AbstractValidator<CreateProductCategoryRequest>
 {
-    public CreateCategoryRequestValidator()
+    public CreateProductCategoryRequestValidator()
     {
         RuleFor(x => x.Name)
-            .NotEmpty().WithMessage("Category name is required")
-            .MaximumLength(100).WithMessage("Category name cannot exceed 100 characters");
+            .NotEmpty().WithMessage("Product category name is required")
+            .MaximumLength(100).WithMessage("Product category name cannot exceed 100 characters");
 
         RuleFor(x => x.Slug)
-            .NotEmpty().WithMessage("Category slug is required")
-            .MaximumLength(100).WithMessage("Category slug cannot exceed 100 characters")
+            .NotEmpty().WithMessage("Product category slug is required")
+            .MaximumLength(100).WithMessage("Product category slug cannot exceed 100 characters")
             .Matches(@"^[a-z0-9]+(?:-[a-z0-9]+)*$").WithMessage("Slug must be URL-friendly (lowercase, hyphens, no spaces)");
 
         RuleFor(x => x.Description)
@@ -29,17 +29,17 @@ public class CreateCategoryRequestValidator : AbstractValidator<CreateCategoryRe
     }
 }
 
-public class UpdateCategoryRequestValidator : AbstractValidator<UpdateCategoryRequest>
+public class UpdateProductCategoryRequestValidator : AbstractValidator<UpdateProductCategoryRequest>
 {
-    public UpdateCategoryRequestValidator()
+    public UpdateProductCategoryRequestValidator()
     {
         RuleFor(x => x.Name)
-            .NotEmpty().WithMessage("Category name is required")
-            .MaximumLength(100).WithMessage("Category name cannot exceed 100 characters");
+            .NotEmpty().WithMessage("Product category name is required")
+            .MaximumLength(100).WithMessage("Product category name cannot exceed 100 characters");
 
         RuleFor(x => x.Slug)
-            .NotEmpty().WithMessage("Category slug is required")
-            .MaximumLength(100).WithMessage("Category slug cannot exceed 100 characters")
+            .NotEmpty().WithMessage("Product category slug is required")
+            .MaximumLength(100).WithMessage("Product category slug cannot exceed 100 characters")
             .Matches(@"^[a-z0-9]+(?:-[a-z0-9]+)*$").WithMessage("Slug must be URL-friendly");
 
         RuleFor(x => x.DisplayOrder)
@@ -71,8 +71,8 @@ public class CreateProductRequestValidator : AbstractValidator<CreateProductRequ
         RuleFor(x => x.FullDescription)
             .MaximumLength(5000).WithMessage("Full description cannot exceed 5000 characters");
 
-        RuleFor(x => x.CategoryId)
-            .NotEmpty().WithMessage("Category is required");
+        RuleFor(x => x.ProductCategoryId)
+            .NotEmpty().WithMessage("Product category is required");
 
         RuleFor(x => x.BasePrice)
             .GreaterThan(0).WithMessage("Base price must be greater than 0");
@@ -127,8 +127,8 @@ public class UpdateProductRequestValidator : AbstractValidator<UpdateProductRequ
             .NotEmpty().WithMessage("Short description is required")
             .MaximumLength(500).WithMessage("Short description cannot exceed 500 characters");
 
-        RuleFor(x => x.CategoryId)
-            .NotEmpty().WithMessage("Category is required");
+        RuleFor(x => x.ProductCategoryId)
+            .NotEmpty().WithMessage("Product category is required");
 
         RuleFor(x => x.BasePrice)
             .GreaterThan(0).WithMessage("Base price must be greater than 0");

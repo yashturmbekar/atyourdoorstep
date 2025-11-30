@@ -8,6 +8,7 @@ import {
   useActiveCategories,
   useFeaturedProducts,
 } from '../../../hooks/useContent';
+import { getImageSrc } from '../../../utils';
 import './Services.css';
 
 interface ProductDisplay {
@@ -134,7 +135,9 @@ export const Services: React.FC = () => {
         .slice(0, 3) // Show top 3 categories
         .map(category => ({
           id: category.id,
-          image: category.imageUrl || '/images/placeholder.png',
+          image:
+            getImageSrc(category.imageBase64, category.imageContentType) ||
+            '/images/placeholder.png',
           title: category.name,
           description: category.description || '',
           features: [], // Categories may not have features
@@ -152,7 +155,11 @@ export const Services: React.FC = () => {
     ) {
       return featuredProductsResponse.data.slice(0, 3).map(product => ({
         id: product.id,
-        image: product.primaryImageUrl || '/images/placeholder.png',
+        image:
+          getImageSrc(
+            product.primaryImageBase64,
+            product.primaryImageContentType
+          ) || '/images/placeholder.png',
         title: product.name,
         description: product.shortDescription || product.fullDescription || '',
         features: product.features || [],
@@ -165,7 +172,7 @@ export const Services: React.FC = () => {
           product.seasonStart,
           product.seasonEnd
         ),
-        categorySlug: product.categorySlug || 'products',
+        categorySlug: product.productCategorySlug || 'products',
       }));
     }
 

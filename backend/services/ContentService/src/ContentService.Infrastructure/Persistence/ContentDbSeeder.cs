@@ -9,10 +9,23 @@ namespace ContentService.Infrastructure.Persistence;
 /// </summary>
 public static class ContentDbSeeder
 {
+    private static string? _seedImagesPath;
+
     public static async Task SeedAsync(ContentDbContext context)
     {
         // Ensure database is created
         await context.Database.MigrateAsync();
+
+        // Try to find seed images path
+        _seedImagesPath = ImageSeeder.GetSeedImagesPath();
+        if (_seedImagesPath != null)
+        {
+            Console.WriteLine($"[Seeder] Found seed images at: {_seedImagesPath}");
+        }
+        else
+        {
+            Console.WriteLine("[Seeder] Warning: Seed images path not found. Seeding without images.");
+        }
 
         // Seed in order of dependencies
         await SeedCategoriesAsync(context);
@@ -27,13 +40,32 @@ public static class ContentDbSeeder
         await SeedDeliverySettingsAsync(context);
 
         await context.SaveChangesAsync();
+        
+        // Clear image cache after seeding
+        ImageSeeder.ClearCache();
+    }
+
+    /// <summary>
+    /// Helper to get image data for seeding
+    /// </summary>
+    private static (byte[]? Data, string? ContentType) GetSeedImage(string logicalName, Dictionary<string, string> imageMapping)
+    {
+        if (_seedImagesPath == null)
+            return (null, null);
+
+        return ImageSeeder.GetImageByName(logicalName, imageMapping, _seedImagesPath);
     }
 
     private static async Task SeedCategoriesAsync(ContentDbContext context)
     {
-        if (await context.Categories.AnyAsync()) return;
+        if (await context.ProductCategories.AnyAsync()) return;
 
-        var categories = new List<Category>
+        // Get images for categories
+        var alphonsoImage = GetSeedImage("alphonso", ImageSeeder.CategoryImages);
+        var jaggeryImage = GetSeedImage("jaggery", ImageSeeder.CategoryImages);
+        var oilImage = GetSeedImage("oil", ImageSeeder.CategoryImages);
+
+        var categories = new List<ProductCategory>
         {
             new()
             {
@@ -42,7 +74,8 @@ public static class ContentDbSeeder
                 Slug = "alphonso",
                 Description = "Fresh, premium quality Alphonso mangoes - the king of mangoes. Sweet, juicy, and aromatic.",
                 Icon = "🥭",
-                ImageUrl = "/images/mangoes-carousel.png",
+                ImageData = alphonsoImage.Data,
+                ImageContentType = alphonsoImage.ContentType,
                 DisplayOrder = 1,
                 IsActive = true
             },
@@ -53,7 +86,8 @@ public static class ContentDbSeeder
                 Slug = "jaggery",
                 Description = "Pure, organic jaggery products made from sugarcane using traditional methods.",
                 Icon = "🍯",
-                ImageUrl = "/images/jaggery-carousel.png",
+                ImageData = jaggeryImage.Data,
+                ImageContentType = jaggeryImage.ContentType,
                 DisplayOrder = 2,
                 IsActive = true
             },
@@ -64,13 +98,14 @@ public static class ContentDbSeeder
                 Slug = "oil",
                 Description = "Pure, unrefined oils extracted using traditional cold-pressing methods. No chemicals, retains natural nutrients.",
                 Icon = "🛢️",
-                ImageUrl = "/images/cold-pressed-oil-carousel.png",
+                ImageData = oilImage.Data,
+                ImageContentType = oilImage.ContentType,
                 DisplayOrder = 3,
                 IsActive = true
             }
         };
 
-        await context.Categories.AddRangeAsync(categories);
+        await context.ProductCategories.AddRangeAsync(categories);
     }
 
     private static async Task SeedProductsAsync(ContentDbContext context)
@@ -80,6 +115,18 @@ public static class ContentDbSeeder
         var alphonsoCategoryId = Guid.Parse("00000000-0000-0000-0000-000000000001");
         var jaggeryCategoryId = Guid.Parse("00000000-0000-0000-0000-000000000002");
         var oilCategoryId = Guid.Parse("00000000-0000-0000-0000-000000000003");
+
+        // Get images for products
+        var mangoImage1 = GetSeedImage("premium-alphonso-mangoes", ImageSeeder.ProductImages);
+        var mangoImage2 = GetSeedImage("sun-premium-alphonso-mangoes", ImageSeeder.ProductImages);
+        var jaggeryBlockImage = GetSeedImage("organic-jaggery-block", ImageSeeder.ProductImages);
+        var jaggeryPowderImage = GetSeedImage("organic-jaggery-powder", ImageSeeder.ProductImages);
+        var sunflowerOilImage = GetSeedImage("cold-pressed-sunflower-oil", ImageSeeder.ProductImages);
+        var groundnutOilImage = GetSeedImage("cold-pressed-groundnut-oil", ImageSeeder.ProductImages);
+        var sesameOilImage = GetSeedImage("cold-pressed-sesame-oil", ImageSeeder.ProductImages);
+        var almondOilImage = GetSeedImage("cold-pressed-almond-oil", ImageSeeder.ProductImages);
+        var mustardOilImage = GetSeedImage("cold-pressed-mustard-oil", ImageSeeder.ProductImages);
+        var coconutOilImage = GetSeedImage("cold-pressed-coconut-oil", ImageSeeder.ProductImages);
 
         var products = new List<Product>
         {
@@ -91,8 +138,9 @@ public static class ContentDbSeeder
                 Slug = "premium-alphonso-mangoes",
                 FullDescription = "Fresh, premium quality Alphonso mangoes - the king of mangoes. Sweet, juicy, and aromatic.",
                 ShortDescription = "The king of mangoes with exceptional sweetness",
-                CategoryId = alphonsoCategoryId,
-                ImageUrl = "/images/mangoes-carousel.png",
+                ProductCategoryId = alphonsoCategoryId,
+                ImageData = mangoImage1.Data,
+                ImageContentType = mangoImage1.ContentType,
                 IsAvailable = true,
                 IsFeatured = true,
                 DisplayOrder = 1,
@@ -117,8 +165,9 @@ public static class ContentDbSeeder
                 Slug = "sun-premium-alphonso-mangoes",
                 FullDescription = "Premium sun-ripened Alphonso mangoes with exceptional sweetness and flavor. Perfect for gifting and special occasions.",
                 ShortDescription = "Premium sun-ripened mangoes for special occasions",
-                CategoryId = alphonsoCategoryId,
-                ImageUrl = "/images/mangoes-carousel-1.png",
+                ProductCategoryId = alphonsoCategoryId,
+                ImageData = mangoImage2.Data,
+                ImageContentType = mangoImage2.ContentType,
                 IsAvailable = true,
                 IsFeatured = false,
                 DisplayOrder = 2,
@@ -143,8 +192,9 @@ public static class ContentDbSeeder
                 Slug = "organic-jaggery-block",
                 FullDescription = "Traditional pure organic jaggery blocks (kolhapuri gul/gud) made from sugarcane. Natural sweetener with rich minerals.",
                 ShortDescription = "Traditional kolhapuri jaggery blocks",
-                CategoryId = jaggeryCategoryId,
-                ImageUrl = "/images/jaggery-carousel.png",
+                ProductCategoryId = jaggeryCategoryId,
+                ImageData = jaggeryBlockImage.Data,
+                ImageContentType = jaggeryBlockImage.ContentType,
                 IsAvailable = true,
                 IsFeatured = true,
                 DisplayOrder = 1,
@@ -167,8 +217,9 @@ public static class ContentDbSeeder
                 Slug = "organic-jaggery-powder",
                 FullDescription = "Fine organic jaggery powder for easy cooking and baking. Perfect for tea, desserts and daily use.",
                 ShortDescription = "Fine jaggery powder for cooking and baking",
-                CategoryId = jaggeryCategoryId,
-                ImageUrl = "/images/jaggery-powder-carousel.png",
+                ProductCategoryId = jaggeryCategoryId,
+                ImageData = jaggeryPowderImage.Data,
+                ImageContentType = jaggeryPowderImage.ContentType,
                 IsAvailable = true,
                 IsFeatured = false,
                 DisplayOrder = 2,
@@ -192,8 +243,9 @@ public static class ContentDbSeeder
                 Slug = "cold-pressed-sunflower-oil",
                 FullDescription = "Pure cold-pressed sunflower oil. Rich in Vitamin E and perfect for cooking.",
                 ShortDescription = "Rich in Vitamin E, perfect for daily cooking",
-                CategoryId = oilCategoryId,
-                ImageUrl = "/images/cold-pressed-oil-carousel.png",
+                ProductCategoryId = oilCategoryId,
+                ImageData = sunflowerOilImage.Data,
+                ImageContentType = sunflowerOilImage.ContentType,
                 IsAvailable = true,
                 IsFeatured = true,
                 DisplayOrder = 1,
@@ -218,8 +270,9 @@ public static class ContentDbSeeder
                 Slug = "cold-pressed-groundnut-oil",
                 FullDescription = "Pure cold-pressed groundnut (peanut) oil. Traditional method of extraction preserves nutrients.",
                 ShortDescription = "Traditional groundnut oil with rich flavor",
-                CategoryId = oilCategoryId,
-                ImageUrl = "/images/cold-pressed-oil-carousel.png",
+                ProductCategoryId = oilCategoryId,
+                ImageData = groundnutOilImage.Data,
+                ImageContentType = groundnutOilImage.ContentType,
                 IsAvailable = true,
                 IsFeatured = false,
                 DisplayOrder = 2,
@@ -243,8 +296,9 @@ public static class ContentDbSeeder
                 Slug = "cold-pressed-sesame-oil",
                 FullDescription = "Pure cold-pressed sesame oil. Perfect for cooking and ayurvedic treatments.",
                 ShortDescription = "Pure sesame oil for cooking and wellness",
-                CategoryId = oilCategoryId,
-                ImageUrl = "/images/cold-pressed-oil-carousel.png",
+                ProductCategoryId = oilCategoryId,
+                ImageData = sesameOilImage.Data,
+                ImageContentType = sesameOilImage.ContentType,
                 IsAvailable = true,
                 IsFeatured = false,
                 DisplayOrder = 3,
@@ -268,8 +322,9 @@ public static class ContentDbSeeder
                 Slug = "cold-pressed-almond-oil",
                 FullDescription = "Premium cold-pressed almond oil. Perfect for baby care and skin care.",
                 ShortDescription = "Premium almond oil for baby and skin care",
-                CategoryId = oilCategoryId,
-                ImageUrl = "/images/cold-pressed-oil-carousel.png",
+                ProductCategoryId = oilCategoryId,
+                ImageData = almondOilImage.Data,
+                ImageContentType = almondOilImage.ContentType,
                 IsAvailable = true,
                 IsFeatured = false,
                 DisplayOrder = 4,
@@ -294,8 +349,9 @@ public static class ContentDbSeeder
                 Slug = "cold-pressed-mustard-oil",
                 FullDescription = "Pure cold-pressed mustard oil. Traditional cooking oil with strong flavor, perfect for Indian cuisine.",
                 ShortDescription = "Traditional mustard oil for authentic Indian cooking",
-                CategoryId = oilCategoryId,
-                ImageUrl = "/images/cold-pressed-oil-carousel.png",
+                ProductCategoryId = oilCategoryId,
+                ImageData = mustardOilImage.Data,
+                ImageContentType = mustardOilImage.ContentType,
                 IsAvailable = true,
                 IsFeatured = false,
                 DisplayOrder = 5,
@@ -320,8 +376,9 @@ public static class ContentDbSeeder
                 Slug = "cold-pressed-coconut-oil",
                 FullDescription = "Premium cold-pressed virgin coconut oil. Perfect for cooking, hair care, and skin care.",
                 ShortDescription = "Multi-purpose virgin coconut oil",
-                CategoryId = oilCategoryId,
-                ImageUrl = "/images/cold-pressed-oil-carousel.png",
+                ProductCategoryId = oilCategoryId,
+                ImageData = coconutOilImage.Data,
+                ImageContentType = coconutOilImage.ContentType,
                 IsAvailable = true,
                 IsFeatured = false,
                 DisplayOrder = 6,
@@ -452,6 +509,11 @@ public static class ContentDbSeeder
     {
         if (await context.HeroSlides.AnyAsync()) return;
 
+        // Get images for hero slides
+        var alphonsoSlideImage = GetSeedImage("alphonso", ImageSeeder.HeroSlideImages);
+        var oilSlideImage = GetSeedImage("oil", ImageSeeder.HeroSlideImages);
+        var jaggerySlideImage = GetSeedImage("jaggery", ImageSeeder.HeroSlideImages);
+
         var heroSlides = new List<HeroSlide>
         {
             new()
@@ -461,9 +523,10 @@ public static class ContentDbSeeder
                 Subtitle = "AT YOUR DOORSTEP",
                 Description = "Experience the king of mangoes - authentic Ratnagiri Alphonso mangoes with unmatched sweetness and aroma.",
                 HighlightText = "KING OF MANGOES",
-                ImageUrl = "/images/mangoes-carousel.png",
                 CtaText = "SHOP NOW",
                 CtaLink = "/products/alphonso",
+                ImageData = alphonsoSlideImage.Data,
+                ImageContentType = alphonsoSlideImage.ContentType,
                 GradientStart = "#FF6B35",
                 GradientMiddle = "#FFAA00",
                 GradientEnd = "#FFE135",
@@ -484,9 +547,10 @@ public static class ContentDbSeeder
                 Subtitle = "AT YOUR DOORSTEP",
                 Description = "Pure, unrefined oils extracted in our cold-pressing facility using traditional methods. Available in coconut, sesame, groundnut, and mustard varieties.",
                 HighlightText = "100% PURE & NATURAL",
-                ImageUrl = "/images/cold-pressed-oil-carousel.png",
                 CtaText = "SHOP NOW",
                 CtaLink = "/products/oil",
+                ImageData = oilSlideImage.Data,
+                ImageContentType = oilSlideImage.ContentType,
                 GradientStart = "#228B22",
                 GradientMiddle = "#32CD32",
                 GradientEnd = "#90EE90",
@@ -507,9 +571,10 @@ public static class ContentDbSeeder
                 Subtitle = "AT YOUR DOORSTEP",
                 Description = "Pure, organic jaggery made from sugarcane in our processing facility using traditional methods. Rich in minerals and free from chemicals and artificial additives.",
                 HighlightText = "CHEMICAL-FREE SWEETNESS",
-                ImageUrl = "/images/jaggery-carousel.png",
                 CtaText = "SHOP NOW",
                 CtaLink = "/products/jaggery",
+                ImageData = jaggerySlideImage.Data,
+                ImageContentType = jaggerySlideImage.ContentType,
                 GradientStart = "#8B4513",
                 GradientMiddle = "#CD853F",
                 GradientEnd = "#DEB887",
@@ -618,6 +683,11 @@ public static class ContentDbSeeder
     {
         if (await context.CompanyStorySections.AnyAsync()) return;
 
+        // Get images for company story sections
+        var ourStoryImage = GetSeedImage("our_story", ImageSeeder.CompanyStoryImages);
+        var ourSpacesImage = GetSeedImage("our_spaces", ImageSeeder.CompanyStoryImages);
+        var ourProductsImage = GetSeedImage("our_products", ImageSeeder.CompanyStoryImages);
+
         var sections = new List<CompanyStorySection>
         {
             new()
@@ -625,6 +695,8 @@ public static class ContentDbSeeder
                 SectionKey = "our_story",
                 Title = "Our Story",
                 Icon = "📖",
+                ImageData = ourStoryImage.Data,
+                ImageContentType = ourStoryImage.ContentType,
                 DisplayOrder = 1,
                 IsActive = true,
                 Items = new List<CompanyStoryItem>
@@ -651,6 +723,8 @@ public static class ContentDbSeeder
                 SectionKey = "our_spaces",
                 Title = "Our Spaces",
                 Icon = "🏭",
+                ImageData = ourSpacesImage.Data,
+                ImageContentType = ourSpacesImage.ContentType,
                 DisplayOrder = 2,
                 IsActive = true,
                 Items = new List<CompanyStoryItem>
@@ -680,6 +754,8 @@ public static class ContentDbSeeder
                 SectionKey = "our_products",
                 Title = "Our Products",
                 Icon = "🌱",
+                ImageData = ourProductsImage.Data,
+                ImageContentType = ourProductsImage.ContentType,
                 DisplayOrder = 3,
                 IsActive = true,
                 Items = new List<CompanyStoryItem>

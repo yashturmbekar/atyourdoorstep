@@ -116,30 +116,25 @@ export const useLowStockProducts = (threshold: number = 10) => {
 /**
  * Admin Badge Counts Hook
  * Fetches counts for navigation badges (pending orders, low stock, etc.)
+ * Uses dashboard stats to avoid redundant API calls
  */
 export const useAdminBadgeCounts = () => {
   return useQuery({
     queryKey: adminQueryKeys.badgeCounts,
     queryFn: async () => {
-      // Only fetch products - orders API is not working properly
-      const productsRes = await productApi.getProducts(1, 100);
-
-      // Count low stock products
-      const lowStockCount = productsRes.data.filter(product =>
-        product.variants.some(
-          variant =>
-            variant.stockQuantity !== undefined && variant.stockQuantity < 10
-        )
-      ).length;
+      // Use the analytics API which is more efficient (pageSize=1 calls)
+      const statsResponse = await analyticsApi.getDashboardStats();
+      const stats = statsResponse.data;
 
       return {
-        pendingOrders: 0, // Orders API not available
-        lowStockProducts: lowStockCount,
-        totalProducts: productsRes.pagination.total,
+        pendingOrders: stats.pendingOrders || 0,
+        lowStockProducts: stats.lowStockProducts || 0,
+        totalProducts: stats.totalProducts || 0,
+        unreadContacts: 0, // Would need separate endpoint
       };
     },
-    staleTime: 30000,
-    refetchInterval: 60000,
+    staleTime: 60000, // 1 minute
+    refetchInterval: 120000, // 2 minutes
   });
 };
 

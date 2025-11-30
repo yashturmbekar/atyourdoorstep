@@ -135,7 +135,8 @@ export interface ProductVariantResponseDto {
 
 export interface ProductImageResponseDto {
   id: string;
-  url: string;
+  imageBase64?: string;
+  imageContentType?: string;
   altText?: string;
   isPrimary: boolean;
 }
@@ -148,6 +149,8 @@ export interface ProductResponseDto {
   fullDescription?: string;
   categoryId: string;
   categoryName?: string;
+  productCategoryId?: string;
+  productCategoryName?: string;
   basePrice: number;
   discountedPrice?: number;
   isFeatured: boolean;
@@ -156,7 +159,8 @@ export interface ProductResponseDto {
   seasonEnd?: string;
   metaTitle?: string;
   metaDescription?: string;
-  primaryImageUrl?: string;
+  primaryImageBase64?: string;
+  primaryImageContentType?: string;
   variants: ProductVariantResponseDto[];
   features: string[];
   images: ProductImageResponseDto[];
@@ -177,7 +181,13 @@ export interface CreateProductRequestDto {
   metaDescription?: string;
   features?: string[];
   variants?: Omit<ProductVariantResponseDto, 'id'>[];
-  images?: { url: string; altText?: string }[];
+  imageBase64?: string;
+  imageContentType?: string;
+  images?: {
+    imageBase64?: string;
+    imageContentType?: string;
+    altText?: string;
+  }[];
 }
 
 export interface UpdateProductRequestDto {
@@ -200,13 +210,14 @@ export interface UpdateProductRequestDto {
 // Order Service DTOs
 // ============================================
 
+// Backend OrderStatus: Pending=1, Confirmed=2, Processing=3, Shipped=4, Delivered=5, Cancelled=6, Refunded=7
 export const OrderStatus = {
-  Pending: 0,
-  Confirmed: 1,
-  Processing: 2,
-  Shipped: 3,
-  Delivered: 4,
-  Cancelled: 5,
+  Pending: 1,
+  Confirmed: 2,
+  Processing: 3,
+  Shipped: 4,
+  Delivered: 5,
+  Cancelled: 6,
 } as const;
 
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];

@@ -68,7 +68,6 @@ public class HeroSlidesController : ControllerBase
             Title = request.Title,
             Subtitle = request.Subtitle,
             Description = request.Description,
-            ImageUrl = request.ImageUrl,
             GradientStart = request.GradientStart,
             GradientEnd = request.GradientEnd,
             CtaText = request.CtaText,
@@ -81,6 +80,13 @@ public class HeroSlidesController : ControllerBase
                 DisplayOrder = i
             }).ToList() ?? new List<HeroSlideFeature>()
         };
+
+        // Handle image byte data
+        if (!string.IsNullOrEmpty(request.ImageBase64))
+        {
+            slide.ImageData = Convert.FromBase64String(request.ImageBase64);
+            slide.ImageContentType = request.ImageContentType;
+        }
 
         await _heroSlideRepository.AddAsync(slide, cancellationToken);
         await _heroSlideRepository.SaveChangesAsync(cancellationToken);
@@ -103,7 +109,6 @@ public class HeroSlidesController : ControllerBase
         slide.Title = request.Title;
         slide.Subtitle = request.Subtitle;
         slide.Description = request.Description;
-        slide.ImageUrl = request.ImageUrl;
         slide.GradientStart = request.GradientStart;
         slide.GradientEnd = request.GradientEnd;
         slide.CtaText = request.CtaText;
@@ -111,6 +116,19 @@ public class HeroSlidesController : ControllerBase
         slide.DisplayOrder = request.DisplayOrder;
         slide.IsActive = request.IsActive;
         slide.UpdatedAt = DateTime.UtcNow;
+
+        // Handle image byte data
+        if (!string.IsNullOrEmpty(request.ImageBase64))
+        {
+            slide.ImageData = Convert.FromBase64String(request.ImageBase64);
+            slide.ImageContentType = request.ImageContentType;
+        }
+        else if (request.ImageBase64 == string.Empty)
+        {
+            // Clear image if empty string is explicitly sent
+            slide.ImageData = null;
+            slide.ImageContentType = null;
+        }
 
         await _heroSlideRepository.UpdateAsync(slide, cancellationToken);
         await _heroSlideRepository.SaveChangesAsync(cancellationToken);
@@ -146,7 +164,8 @@ public class HeroSlidesController : ControllerBase
             Title = slide.Title,
             Subtitle = slide.Subtitle,
             Description = slide.Description,
-            ImageUrl = slide.ImageUrl,
+            ImageBase64 = slide.ImageData != null ? Convert.ToBase64String(slide.ImageData) : null,
+            ImageContentType = slide.ImageContentType,
             GradientStart = slide.GradientStart,
             GradientEnd = slide.GradientEnd,
             CtaText = slide.CtaText,

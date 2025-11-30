@@ -5,9 +5,18 @@
  */
 
 import React, { useState } from 'react';
+import { FiMail } from 'react-icons/fi';
 import { useContacts, useContactById } from '../../../hooks/useContent';
 import type { ContactQueryParams } from '../../../types/content.types';
+import { Breadcrumb, EmptyState } from '../ui';
 import './ContentManagement.css';
+
+// Breadcrumb items for navigation
+const breadcrumbItems = [
+  { label: 'Dashboard', href: '/admin' },
+  { label: 'Content', href: '/admin/content' },
+  { label: 'Contacts', href: '/admin/content/contacts' },
+];
 
 const statusColors: Record<string, string> = {
   pending: 'status-pending',
@@ -69,6 +78,11 @@ const ContactManagement: React.FC = () => {
   if (isLoading) {
     return (
       <div className="content-management">
+        <div className="page-header">
+          <Breadcrumb items={breadcrumbItems} />
+          <h1 className="page-title">Contact Submissions</h1>
+          <p className="page-subtitle">Loading contact submissions...</p>
+        </div>
         <div className="loading-state">Loading contact submissions...</div>
       </div>
     );
@@ -77,20 +91,27 @@ const ContactManagement: React.FC = () => {
   if (error) {
     return (
       <div className="content-management">
-        <div className="error-state">
-          Failed to load contact submissions. Please try again.
+        <div className="page-header">
+          <Breadcrumb items={breadcrumbItems} />
+          <h1 className="page-title">Contact Submissions</h1>
         </div>
+        <EmptyState
+          icon={<FiMail />}
+          title="Failed to load contact submissions"
+          description="There was an error loading the contact submissions. Please try again later."
+        />
       </div>
     );
   }
 
   return (
     <div className="content-management">
-      <div className="content-header">
-        <div>
-          <h1>Contact Submissions</h1>
-          <p>Manage and respond to customer inquiries</p>
-        </div>
+      <div className="page-header">
+        <Breadcrumb items={breadcrumbItems} />
+        <h1 className="page-title">Contact Submissions</h1>
+        <p className="page-subtitle">
+          Manage and respond to customer inquiries
+        </p>
       </div>
 
       {/* Filters */}

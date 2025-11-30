@@ -3,6 +3,7 @@ using System;
 using ContentService.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ContentService.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251129193901_AddImageByteData")]
+    partial class AddImageByteData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,6 +24,91 @@ namespace ContentService.Infrastructure.Persistence.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("ContentService.Domain.Entities.Category", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("description");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("integer")
+                        .HasColumnName("display_order");
+
+                    b.Property<string>("Icon")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("icon");
+
+                    b.Property<string>("ImageContentType")
+                        .HasColumnType("text")
+                        .HasColumnName("image_content_type");
+
+                    b.Property<byte[]>("ImageData")
+                        .HasColumnType("bytea")
+                        .HasColumnName("image_data");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("text")
+                        .HasColumnName("image_url");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_deleted");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
+
+                    b.Property<Guid?>("ParentId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("parent_id");
+
+                    b.Property<int>("ProductCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("product_count");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("slug");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("p_k_categories");
+
+                    b.HasIndex("ParentId")
+                        .HasDatabaseName("i_x_categories_parent_id");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.ToTable("categories");
+                });
 
             modelBuilder.Entity("ContentService.Domain.Entities.CompanyStoryItem", b =>
                 {
@@ -108,6 +196,10 @@ namespace ContentService.Infrastructure.Persistence.Migrations
                     b.Property<byte[]>("ImageData")
                         .HasColumnType("bytea")
                         .HasColumnName("image_data");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("text")
+                        .HasColumnName("image_url");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean")
@@ -427,6 +519,10 @@ namespace ContentService.Infrastructure.Persistence.Migrations
                         .HasColumnType("bytea")
                         .HasColumnName("image_data");
 
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("text")
+                        .HasColumnName("image_url");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean")
                         .HasColumnName("is_active");
@@ -568,6 +664,10 @@ namespace ContentService.Infrastructure.Persistence.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("base_price");
 
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("category_id");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -598,6 +698,10 @@ namespace ContentService.Infrastructure.Persistence.Migrations
                         .HasColumnType("bytea")
                         .HasColumnName("image_data");
 
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("text")
+                        .HasColumnName("image_url");
+
                     b.Property<bool>("IsAvailable")
                         .HasColumnType("boolean")
                         .HasColumnName("is_available");
@@ -625,10 +729,6 @@ namespace ContentService.Infrastructure.Persistence.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)")
                         .HasColumnName("name");
-
-                    b.Property<Guid>("ProductCategoryId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("product_category_id");
 
                     b.Property<string>("SeasonEnd")
                         .HasMaxLength(20)
@@ -667,94 +767,13 @@ namespace ContentService.Infrastructure.Persistence.Migrations
                     b.HasKey("Id")
                         .HasName("p_k_products");
 
-                    b.HasIndex("ProductCategoryId")
-                        .HasDatabaseName("i_x_products_product_category_id");
+                    b.HasIndex("CategoryId")
+                        .HasDatabaseName("i_x_products_category_id");
 
                     b.HasIndex("Slug")
                         .IsUnique();
 
                     b.ToTable("products");
-                });
-
-            modelBuilder.Entity("ContentService.Domain.Entities.ProductCategory", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("deleted_at");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("description");
-
-                    b.Property<int>("DisplayOrder")
-                        .HasColumnType("integer")
-                        .HasColumnName("display_order");
-
-                    b.Property<string>("Icon")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("icon");
-
-                    b.Property<string>("ImageContentType")
-                        .HasColumnType("text")
-                        .HasColumnName("image_content_type");
-
-                    b.Property<byte[]>("ImageData")
-                        .HasColumnType("bytea")
-                        .HasColumnName("image_data");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_active");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_deleted");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("name");
-
-                    b.Property<Guid?>("ParentId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("parent_id");
-
-                    b.Property<int>("ProductCount")
-                        .HasColumnType("integer")
-                        .HasColumnName("product_count");
-
-                    b.Property<string>("Slug")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("slug");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.HasKey("Id")
-                        .HasName("p_k_product_categories");
-
-                    b.HasIndex("ParentId")
-                        .HasDatabaseName("i_x_product_categories_parent_id");
-
-                    b.HasIndex("Slug")
-                        .IsUnique();
-
-                    b.ToTable("product_categories", (string)null);
                 });
 
             modelBuilder.Entity("ContentService.Domain.Entities.ProductFeature", b =>
@@ -850,6 +869,12 @@ namespace ContentService.Infrastructure.Persistence.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("url");
 
                     b.HasKey("Id")
                         .HasName("p_k_product_images");
@@ -1096,6 +1121,10 @@ namespace ContentService.Infrastructure.Persistence.Migrations
                         .HasColumnType("bytea")
                         .HasColumnName("customer_image_data");
 
+                    b.Property<string>("CustomerImageUrl")
+                        .HasColumnType("text")
+                        .HasColumnName("customer_image_url");
+
                     b.Property<string>("CustomerLocation")
                         .HasColumnType("text")
                         .HasColumnName("customer_location");
@@ -1207,6 +1236,17 @@ namespace ContentService.Infrastructure.Persistence.Migrations
                     b.ToTable("usp_items");
                 });
 
+            modelBuilder.Entity("ContentService.Domain.Entities.Category", b =>
+                {
+                    b.HasOne("ContentService.Domain.Entities.Category", "Parent")
+                        .WithMany("Children")
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("f_k_categories_categories_parent_id");
+
+                    b.Navigation("Parent");
+                });
+
             modelBuilder.Entity("ContentService.Domain.Entities.CompanyStoryItem", b =>
                 {
                     b.HasOne("ContentService.Domain.Entities.CompanyStorySection", "Section")
@@ -1244,25 +1284,14 @@ namespace ContentService.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("ContentService.Domain.Entities.Product", b =>
                 {
-                    b.HasOne("ContentService.Domain.Entities.ProductCategory", "ProductCategory")
+                    b.HasOne("ContentService.Domain.Entities.Category", "Category")
                         .WithMany("Products")
-                        .HasForeignKey("ProductCategoryId")
+                        .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
-                        .HasConstraintName("f_k_products__product_categories_product_category_id");
+                        .HasConstraintName("f_k_products_categories_category_id");
 
-                    b.Navigation("ProductCategory");
-                });
-
-            modelBuilder.Entity("ContentService.Domain.Entities.ProductCategory", b =>
-                {
-                    b.HasOne("ContentService.Domain.Entities.ProductCategory", "Parent")
-                        .WithMany("Children")
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("f_k_product_categories_product_categories_parent_id");
-
-                    b.Navigation("Parent");
+                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("ContentService.Domain.Entities.ProductFeature", b =>
@@ -1301,6 +1330,13 @@ namespace ContentService.Infrastructure.Persistence.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("ContentService.Domain.Entities.Category", b =>
+                {
+                    b.Navigation("Children");
+
+                    b.Navigation("Products");
+                });
+
             modelBuilder.Entity("ContentService.Domain.Entities.CompanyStorySection", b =>
                 {
                     b.Navigation("Items");
@@ -1318,13 +1354,6 @@ namespace ContentService.Infrastructure.Persistence.Migrations
                     b.Navigation("Images");
 
                     b.Navigation("Variants");
-                });
-
-            modelBuilder.Entity("ContentService.Domain.Entities.ProductCategory", b =>
-                {
-                    b.Navigation("Children");
-
-                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

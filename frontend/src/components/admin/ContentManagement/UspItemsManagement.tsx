@@ -5,6 +5,7 @@
  */
 
 import React, { useState } from 'react';
+import { FiStar } from 'react-icons/fi';
 import {
   useUspItems,
   useCreateUspItem,
@@ -16,7 +17,15 @@ import type {
   CreateUspItemRequestDto,
   UpdateUspItemRequestDto,
 } from '../../../types/content.types';
+import { Breadcrumb, EmptyState } from '../ui';
 import './ContentManagement.css';
+
+// Breadcrumb items for navigation
+const breadcrumbItems = [
+  { label: 'Dashboard', href: '/admin' },
+  { label: 'Content', href: '/admin/content' },
+  { label: 'USP Items', href: '/admin/content/usp-items' },
+];
 
 interface UspFormData {
   icon: string;
@@ -126,6 +135,11 @@ const UspItemsManagement: React.FC = () => {
   if (isLoading) {
     return (
       <div className="content-management">
+        <div className="page-header">
+          <Breadcrumb items={breadcrumbItems} />
+          <h1 className="page-title">USP Items Management</h1>
+          <p className="page-subtitle">Loading USP items...</p>
+        </div>
         <div className="loading-state">Loading USP items...</div>
       </div>
     );
@@ -134,20 +148,30 @@ const UspItemsManagement: React.FC = () => {
   if (error) {
     return (
       <div className="content-management">
-        <div className="error-state">
-          Failed to load USP items. Please try again.
+        <div className="page-header">
+          <Breadcrumb items={breadcrumbItems} />
+          <h1 className="page-title">USP Items Management</h1>
         </div>
+        <EmptyState
+          icon={<FiStar />}
+          title="Failed to load USP items"
+          description="There was an error loading the USP items. Please try again later."
+        />
       </div>
     );
   }
 
   return (
     <div className="content-management">
+      <div className="page-header">
+        <Breadcrumb items={breadcrumbItems} />
+        <h1 className="page-title">USP Items Management</h1>
+        <p className="page-subtitle">
+          Manage your Unique Selling Points displayed on the homepage
+        </p>
+      </div>
       <div className="content-header">
-        <div>
-          <h1>USP Items Management</h1>
-          <p>Manage your Unique Selling Points displayed on the homepage</p>
-        </div>
+        <div></div>
         <button className="btn-primary" onClick={() => handleOpenModal()}>
           Add USP Item
         </button>

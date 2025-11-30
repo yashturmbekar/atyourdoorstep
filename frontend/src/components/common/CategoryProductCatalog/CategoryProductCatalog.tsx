@@ -6,6 +6,7 @@ import {
   useFeaturedProducts,
 } from '../../../hooks/useContent';
 import { useCart } from '../../../hooks';
+import { getImageSrc } from '../../../utils';
 import './CategoryProductCatalog.css';
 
 // Fallback products when API is not available
@@ -93,12 +94,16 @@ export const CategoryProductCatalog: React.FC<CategoryProductCatalogProps> = ({
   const filteredProducts: Product[] = useMemo(() => {
     if (productsResponse?.data && productsResponse.data.length > 0) {
       return productsResponse.data
-        .filter(apiProduct => apiProduct.categorySlug === category)
+        .filter(apiProduct => apiProduct.productCategorySlug === category)
         .map(apiProduct => ({
           id: apiProduct.id,
           name: apiProduct.name,
-          category: apiProduct.categorySlug || category,
-          image: apiProduct.primaryImageUrl || '/images/placeholder.png',
+          category: apiProduct.productCategorySlug || category,
+          image:
+            getImageSrc(
+              apiProduct.primaryImageBase64,
+              apiProduct.primaryImageContentType
+            ) || '/images/placeholder.png',
           description:
             apiProduct.shortDescription || apiProduct.fullDescription || '',
           features: apiProduct.features || [],
