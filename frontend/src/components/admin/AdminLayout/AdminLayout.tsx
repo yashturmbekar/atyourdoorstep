@@ -102,8 +102,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             badge: badgeCounts?.lowStockProducts || undefined,
           },
           {
-            name: 'Categories',
-            href: '/admin/content/categories',
+            name: 'Product Categories',
+            href: '/admin/product-categories',
             icon: FiGrid,
           },
         ],

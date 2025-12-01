@@ -94,7 +94,7 @@ const AdminRoutes: React.FC = () => {
 
         {/* Content Management Routes */}
         <Route path="content" element={<AdminContentPage />} />
-        <Route path="content/categories" element={<AdminCategoriesPage />} />
+        <Route path="product-categories" element={<AdminCategoriesPage />} />
         <Route path="content/hero-slides" element={<AdminHeroSlidesPage />} />
         <Route
           path="content/testimonials"

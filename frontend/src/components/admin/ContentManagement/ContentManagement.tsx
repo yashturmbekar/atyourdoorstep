@@ -6,7 +6,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import {
-  FiGrid,
   FiImage,
   FiMessageSquare,
   FiTrendingUp,
@@ -28,13 +27,6 @@ interface ContentSection {
 
 const ContentManagement: React.FC = () => {
   const contentSections: ContentSection[] = [
-    {
-      id: 'categories',
-      title: 'Categories',
-      description: 'Manage product categories and subcategories',
-      icon: <FiGrid />,
-      link: '/admin/content/categories',
-    },
     {
       id: 'hero-slides',
       title: 'Hero Slides',

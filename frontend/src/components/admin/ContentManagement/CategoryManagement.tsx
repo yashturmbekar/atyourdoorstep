@@ -64,8 +64,7 @@ const initialFormData: CategoryFormData = {
 // Breadcrumb items for navigation
 const breadcrumbItems = [
   { label: 'Dashboard', href: '/admin' },
-  { label: 'Content', href: '/admin/content' },
-  { label: 'Categories', href: '/admin/content/categories' },
+  { label: 'Product Categories', href: '/admin/product-categories' },
 ];
 
 // Inner component that uses toast hook
@@ -277,9 +276,9 @@ const CategoryManagementContent: React.FC = () => {
           title="Error loading categories"
           description="There was an error loading the categories. Please try again later."
           action={
-            <Link to="/admin/content" className="btn btn-ghost">
+            <Link to="/admin/products" className="btn btn-ghost">
               <FiArrowLeft />
-              Back to Content
+              Back to Products
             </Link>
           }
         />

@@ -6,7 +6,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import {
-  FiGrid,
   FiImage,
   FiMessageSquare,
   FiTrendingUp,
@@ -17,7 +16,6 @@ import {
   FiInfo,
 } from 'react-icons/fi';
 import {
-  useCategories,
   useHeroSlides,
   useTestimonials,
   useStatistics,
@@ -37,8 +35,6 @@ interface ContentSection {
 
 const ContentDashboard: React.FC = () => {
   // Fetch counts for each section
-  const { data: categoriesData, isLoading: categoriesLoading } =
-    useCategories();
   const { data: heroSlidesData, isLoading: heroSlidesLoading } =
     useHeroSlides();
   const { data: testimonialsData, isLoading: testimonialsLoading } =
@@ -49,14 +45,6 @@ const ContentDashboard: React.FC = () => {
   const { data: uspData, isLoading: uspLoading } = useUspItems();
 
   const contentSections: ContentSection[] = [
-    {
-      title: 'Categories',
-      description: 'Manage product categories and subcategories',
-      icon: <FiGrid />,
-      path: '/admin/content/categories',
-      count: categoriesData?.data?.length,
-      isLoading: categoriesLoading,
-    },
     {
       title: 'Hero Slides',
       description: 'Configure homepage hero carousel slides',
@@ -172,35 +160,6 @@ const ContentDashboard: React.FC = () => {
             gap: '1rem',
           }}
         >
-          <div
-            style={{
-              padding: '1.25rem',
-              background: 'var(--color-card)',
-              border: '1px solid var(--color-border)',
-              borderRadius: '0.75rem',
-            }}
-          >
-            <div
-              style={{
-                fontSize: '0.75rem',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-                color: 'var(--color-text-light)',
-                marginBottom: '0.25rem',
-              }}
-            >
-              Total Categories
-            </div>
-            <div
-              style={{
-                fontSize: '2rem',
-                fontWeight: 700,
-                color: 'var(--color-primary)',
-              }}
-            >
-              {categoriesLoading ? '...' : categoriesData?.data?.length || 0}
-            </div>
-          </div>
           <div
             style={{
               padding: '1.25rem',

@@ -6,6 +6,60 @@
 
 ---
 
+## [2025-12-02] — Rename Categories to Product Categories & Move to Products Section
+
+### Status: Completed ✅
+
+**Objective:** Rename "Categories" to "Product Categories" in the admin panel sidebar, move it from "Content" section to "Products & Inventory" section, fix breadcrumb navigation, and ensure correct sidebar active state.
+
+**Changes Made:**
+
+1. **AdminLayout.tsx:**
+
+   - Renamed sidebar item from "Categories" to "Product Categories"
+   - Changed route from `/admin/content/categories` to `/admin/product-categories`
+   - Item remains in "Products & Inventory" section (was already there)
+
+2. **CategoryManagement.tsx:**
+
+   - Updated breadcrumb from `[Dashboard, Content, Categories]` to `[Dashboard, Product Categories]`
+   - Changed error state "Back to Content" link to "Back to Products" linking to `/admin/products`
+
+3. **ContentManagement.tsx:**
+
+   - Removed Categories section from the content management dashboard grid
+   - Removed unused `FiGrid` import
+
+4. **ContentDashboard.tsx:**
+
+   - Removed Categories from the content sections list
+   - Removed Categories from "Total Categories" stat card
+   - Removed unused `useCategories` hook and `FiGrid` import
+
+5. **App.tsx:**
+   - Changed route from `content/categories` to `product-categories`
+
+**Files Modified:**
+
+| File                                                                     | Changes                                                                       |
+| ------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| `frontend/src/components/admin/AdminLayout/AdminLayout.tsx`              | Renamed to "Product Categories", changed route to `/admin/product-categories` |
+| `frontend/src/components/admin/ContentManagement/CategoryManagement.tsx` | Updated breadcrumb, changed back link                                         |
+| `frontend/src/components/admin/ContentManagement/ContentManagement.tsx`  | Removed categories section from grid                                          |
+| `frontend/src/components/admin/ContentManagement/ContentDashboard.tsx`   | Removed categories section and stat card                                      |
+| `frontend/src/App.tsx`                                                   | Changed route from `content/categories` to `product-categories`               |
+
+**Build Status:** ✅ Frontend builds successfully
+
+**Result:**
+
+- "Product Categories" now appears in "Products & Inventory" section
+- Clicking "Product Categories" shows correct breadcrumb: `Dashboard > Product Categories`
+- "Products & Inventory" section is highlighted when on Product Categories page
+- Categories no longer appears in the "Site Content" section or Content Management dashboard
+
+---
+
 ## [2025-11-30] — Complete ImageUrl Removal (Upload Only)
 
 ### Status: Completed ✅
